@@ -14,9 +14,22 @@ export default function uploadFileComp() {
                 }
         };
 
+        const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
+                event.preventDefault();
+        };
+
+        const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
+                event.preventDefault();
+                const file = event.dataTransfer.files?.[0];
+                if (file) {
+                        setFileType(file.type);
+                        setFileName(file.name);
+                }
+        };
+
         return (
                 <div className="mx-auto mt-10 max-w-xl">
-                        <div className="rounded-lg border-4 border-dashed border-blue-200 p-12 text-center">
+                        <div className="rounded-lg border-4 border-dashed border-blue-200 p-12 text-center" onDragOver={handleDragOver} onDrop={handleDrop}>
                                 <FolderPlusIcon className="mx-auto mb-6 text-blue-500 text-8xl" />
                                 <div className="text-lg font-medium text-gray-400">Drop your image or pdf here</div>
                                 {fileName && <div className="text-lg font-medium text-gray-400 mt-4">{fileName}</div>}
