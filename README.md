@@ -1,24 +1,4 @@
-Miniconda required
 
-conda create env --name SOMETHING
-
-conda activate SOMETHING
-
-conda install yarn
-
-yarn create next-app
-- Name it something usefull like front    
-- Press enter all over
-
-conda install pip
-
-pip install fastapi 
-
-pip install "uvicorn[standard]"
-
-cd frontend   
-
-yarn dev
 
 ## Setting up Miniconda Environment
 
