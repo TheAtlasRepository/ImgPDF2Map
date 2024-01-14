@@ -2,6 +2,8 @@
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react';
 
+// This will be a component in the future
+
 export default function Page() {
     const router = useRouter();
 
