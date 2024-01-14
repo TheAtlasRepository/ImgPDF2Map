@@ -3,13 +3,13 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react';
 
 export default function uploadFileComp() {
-        const router = useRouter()
+        const router = useRouter()        
         const [fileType, setFileType] = useState('');
         const [fileName, setFileName] = useState('');
 
         const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
                 const file = event.target.files?.[0];
-                if (file) {
+                if (file && file.type === 'application/pdf') {
                         setFileType(file.type);
                         setFileName(file.name);
                         const reader = new FileReader();
@@ -18,6 +18,12 @@ export default function uploadFileComp() {
                                 localStorage.setItem('pdfData', URL.createObjectURL(blob));
                         };
                         reader.readAsArrayBuffer(file);
+
+                        // Delete previous PDF if it exists
+                        if (localStorage.getItem('pdfData')) {
+                                URL.revokeObjectURL(localStorage.getItem('pdfData')!);
+                                localStorage.removeItem('pdfData');
+                        }
 
                         //push to FullPagePDF
                         router.push('/FullPagePDF');
@@ -32,7 +38,7 @@ export default function uploadFileComp() {
         const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
                 event.preventDefault();
                 const file = event.dataTransfer.files?.[0];
-                if (file) {
+                if (file && file.type === 'application/pdf') {
                         setFileType(file.type);
                         setFileName(file.name);
                         const reader = new FileReader();
@@ -41,6 +47,12 @@ export default function uploadFileComp() {
                                 localStorage.setItem('pdfData', URL.createObjectURL(blob));
                         };
                         reader.readAsArrayBuffer(file);
+
+                        // Delete previous PDF if it exists
+                        if (localStorage.getItem('pdfData')) {
+                                URL.revokeObjectURL(localStorage.getItem('pdfData')!);
+                                localStorage.removeItem('pdfData');
+                        }
 
                         //push to FullPagePDF
                         router.push('/FullPagePDF');
