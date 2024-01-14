@@ -1,8 +1,9 @@
 import { Button } from '@windmill/react-ui'
-
+import { useRouter } from 'next/navigation'
 import { useState } from 'react';
 
 export default function uploadFileComp() {
+        const router = useRouter()
         const [fileType, setFileType] = useState('');
         const [fileName, setFileName] = useState('');
 
@@ -11,8 +12,18 @@ export default function uploadFileComp() {
                 if (file) {
                         setFileType(file.type);
                         setFileName(file.name);
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                                const blob = new Blob([reader.result as string], { type: file.type });
+                                localStorage.setItem('pdfData', URL.createObjectURL(blob));
+                        };
+                        reader.readAsArrayBuffer(file);
+
+                        //push to FullPagePDF
+                        router.push('/FullPagePDF');
                 }
         };
+        
 
         const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
                 event.preventDefault();
@@ -24,6 +35,15 @@ export default function uploadFileComp() {
                 if (file) {
                         setFileType(file.type);
                         setFileName(file.name);
+                        const reader = new FileReader();
+                        reader.onload = () => {
+                                const blob = new Blob([reader.result as string], { type: file.type });
+                                localStorage.setItem('pdfData', URL.createObjectURL(blob));
+                        };
+                        reader.readAsArrayBuffer(file);
+
+                        //push to FullPagePDF
+                        router.push('/FullPagePDF');
                 }
         };
 
