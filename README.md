@@ -25,6 +25,10 @@
 
     pip install "uvicorn[standard]"
 
+    yarn add next
+
     cd frontend
+
+    npx v0@latest init  
 
     yarn dev

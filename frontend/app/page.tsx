@@ -1,5 +1,5 @@
 'use client';
-import UploadFileComp from './components/uploadFile';
+import UploadFileComp from '../components/component/upload-file';
 
 export default function Home() {
   return (

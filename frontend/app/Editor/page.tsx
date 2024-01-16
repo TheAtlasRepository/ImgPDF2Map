@@ -1,6 +1,8 @@
 'use client';
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react';
+import Editor from '../../components/component/editor';
+import UploadFile from '../../components/component/upload-file';
 
 // This will be a component in the future
 
@@ -19,12 +21,8 @@ export default function Page() {
     }, []);
 
     return (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}>
-            {pdfData ? (
-                <embed src={pdfData} type="application/pdf" width="100%" height="100%" />
-            ) : (
-                <p>No PDF found.</p>
-            )}
-        </div>
+        <main>
+            {pdfData !== null ? <Editor /> : <UploadFile />}
+        </main>
     );
 }
