@@ -1,5 +1,5 @@
 import Map, { NavigationControl, GeolocateControl } from "react-map-gl";
-
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 export default function splitView() {
   
@@ -16,7 +16,7 @@ export default function splitView() {
           minZoom={3}
         >
           <GeolocateControl position="bottom-right" />
-          <NavigationControl position="bottom-right" />
+				  <NavigationControl position="bottom-right" />
         </Map>
       </div>
       <div className="w-1/2">
