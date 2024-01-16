@@ -1,6 +1,5 @@
-
-import { Button } from "@/components/ui/button"
-import { useRouter } from 'next/navigation'
+import { Button } from "@/components/ui/button";
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function uploadFile() {
@@ -11,7 +10,7 @@ export default function uploadFile() {
 
         const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
                 const file = event.target.files?.[0];
-                if (file && file.type === 'application/pdf') {
+                if (file && (file.type === 'application/pdf' || file.type.startsWith('image/'))) {
                         setFileType(file.type);
                         setFileName(file.name);
                         const reader = new FileReader();
@@ -40,7 +39,7 @@ export default function uploadFile() {
         const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
                 event.preventDefault();
                 const file = event.dataTransfer.files?.[0];
-                if (file && file.type === 'application/pdf') {
+                if (file && (file.type === 'application/pdf' || file.type.startsWith('image/'))) {
                         setFileType(file.type);
                         setFileName(file.name);
                         const reader = new FileReader();
@@ -68,8 +67,8 @@ export default function uploadFile() {
         <div className="text-lg font-medium text-gray-400">Drop your image or pdf here</div>
         {fileName && <div className="text-lg font-medium text-gray-400 mt-4">{fileName}</div>}
       </div>
-      <input type="file" accept=".pdf" onChange={handleFileChange} className="hidden" />
-      <Button onClick={() => document.querySelector('input')?.click()} className="mt-6 w-full bg-blue-600 text-white text-xl">Open a file</Button>
+      <input type="file" accept=".pdf, image/*" onChange={handleFileChange} className="hidden" />
+      <Button onClick={() => document.querySelector('input')?.click()} className="mt-6 w-full bg-blue-600 text-white text-xl" variant="blue">Open a file</Button>
     </div>
   )
 }

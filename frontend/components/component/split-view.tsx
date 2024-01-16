@@ -1,5 +1,7 @@
 import Map, { NavigationControl, GeolocateControl } from "react-map-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
+import 'react-image-crop/dist/ReactCrop.css'
+import ImageEdit from "./imageEdit";
 
 export default function splitView() {
   
@@ -19,18 +21,8 @@ export default function splitView() {
 				  <NavigationControl position="bottom-right" />
         </Map>
       </div>
-      <div className="w-1/2">
-        <img
-          alt="PDF"
-          className="h-full w-full object-cover"
-          height="100"
-          src="/placeholder.svg"
-          style={{
-            aspectRatio: "100/100",
-            objectFit: "cover",
-          }}
-          width="100"
-        />
+      <div className="w-1/2 flex justify-center items-center">
+        <ImageEdit src={localStorage.getItem('pdfData')!} editBool={true} />
       </div>
     </div>
   )

@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import SplitView from "./split-view";
+import ImageEdit from "./imageEdit";
 
 export default function Editor() {
   const [projectName, setProjectName] = useState(""); // Set initial value to an empty string
   const [isAutoSaved, setIsAutoSaved] = useState(false);
   const [isSideBySide, setIsSideBySide] = useState(false); // Add state for side by side toggle
+  const [isCrop, setIsCrop] = useState(false);
+
 
   const handleSave = () => {
     setIsAutoSaved(true);
@@ -15,6 +18,11 @@ export default function Editor() {
     setIsSideBySide(!isSideBySide); // Toggle the value of isSideBySide
     console.log(isSideBySide); // Log the value of isSideBySide
   };
+
+  const handleToggleCrop = () => {
+    setIsCrop(!isCrop); // Toggle the value of isSideBySide
+    console.log(isCrop); // Log the value of isSideBySide
+  }
 
   return (
     <div className="flex flex-col h-screen bg-white">
@@ -49,25 +57,21 @@ export default function Editor() {
             <TargetIcon className="text-gray-500" />
             <span>Coordinates</span>
           </Button>
-          <Button className="bg-gray-200" variant="secondary">
+          <Button
+            className={`${isCrop ? "bg-blue-500" : "bg-gray-800"}`}
+            variant="toggle"
+            onClick={handleToggleCrop} // Add onClick event handler
+          >
             <ScissorsIcon className="text-gray-500" />
-            <span>Clip</span>
+            Clip
           </Button>
         </div>
       </div>
       {isSideBySide ? <SplitView /> : <div className="flex flex-col items-center justify-center flex-1 bg-gray-100">
-        <div className="flex items-center justify-center w-full h-full">
-          <img
-            alt="PDF"
-            className="h-full w-full object-cover"
-            height="100"
-            src="/placeholder.svg"
-            style={{
-              aspectRatio: "100/100",
-              objectFit: "cover",
-            }}
-            width="100"
-          />
+        <div className="flex items-center justify-center w-full">
+            <div className="w-1/2 flex justify-center items-center">
+            <ImageEdit src={localStorage.getItem('pdfData')!} editBool={isCrop} />
+          </div>
         </div>
       </div>}
     </div>

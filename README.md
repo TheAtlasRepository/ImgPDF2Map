@@ -27,6 +27,8 @@
 
     yarn add next
 
+    yarn add react-image-crop
+
     yarn add mapbox-gl
 
     cd frontend
