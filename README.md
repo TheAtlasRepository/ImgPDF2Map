@@ -27,6 +27,8 @@
 
     yarn add next
 
+    yarn add mapbox-gl
+
     cd frontend
 
     npx v0@latest init  

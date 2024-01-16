@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import SplitView from "./split-view";
 
 export default function Editor() {
   const [projectName, setProjectName] = useState(""); // Set initial value to an empty string
@@ -32,9 +33,9 @@ export default function Editor() {
           Continue
         </Button>
       </div>
-      <div className="flex items-center justify-center p-4 pt-24">
+      <div className="absolute top-16 left-0 right-0 z-30 flex items-center justify-center p-4">
         <div className="flex items-center space-x-4">
-          <Button
+        <Button
             className={`${isSideBySide ? "bg-blue-500" : "bg-gray-800"}`}
             variant="toggle"
             onClick={handleToggleSideBySide} // Add onClick event handler
@@ -54,6 +55,21 @@ export default function Editor() {
           </Button>
         </div>
       </div>
+      {isSideBySide ? <SplitView /> : <div className="flex flex-col items-center justify-center flex-1 bg-gray-100">
+        <div className="flex items-center justify-center w-full h-full">
+          <img
+            alt="PDF"
+            className="h-full w-full object-cover"
+            height="100"
+            src="/placeholder.svg"
+            style={{
+              aspectRatio: "100/100",
+              objectFit: "cover",
+            }}
+            width="100"
+          />
+        </div>
+      </div>}
     </div>
   );
 }
