@@ -3,7 +3,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import 'react-image-crop/dist/ReactCrop.css'
 import ImageEdit from "./imageEdit";
 
-export default function splitView() {
+export default function SplitView() {
   
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 

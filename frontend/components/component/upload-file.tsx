@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-export default function uploadFile() {
+export default function UploadFile() {
 
   const router = useRouter()        
         const [fileType, setFileType] = useState('');
