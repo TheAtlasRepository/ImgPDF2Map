@@ -31,8 +31,14 @@
 
     yarn add mapbox-gl
 
+3. **To Run Frontend**
     cd frontend
 
     npx v0@latest init  
 
     yarn dev
+
+4. **To run Backend**
+   cd backend
+
+   uvicorn main:app --reload
