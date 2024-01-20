@@ -13,8 +13,8 @@ export default function ImageMap({ src }: { src: string }) {
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging) return;
-    const deltaX = event.clientX - dragStart.x;
-    const deltaY = event.clientY - dragStart.y;
+    const deltaX = (event.clientX - dragStart.x) * 0.5; //speed of drag
+    const deltaY = (event.clientY - dragStart.y) * 0.5; //speed of drag
     setPosition((prevPosition) => ({
       x: prevPosition.x + deltaX,
       y: prevPosition.y + deltaY,
@@ -24,14 +24,6 @@ export default function ImageMap({ src }: { src: string }) {
 
   const handleMouseUp = () => {
     setIsDragging(false);
-  };
-
-  const handleZoomIn = () => {
-    setZoomLevel((prevZoomLevel) => prevZoomLevel + 0.1);
-  };
-
-  const handleZoomOut = () => {
-    setZoomLevel((prevZoomLevel) => prevZoomLevel - 0.1);
   };
 
   const handleMouseWheel = (event: React.WheelEvent<HTMLDivElement>) => {
@@ -70,7 +62,8 @@ export default function ImageMap({ src }: { src: string }) {
           position: 'absolute',
           top: position.y,
           left: position.x,
-          transform: `scale(${zoomLevel})`,
+          transform: `translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
+          overflow: 'auto',
         }}
       >
         <img
@@ -78,10 +71,6 @@ export default function ImageMap({ src }: { src: string }) {
           alt="Image"
           onDragStart={(e) => e.preventDefault()}
         />
-      </div>
-      <div>
-        <button onClick={handleZoomIn}>Zoom In</button>
-        <button onClick={handleZoomOut}>Zoom Out</button>
       </div>
     </div>
   );
