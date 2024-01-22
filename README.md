@@ -6,6 +6,8 @@
    - Download and install Miniconda from [Miniconda website](https://docs.conda.io/en/latest/miniconda.html).
 
 2. **Create a Conda Environment:**
+   - Need to be in the directory you want to set the project up in!
+
    ```bash
     conda create --name YOUR_ENV_NAME
 
@@ -23,6 +25,20 @@
 
     pip install "uvicorn[standard]"
 
+    yarn add next
+
+    yarn add react-image-crop
+
+    yarn add mapbox-gl
+
+3. **To Run Frontend**
     cd frontend
 
+    npx v0@latest init  
+
     yarn dev
+
+4. **To run Backend**
+   cd backend
+
+   uvicorn main:app --reload
