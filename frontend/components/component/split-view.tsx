@@ -9,7 +9,7 @@ export default function SplitView() {
 
   return (
     <div className="flex h-screen">
-    <div className="w-1/2 relative">
+    <div className="w-1/2 relative" style={{ zIndex: 1}}>
       <Map
         mapboxAccessToken={mapboxToken}
         mapStyle="mapbox://styles/mapbox/streets-v12"

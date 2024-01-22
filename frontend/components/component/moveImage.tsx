@@ -35,11 +35,11 @@ export default function ImageMap({ src }: { src: string }) {
   useEffect(() => {
     const container = document.getElementById('image-container');
     if (container) {
-      container.addEventListener('wheel', handleMouseWheel);
+      container.addEventListener('wheel', handleMouseWheel as unknown as EventListener);
     }
     return () => {
       if (container) {
-        container.removeEventListener('wheel', handleMouseWheel);
+        container.removeEventListener('wheel', handleMouseWheel as unknown as EventListener);
       }
     };
   }, []);
