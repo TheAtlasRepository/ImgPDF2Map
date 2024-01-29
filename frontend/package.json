@@ -32,6 +32,7 @@
     "urql": "^4.0.6"
   },
   "devDependencies": {
+    "@types/mapbox__mapbox-gl-geocoder": "^4.7.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

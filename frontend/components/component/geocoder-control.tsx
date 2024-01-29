@@ -1,7 +1,7 @@
-import * as React from 'react';
 import {useState} from 'react';
 import {useControl, Marker, MarkerProps, ControlPosition} from 'react-map-gl';
 import MapboxGeocoder, {GeocoderOptions} from '@mapbox/mapbox-gl-geocoder';
+import "react-map-gl-geocoder/dist/mapbox-gl-geocoder.css";
 
 type GeocoderControlProps = Omit<GeocoderOptions, 'accessToken' | 'mapboxgl' | 'marker'> & {
   mapboxAccessToken: string;
@@ -9,15 +9,15 @@ type GeocoderControlProps = Omit<GeocoderOptions, 'accessToken' | 'mapboxgl' | '
 
   position: ControlPosition;
 
-  onLoading?: (e: object) => void;
-  onResults?: (e: object) => void;
-  onResult?: (e: object) => void;
-  onError?: (e: object) => void;
+  onLoading: (e: object) => void;
+  onResults: (e: object) => void;
+  onResult: (e: object) => void;
+  onError: (e: object) => void;
 };
 
 /* eslint-disable complexity,max-statements */
 export default function GeocoderControl(props: GeocoderControlProps) {
-  const [marker, setMarker] = useState(null);
+    const [marker, setMarker] = useState<JSX.Element | null>(null);;
 
   const geocoder = useControl<MapboxGeocoder>(
     () => {
@@ -29,16 +29,13 @@ export default function GeocoderControl(props: GeocoderControlProps) {
       ctrl.on('loading', props.onLoading);
       ctrl.on('results', props.onResults);
       ctrl.on('result', evt => {
-        props.onResult(evt);
-
-        const {result} = evt;
-        const location =
-          result &&
-          (result.center || (result.geometry?.type === 'Point' && result.geometry.coordinates));
-        if (location && props.marker) {
-          setMarker(<Marker {...props.marker} longitude={location[0]} latitude={location[1]} />);
-        } else {
-          setMarker(null);
+        if (props.onResult) {
+          props.onResult(evt);
+      
+          const { result } = evt;
+          const location =
+            result &&
+            (result.center || (result.geometry?.type === 'Point' && result.geometry.coordinates));
         }
       });
       ctrl.on('error', props.onError);
@@ -87,19 +84,6 @@ export default function GeocoderControl(props: GeocoderControlProps) {
     if (geocoder.getOrigin() !== props.origin && props.origin !== undefined) {
       geocoder.setOrigin(props.origin);
     }
-    // Types missing from @types/mapbox__mapbox-gl-geocoder
-    // if (geocoder.getAutocomplete() !== props.autocomplete && props.autocomplete !== undefined) {
-    //   geocoder.setAutocomplete(props.autocomplete);
-    // }
-    // if (geocoder.getFuzzyMatch() !== props.fuzzyMatch && props.fuzzyMatch !== undefined) {
-    //   geocoder.setFuzzyMatch(props.fuzzyMatch);
-    // }
-    // if (geocoder.getRouting() !== props.routing && props.routing !== undefined) {
-    //   geocoder.setRouting(props.routing);
-    // }
-    // if (geocoder.getWorldview() !== props.worldview && props.worldview !== undefined) {
-    //   geocoder.setWorldview(props.worldview);
-    // }
   }
   return marker;
 }
