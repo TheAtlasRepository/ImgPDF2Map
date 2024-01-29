@@ -1,5 +1,6 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
+from routers import georeferencing
 #TODO: import routers when they are created
 
 app = FastAPI()
@@ -20,6 +21,9 @@ app.add_middleware(
 )
 
 #todo: add routes to router
+
+#Goereferencing routes
+# router.include_router(georeferencing.router, tags=["georeferencing"], prefix="/georeferencing")
 
 # if __name__ == "__main__": run unicorn server
 if __name__ == "__main__":
