@@ -22,8 +22,14 @@ app.add_middleware(
 
 #todo: add routes to router
 
+#test route
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+
 #Goereferencing routes
-# router.include_router(georeferencing.router, tags=["georeferencing"], prefix="/georeferencing")
+app.router.include_router(georeferencing.router, prefix="/georef")
 
 # if __name__ == "__main__": run unicorn server
 if __name__ == "__main__":

@@ -1,5 +1,11 @@
 {
   "dependencies": {
     "next": "^14.1.0"
-  }
+  },
+  "name": "ImgPDF2Map",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/TheAtlasRepository/ImgPDF2Map.git",
+  "author": "Trivinyx <tom.a.s.myre@gmail.com>",
+  "license": "MIT"
 }
