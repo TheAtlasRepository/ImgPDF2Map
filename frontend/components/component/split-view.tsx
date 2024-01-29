@@ -2,10 +2,11 @@ import Map, { NavigationControl, GeolocateControl } from "react-map-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import 'react-image-crop/dist/ReactCrop.css'
 import ImageMap from "./moveImage";
+import GeocoderControl from "./geocoder-control";
 
 export default function SplitView() {
   
-  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
 
   return (
     <div className="flex h-screen">
@@ -19,6 +20,9 @@ export default function SplitView() {
       >
         <GeolocateControl position="bottom-right" />
         <NavigationControl position="bottom-right" />
+        <div className="absolute top-20">
+          <GeocoderControl mapboxAccessToken={mapboxToken} position="bottom-left"/>
+        </div>
       </Map>
     </div>
     <div className="w-1/2 flex inset-2 justify-center items-center h-full">
