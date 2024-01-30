@@ -1,4 +1,6 @@
+import { useRef } from "react";
 import {Map, NavigationControl, GeolocateControl } from "react-map-gl";
+import type { MapRef } from "react-map-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import 'react-image-crop/dist/ReactCrop.css'
 import ImageMap from "./moveImage";
@@ -8,10 +10,11 @@ import "allotment/dist/style.css";
 export default function SplitView() {
   
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+  const mapRef = useRef<MapRef>(null);
 
   return (
     <div className="h-screen">
-      <Allotment>
+      <Allotment onDragEnd={() => mapRef.current?.resize()}>
         <Allotment.Pane minSize={200}>
           <Map
             mapboxAccessToken={mapboxToken}
@@ -20,6 +23,7 @@ export default function SplitView() {
             maxZoom={20}
             minZoom={3}
             reuseMaps={true}
+            ref={mapRef}
           >
             <GeolocateControl position="bottom-right" />
             <NavigationControl position="bottom-right" />
