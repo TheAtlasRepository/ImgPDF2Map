@@ -1,6 +1,10 @@
 import requests
 from pdf2image import convert_from_path
 
+#TODO: return png image
+#TODO: intake blob for file upload
+#TODO: Convert correct pdf page to image
+
 def pdf2png(pdf_url, image_name, page_number):
     response = requests.get(pdf_url)
     with open('temp.pdf', 'wb') as f:

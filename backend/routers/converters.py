@@ -1,8 +1,10 @@
 # API router for file conversion
 
-from fastapi import APIRouter, File, UploadFile, Depends, HTTPException
+from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi.responses import FileResponse
+from modules import converter
 
-from ..modules import converter
+#from ..modules import converter
 
 router = APIRouter()
 
@@ -13,6 +15,7 @@ router = APIRouter()
 @router.post("/pdf2png")
 async def convert_pdf2png(file: UploadFile = File(...), page: int = 0):
     try:
-        return converter.pdf2png(file, page)
-    except:
-        raise HTTPException(status_code=500, detail="Error converting file")    
+        return converter.pdf2png(file, file.filename, page)
+    # Pass expeption message in HTTPException
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
