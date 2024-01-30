@@ -6,10 +6,11 @@ import 'react-image-crop/dist/ReactCrop.css'
 import ImageMap from "./moveImage";
 import { Allotment } from "allotment";
 import "allotment/dist/style.css";
+import GeocoderControl from "./geocoder-control";
 
 export default function SplitView() {
   
-  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || '';
   const mapRef = useRef<MapRef>(null);
 
   return (
@@ -27,6 +28,9 @@ export default function SplitView() {
           >
             <GeolocateControl position="bottom-right" />
             <NavigationControl position="bottom-right" />
+            <div className="absolute top-20">
+              <GeocoderControl mapboxAccessToken={mapboxToken} position="bottom-left"/>
+            </div>
           </Map>
         </Allotment.Pane>
         <Allotment.Pane minSize={200}>
