@@ -16,7 +16,7 @@ export default function SplitView() {
           <Map
             mapboxAccessToken={mapboxToken}
             mapStyle="mapbox://styles/mapbox/streets-v12"
-            initialViewState={{ latitude: 35.668641, longitude: 139.750567, zoom: 10 }}
+            initialViewState={{  }}
             maxZoom={20}
             minZoom={3}
             reuseMaps={true}
