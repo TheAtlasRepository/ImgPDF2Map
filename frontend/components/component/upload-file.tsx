@@ -1,16 +1,16 @@
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function UploadFile() {
 
-	const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+	const [errorMessage, setErrorMessage] = useState<string | null>(null); // Add state for error message
 	const router = useRouter()
 	const [fileType, setFileType] = useState('');
 	const [fileName, setFileName] = useState('');
 
+	// Handle file input change when user has used "Open a file"-button
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0];
 		if (file) {
@@ -18,11 +18,12 @@ export default function UploadFile() {
 		}
 	};
 
-
+	// Handle drag over
 	const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
 		event.preventDefault();
 	};
 
+	// Handle file drop
 	const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
 		event.preventDefault();
 		const file = event.dataTransfer.files?.[0];
@@ -31,11 +32,14 @@ export default function UploadFile() {
 		}
 	};
 
+	// Check if file type is supported
 	const checkFileType = (file: File) => {
 		if (file && (file.type === 'application/pdf' || file.type.startsWith('image/'))) {
 			setErrorMessage(null); // Clear any existing error message
 			setFileType(file.type);
 			setFileName(file.name);
+
+			// Read and save file to local storage
 			const reader = new FileReader();
 			reader.onload = () => {
 				const blob = new Blob([reader.result as string], { type: file.type });
@@ -51,6 +55,7 @@ export default function UploadFile() {
 
 			//push to Editor
 			router.push('/Editor');
+			
 		} else {
 			setErrorMessage('File type not supported.');
 		}
@@ -58,13 +63,17 @@ export default function UploadFile() {
 
 	return (
 		<div className="mx-auto mt-10 max-w-xl">
-			<div className="rounded-lg border-4 border-dashed border-blue-200 p-12 text-center" onDragOver={handleDragOver} onDrop={handleDrop}>
-				<FolderPlusIcon className="mx-auto mb-6 text-blue-500 text-8xl" />
-				<div className="text-lg font-medium text-gray-400">Drop your image or pdf here</div>
-				{fileName && <div className="text-lg font-medium text-gray-400 mt-4">{fileName}</div>}
+			<div onClick={() => document.querySelector('input')?.click()} className="cursor-pointer">
+				<div className="rounded-lg border-4 border-dashed border-blue-200 p-10 py-20 text-center" onDragOver={handleDragOver} onDrop={handleDrop}>
+					<FolderPlusIcon className="mx-auto mb-6 text-blue-500 text-8xl" />
+					<div className="text-lg font-medium text-gray-400">Open, or drop your <b>image or PDF</b> here</div>
+					{fileName && <div className="text-lg font-medium text-gray-400 mt-4">{fileName}</div>}
+				</div>
+
+				<input type="file" accept=".pdf, image/*" onChange={handleFileChange} className="hidden" />
+				<Button className="mt-6 w-full bg-blue-600 text-white text-xl" variant="blue">Open a file</Button>
 			</div>
-			<input type="file" accept=".pdf, image/*" onChange={handleFileChange} className="hidden" />
-			<Button onClick={() => document.querySelector('input')?.click()} className="mt-6 w-full bg-blue-600 text-white text-xl" variant="blue">Open a file</Button>
+			
 
 			{errorMessage &&
 				<Alert variant="destructive" className="mt-5">
@@ -74,14 +83,8 @@ export default function UploadFile() {
 					</AlertDescription>
 				</Alert>
 			}
-
-
 		</div>
 	)
-}
-
-function checkFileType(file: File) {
-
 }
 
 function FolderPlusIcon(props: any) {
