@@ -15,6 +15,7 @@
     "@radix-ui/react-slot": "^1.0.2",
     "@types/mapbox-gl": "^2.7.20",
     "@windmill/react-ui": "^0.6.0",
+    "allotment": "^1.20.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "lucide-react": "^0.309.0",

@@ -26,7 +26,7 @@ export default function Editor() {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gray-800 shadow-md">
+      <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-gray-800 shadow-md">
         <div className="items-center text-white">
           <input
             type="text"
