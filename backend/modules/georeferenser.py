@@ -1,8 +1,7 @@
 #potentially useful imports
 from geopandas import geopandas as gpd
 from rasterio import rasterio as rio
-from numpy import numpy as np
-from gdal import gdal as gdal
+from osgeo import gdal
 
 #imports of self-written models
 from .models import Point
@@ -11,11 +10,6 @@ from .models import Point
 #this function should take in a geotiff as a blob first, and then a list of points (Point model) m
 
 #This function should take in a geotiff as a blob first, and then a list of points (Point model) minimum 3 points, and then return the geotiff with the gcp points added to it.
-
-
-
-
-
 
 
 #function to add 3 or more gcp (ground control point) to image (gtiff as blob), inital triangulation
