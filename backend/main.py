@@ -28,7 +28,7 @@ async def root():
 
 # Mount all routers to app
 
-app.router.include_router(converters.router, prefix="/converter")
+app.router.include_router(converters.router, prefix="/converter", tags=["converter"])
 
 
 # if __name__ == "__main__": run unicorn server
