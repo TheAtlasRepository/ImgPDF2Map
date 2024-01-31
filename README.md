@@ -21,15 +21,7 @@
 
     conda install pip
 
-    pip install fastapi
-
-    pip install "uvicorn[standard]"
-
     yarn add next
-
-    yarn add react-image-crop
-
-    yarn add mapbox-gl
 
    ```
 
@@ -44,5 +36,7 @@
 
 4. **To run Backend**
    cd backend
+
+   pip install -r requirements.txt
 
    uvicorn main:app --reload
