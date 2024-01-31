@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 export default function ImageMap({ src }: { src: string }) {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [transform, setTransform] = useState({ x: 0, y: 0});
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -13,11 +13,11 @@ export default function ImageMap({ src }: { src: string }) {
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging) return;
-    const deltaX = (event.clientX - dragStart.x) * 0.5; //speed of drag
-    const deltaY = (event.clientY - dragStart.y) * 0.5; //speed of drag
-    setPosition((prevPosition) => ({
-      x: prevPosition.x + deltaX,
-      y: prevPosition.y + deltaY,
+    const deltaX = (event.clientX - dragStart.x);// speed of drag
+    const deltaY = (event.clientY - dragStart.y); // speed of drag
+    setTransform((prevTransform) => ({
+      x: prevTransform.x + deltaX,
+      y: prevTransform.y + deltaY,
     }));
     setDragStart({ x: event.clientX, y: event.clientY });
   };
@@ -60,9 +60,7 @@ export default function ImageMap({ src }: { src: string }) {
       <div
         style={{
           position: 'absolute',
-          top: position.y,
-          left: position.x,
-          transform: `translate(${position.x}px, ${position.y}px) scale(${zoomLevel})`,
+          transform: `translate(${transform.x}px, ${transform.y}px) scale(${zoomLevel})`,
           overflow: 'auto',
         }}
       >
