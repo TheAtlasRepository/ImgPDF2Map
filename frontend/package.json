@@ -9,13 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@mapbox/mapbox-gl-geocoder": "^5.0.2",
+    "@mapbox/search-js-react": "^1.0.0-beta.18",
     "@radix-ui/react-icons": "^1.3.0",
     "@radix-ui/react-slot": "^1.0.2",
+    "@types/mapbox-gl": "^2.7.20",
     "@windmill/react-ui": "^0.6.0",
+    "allotment": "^1.20.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "lucide-react": "^0.309.0",
-    "mapbox-gl": "^3.0.1",
+    "mapbox-gl": "^3.1.2",
     "next": "^14.1.0",
     "next-auth": "^4.24.5",
     "react": "^18",
@@ -23,11 +27,13 @@
     "react-icons": "^5.0.1",
     "react-image-crop": "^11.0.5",
     "react-map-gl": "^7.1.7",
+    "react-map-gl-geocoder": "^2.2.0",
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7",
     "urql": "^4.0.6"
   },
   "devDependencies": {
+    "@types/mapbox__mapbox-gl-geocoder": "^4.7.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
