@@ -33,7 +33,7 @@ export default function SplitView() {
             </div>
           </Map>
         </Allotment.Pane>
-        <Allotment.Pane minSize={200}>
+        <Allotment.Pane minSize={200} className="bg-gray-100">
           <ImageMap src={localStorage.getItem('pdfData')!} />
         </Allotment.Pane>
       </Allotment>
