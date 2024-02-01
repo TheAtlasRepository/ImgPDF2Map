@@ -47,25 +47,16 @@ async def pdf2png(file: UploadFile = File(...), page_number: int = 1):
 #known good formats: .bmp, .dds, .gif, .ico, .jpe, .jpeg, .jpg, .tiff, .cr2, .dng, .jfif, .nef, .webp
 @router.post('/image2png')
 async def image2png(file: UploadFile = File(...)):
+    # file types that PIL can't convert to png, but have image headers
+    unsupported_types = ['image/svg+xml', 'image/ERF', 'image/NRW', 'image/ORF', 'image/PEF', 'image/RAF', 'image/RW2']
+    
     #failsafe checks
     if not file.content_type.startswith('image/'):
         raise HTTPException(status_code=400, detail='File must be an image')
     if file.content_type == 'image/png':
         raise HTTPException(status_code=400, detail='File is already a .png file')
-    if file.content_type == 'image/svg+xml':
-        raise HTTPException(status_code=400, detail='File is an SVG file, which is not supported')
-    if file.content_type == 'image/ERF':
-        raise HTTPException(status_code=400, detail='File is an ERF file, which is not supported')
-    if file.content_type == 'image/NRW':
-        raise HTTPException(status_code=400, detail='File is an NRW file, which is not supported')
-    if file.content_type == 'image/ORF':
-        raise HTTPException(status_code=400, detail='File is an ORF file, which is not supported')
-    if file.content_type == 'image/PEF':
-        raise HTTPException(status_code=400, detail='File is an PEF file, which is not supported')
-    if file.content_type == 'image/RAF':
-        raise HTTPException(status_code=400, detail='File is an RAF file, which is not supported')
-    if file.content_type == 'image/RW2':
-        raise HTTPException(status_code=400, detail='File is an RW2 file, which is not supported')
+    if file.content_type in unsupported_types:
+        raise HTTPException(status_code=400, detail=f'File is a {file.content_type} file, which is not supported')
     
     #create a temporary file to store input image
     temp_image = tempfile.NamedTemporaryFile(delete=False)
