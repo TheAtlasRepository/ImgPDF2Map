@@ -4,3 +4,9 @@
 
 #import all from routers
 from routers import *
+
+#Package name is backend
+#This file is the entry point for the backend application
+
+from fastapi import FastAPI, APIRouter
+from routers import *

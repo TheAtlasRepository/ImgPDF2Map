@@ -1,7 +1,6 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from routers import georeferencing
-#TODO: import routers when they are created
+from routers import georeferencing ,converters
 
 app = FastAPI()
 router = APIRouter()
@@ -21,12 +20,15 @@ app.add_middleware(
 )
 
 #todo: add routes to router
-
-#test route
-@app.get("/")
+# Default test route
+@router.get("/")
 async def root():
     return {"message": "Hello World"}
 
+#adding the routers to the app
+
+#Converter routes
+app.router.include_router(converters.router, prefix="/converter", tags=["converter"])
 
 #Goereferencing routes
 app.router.include_router(georeferencing.router, prefix="/georef")
