@@ -1,0 +1,9 @@
+###### Requirements without Version Specifiers ######
+fastapi
+uvicorn[standard]
+geopandas
+rasterio
+python-multipart
+pdf2image
+
+###### Requirements with Version Specifiers ######

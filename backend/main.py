@@ -1,6 +1,7 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-#TODO: import routers when they are created
+# import all routers from routers module (folder)
+from routers import converters
 
 app = FastAPI()
 router = APIRouter()
@@ -20,6 +21,15 @@ app.add_middleware(
 )
 
 #todo: add routes to router
+# Default test route
+@router.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+# Mount all routers to app
+
+app.router.include_router(converters.router, prefix="/converter", tags=["converter"])
+
 
 # if __name__ == "__main__": run unicorn server
 if __name__ == "__main__":
