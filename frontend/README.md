@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Image/PDF 2 Map
+## Setting up project
+1. **Install Miniconda:**
+   Download and install Miniconda from [Miniconda website](https://docs.conda.io/en/latest/miniconda.html).
 
-## Getting Started
+2. **Create a Conda Environment:**
+   Need to be in the directory you want to set the project up in!
 
-First, run the development server:
+   ```bash
+    conda create --name YOUR_ENV_NAME
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+    conda activate YOUR_ENV_NAME
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+    conda install yarn
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+    conda install pip
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+    conda install -c conda-forge poppler
+   ```
 
-## Learn More
+3. **To run Backend**
+   ```bash
+   cd backend
 
-To learn more about Next.js, take a look at the following resources:
+   pip install -r requirements.txt
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   uvicorn main:app --reload
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+4. **Set up Mapbox API key**
+   In directory "frontend", create a file named `.env.local`.
+   Add and modify the following line:
+   ```bash
+   NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=*your Mapbox API key*
+   ```
 
-## Deploy on Vercel
+5. **To Run Frontend**
+   ```bash
+   cd frontend
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   yarn install
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+   yarn dev
+   ```
