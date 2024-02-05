@@ -7,6 +7,7 @@ export default function Editor() {
   const [projectName, setProjectName] = useState(""); // Set initial value to an empty string
   const [isAutoSaved, setIsAutoSaved] = useState(false);
   const [isSideBySide, setIsSideBySide] = useState(false); // Add state for side by side toggle
+  const [wasSideBySide, setWasSideBySide] = useState(false);
   const [isCrop, setIsCrop] = useState(false);
 
 
@@ -15,18 +16,28 @@ export default function Editor() {
   };
 
   const handleToggleSideBySide = () => {
-    setIsSideBySide(!isSideBySide); // Toggle the value of isSideBySide
-    console.log(isSideBySide); // Log the value of isSideBySide
+    if (!isCrop) {
+      setIsSideBySide(!isSideBySide); // Toggle the value of isSideBySide
+      console.log(isSideBySide); // Log the value of isSideBySide
+    }
   };
 
   const handleToggleCrop = () => {
-    setIsCrop(!isCrop); // Toggle the value of isSideBySide
+    if (!isCrop) {
+        setWasSideBySide(isSideBySide); // Save the current value of isSideBySide
+        setIsSideBySide(false); // Set isSideBySide to false when cropping is activated
+    } else {
+        setIsSideBySide(wasSideBySide); // Restore the value of isSideBySide when cropping is deactivated
+    }
+
+    setIsCrop((prevCrop) => !prevCrop); // Toggle the value of isCrop
+
     console.log(isCrop); // Log the value of isSideBySide
   }
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gray-800 shadow-md">
+      <div className="flex items-center justify-between p-4 bg-gray-800 shadow-md">
         <div className="items-center text-white">
           <input
             type="text"
@@ -37,14 +48,9 @@ export default function Editor() {
           />
           {isAutoSaved && <span className="text-sm text-gray-500">Auto saved</span>}
         </div>
-        <Button className="bg-gray-200" onClick={handleSave}>
-          Continue
-        </Button>
-      </div>
-      <div className="absolute top-16 left-0 right-0 z-30 flex items-center justify-center p-4">
         <div className="flex items-center space-x-4">
-        <Button
-            className={`${isSideBySide ? "bg-blue-500" : "bg-gray-800"}`}
+          <Button
+            className={`${isSideBySide ? "bg-blue-500" : "bg-blue-800"}`}
             variant="toggle"
             onClick={handleToggleSideBySide} // Add onClick event handler
           >
@@ -54,20 +60,23 @@ export default function Editor() {
             Overlay
           </Button>
           <Button className="bg-gray-200" variant="secondary">
-            <TargetIcon className="text-gray-500" />
-            <span>Coordinates</span>
+              <TargetIcon className="text-gray-500" />
+              <span>Coordinates</span>
           </Button>
           <Button
-            className={`${isCrop ? "bg-blue-500" : "bg-gray-800"}`}
+            className={`${isCrop ? "bg-blue-500" : "bg-gray-700"}`}
             variant="toggle"
             onClick={handleToggleCrop} // Add onClick event handler
           >
             <ScissorsIcon className="text-gray-500" />
-            Clip
+            Crop
           </Button>
         </div>
+        <Button className="bg-gray-200" onClick={handleSave}>
+          Continue
+        </Button>
       </div>
-      {isSideBySide ? <SplitView /> : <div className="flex flex-col items-center justify-center flex-1 bg-gray-100">
+      {isSideBySide ? <SplitView /> : <div className={`flex flex-col items-center justify-center flex-1 ${!isCrop ? "bg-gray-100" : "bg-gray-500"}`}>
         <div className="flex items-center justify-center w-full">
             <div className="w-1/2 flex justify-center items-center">
             <ImageEdit src={localStorage.getItem('pdfData')!} editBool={isCrop} />
