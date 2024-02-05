@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function UploadFile() {
 
@@ -9,6 +9,14 @@ export default function UploadFile() {
 	const router = useRouter()
 	const [fileType, setFileType] = useState('');
 	const [fileName, setFileName] = useState('');
+	const params = useSearchParams();
+
+
+	useEffect(() => {
+		if (params.get("e")) {
+			setErrorMessage(params.get("e") as string);
+		}
+	});
 
 	// Handle file input change when user has used "Open a file"-button
 	const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +51,10 @@ export default function UploadFile() {
 			const reader = new FileReader();
 			reader.onload = () => {
 				const blob = new Blob([reader.result as string], { type: file.type });
-				localStorage.setItem('pdfData', URL.createObjectURL(blob));
+				localStorage.setItem('pdfData', JSON.stringify({
+					url: URL.createObjectURL(blob),
+					type: blob.type
+				}));
 			};
 			reader.readAsArrayBuffer(file);
 
@@ -53,8 +64,8 @@ export default function UploadFile() {
 				localStorage.removeItem('pdfData');
 			}
 
-			//push to Editor
-			router.push('/Editor');
+			//Push to Conversion, where the file will be converted to PNG
+			router.push('/Conversion');
 			
 		} else {
 			setErrorMessage('File type not supported.');
