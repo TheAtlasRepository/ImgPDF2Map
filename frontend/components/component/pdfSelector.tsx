@@ -56,6 +56,7 @@ export default function PdfSelect() {
     console.error("Error loading PDF:", error);
     //log error message
     console.error(error.message);
+    router.push(`/?e=Error loading PDF: ${error.message}`);
   };
 
   return (

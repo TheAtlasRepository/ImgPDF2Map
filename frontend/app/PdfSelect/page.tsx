@@ -20,9 +20,7 @@ export default function Page() {
   }, []);
   return (
     <main>
-      <body className=" bg-white">
-        <PdfSelect />
-      </body>
+      <PdfSelect />
     </main>
   );
 }
