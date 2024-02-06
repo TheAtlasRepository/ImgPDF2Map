@@ -27,13 +27,6 @@ export default function PdfSelect() {
     setSelectedPage(1);
   };
 
-  // handle page selection
-  const handlePageSelection = (pageNumber: number) => {
-    setSelectedPage(pageNumber);
-    // perform logic for the selected page
-    console.log(`page ${pageNumber} selected for georeferecing`);
-  };
-
   function changePage(offset: number) {
     setSelectedPage((prevPageNumber) => prevPageNumber + offset);
   }
@@ -53,6 +46,32 @@ export default function PdfSelect() {
     console.error(error.message);
     router.push(`/?e=Error loading PDF: ${error.message}`);
   };
+
+  // handle page selection
+  const handlePageSelection = (pageNumber: number) => {
+    setSelectedPage(pageNumber);
+    // perform logic for the selected page
+    // selectPageForConversion(pageNumber);
+    console.log(`page ${pageNumber} selected for georeferecing`);
+  };
+
+  //TODO Check if this needs another function
+  async function selectPageForConversion(pageNumber: number) {
+    const response = await fetch("/pdf2png", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ page_number: pageNumber }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log(data);
+  }
 
   return (
     <div className="flex flex-col">
@@ -74,6 +93,15 @@ export default function PdfSelect() {
             pageNumber={selectedPage}
           />
         </Document>
+      </div>
+      <div className="flex justify-center">
+        <button
+          className="mt-4 w-full bg-blue-600 text-white mx-2"
+          type="button"
+          onClick={() => handlePageSelection(selectedPage)}
+        >
+          Select Page
+        </button>
       </div>
       <div>
         <p>
