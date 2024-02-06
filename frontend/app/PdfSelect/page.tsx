@@ -20,7 +20,9 @@ export default function Page() {
   }, []);
   return (
     <main>
-      <PdfSelect src={localStorage.getItem("pdfData")!} />
+      <body className=" bg-white">
+        <PdfSelect />
+      </body>
     </main>
   );
 }

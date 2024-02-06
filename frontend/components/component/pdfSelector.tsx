@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useRouter } from "next/navigation";
+import "react-pdf/dist/esm/Page/TextLayer.css";
 
 export default function PdfSelect() {
   const [numPages, setNumPages] = useState(0);
@@ -39,7 +40,7 @@ export default function PdfSelect() {
   };
 
   function changePage(offset: number) {
-    setNumPages((prevPageNumber) => prevPageNumber + offset);
+    setSelectedPage((prevPageNumber) => prevPageNumber + offset);
   }
 
   function previousPage() {
@@ -58,8 +59,8 @@ export default function PdfSelect() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
-      <div className="absolute top-0 left-0 right-0 z-50 flex items-center justify-center p-4 bg-gray-800 shadow-md">
+    <div className="flex flex-col">
+      <div className=" top-0 left-0 right-0 z-50 flex items-center justify-center p-4 bg-gray-800 shadow-md">
         <div className="items-center text-white">
           <h1>PDF Selector</h1>
           <p>Select which page you want to use from your PDF (max one page)</p>
@@ -71,29 +72,35 @@ export default function PdfSelect() {
           onLoadSuccess={onDocumentLoadSuccess}
           onLoadError={handlePdfError}
         >
-          <Page pageNumber={selectedPage} />
+          <Page
+            renderAnnotationLayer={false}
+            renderTextLayer={false}
+            pageNumber={selectedPage}
+          />
         </Document>
       </div>
       <div>
         <p>
           Page {selectedPage || (numPages ? 1 : "--")} of {numPages || "--"}
         </p>
-        <button
-          className="mt-6 w-full bg-blue-600 text-white "
-          type="button"
-          disabled={selectedPage <= 1}
-          onClick={previousPage}
-        >
-          Previous
-        </button>
-        <button
-          className="mt-6 w-full bg-blue-600 text-white "
-          type="button"
-          disabled={selectedPage >= numPages}
-          onClick={nextPage}
-        >
-          Next
-        </button>
+        <div className="flex justify-center mb-2">
+          <button
+            className="mt-4 w-full bg-blue-600 text-white mx-2"
+            type="button"
+            disabled={selectedPage <= 1}
+            onClick={previousPage}
+          >
+            Previous
+          </button>
+          <button
+            className="mt-4 w-full bg-blue-600 text-white mx-2 "
+            type="button"
+            disabled={selectedPage >= numPages}
+            onClick={nextPage}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
