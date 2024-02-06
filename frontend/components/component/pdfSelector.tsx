@@ -21,11 +21,6 @@ export default function PdfSelect() {
     }
   }, []);
 
-  //check if file is empty or not a pdf
-  // if (!file) {
-  //   router.push("/?e=No file selected or file not a PDF");
-  // }
-
   // handle PDF loading
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
