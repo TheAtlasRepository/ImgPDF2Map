@@ -1,23 +1,34 @@
-import { useState } from "react";
-import ReactDOM from "react-dom";
-import { PDFViewer } from "@react-pdf/renderer";
+import { useState, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import { useRouter } from "next/navigation";
 
-export default function PdfSelect({ src }: { src: string }) {
+export default function PdfSelect() {
   const [numPages, setNumPages] = useState(0);
   const [selectedPage, setSelectedPage] = useState(1);
+  const [file, setFile] = useState<File | null>(null);
   const router = useRouter();
 
-  // // check if source is empty or not a PDF
-  // if (!src || !src.includes(".pdf")) {
-  //   // redirect to main page
-  //   router.push("/");
+  // pdfworker needed for pdf.js
+  useEffect(() => {
+    pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+  }, []);
+
+  useEffect(() => {
+    const pdfData = JSON.parse(localStorage.getItem("pdfData") ?? "");
+    if (pdfData && pdfData.url) {
+      setFile(pdfData.url);
+    }
+  }, []);
+
+  //check if file is empty or not a pdf
+  // if (!file) {
+  //   router.push("/?e=No file selected or file not a PDF");
   // }
 
   // handle PDF loading
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
+    setSelectedPage(1);
   };
 
   // handle page selection
@@ -27,11 +38,23 @@ export default function PdfSelect({ src }: { src: string }) {
     console.log(`page ${pageNumber} selected for georeferecing`);
   };
 
+  function changePage(offset: number) {
+    setNumPages((prevPageNumber) => prevPageNumber + offset);
+  }
+
+  function previousPage() {
+    changePage(-1);
+  }
+
+  function nextPage() {
+    changePage(1);
+  }
+
   // handle PDF loading error
   const handlePdfError = (error: any) => {
     console.error("Error loading PDF:", error);
-    // redirect to main page or display an error message
-    router.push("/");
+    //log error message
+    console.error(error.message);
   };
 
   return (
@@ -42,25 +65,35 @@ export default function PdfSelect({ src }: { src: string }) {
           <p>Select which page you want to use from your PDF (max one page)</p>
         </div>
       </div>
-      <div>
-        {src && (
-          <Document file={src} onLoadSuccess={onDocumentLoadSuccess}>
-            {numPages}
-          </Document>
-        )}
+      <div className="flex items-center justify-center">
+        <Document
+          file={file}
+          onLoadSuccess={onDocumentLoadSuccess}
+          onLoadError={handlePdfError}
+        >
+          <Page pageNumber={selectedPage} />
+        </Document>
       </div>
-      <div className="">
-        {Array.from(new Array(numPages), (_, index) => index + 1).map(
-          (pageNumber) => (
-            <button
-              key={pageNumber}
-              onClick={() => handlePageSelection(pageNumber)}
-              disabled={pageNumber === selectedPage}
-            >
-              Page {pageNumber}
-            </button>
-          )
-        )}
+      <div>
+        <p>
+          Page {selectedPage || (numPages ? 1 : "--")} of {numPages || "--"}
+        </p>
+        <button
+          className="mt-6 w-full bg-blue-600 text-white "
+          type="button"
+          disabled={selectedPage <= 1}
+          onClick={previousPage}
+        >
+          Previous
+        </button>
+        <button
+          className="mt-6 w-full bg-blue-600 text-white "
+          type="button"
+          disabled={selectedPage >= numPages}
+          onClick={nextPage}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
