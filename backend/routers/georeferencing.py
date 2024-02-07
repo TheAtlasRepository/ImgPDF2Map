@@ -1,8 +1,9 @@
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException
+from fastapi.responses import FileResponse
 from modules.georeferenser import georeferencer
 from modules.models import *
 from typing import List
-
+from typing_extensions import Annotated
 from localrepository import Projects
 
 #Router handles all requests to the georeferencing API/ depending on the singelton repository of app in main.py
@@ -45,6 +46,10 @@ async def updateProject(projectId: int):
 async def deleteProject(projectId: int):
     #try to find the project by id and delete it
     try:
+        #find the project by id
+        project = Repo.getProject(projectId)
+        #run the delete method of the project
+        project.delete()
         Repo.removeProject(projectId)
         return {"id": projectId}
     except Exception as e:
@@ -148,9 +153,36 @@ async def getPoint(projectId: int, pointId: int):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-#route to upload an image
+#route to upload an image /specify only accept png
 @router.post("/{projectId}/image")
-async def uploadImage(projectId: int, image: UploadFile = File(...)):
-    #todo: find project by id and upload image, give the path to project, return success
-    #tempreturn not implemented
-    return {"id": projectId}
+async def uploadImage(projectId: int, file: UploadFile):
+    #try to find the project by id and upload an image
+    try:
+        #check if the file is a png
+        if file.content_type != "image/png":
+            raise HTTPException(status_code=415, detail="Only png files are accepted")
+        project = Repo.getProject(projectId)
+        #save the image to the project
+        with open(project.imageFilePath, "wb") as buffer:
+            buffer.write(file.file.read())
+        return {"id": projectId}
+    except Exception as e:
+        if e.status_code == 415:
+            raise e
+        else:
+            raise HTTPException(status_code=404, detail=str(e))
+
+#route to get the image of a project
+@router.get("/{projectId}/image")
+async def getImage(projectId: int):
+    #try to find the project by id and return the image
+    try:
+        project = Repo.getProject(projectId)
+        #get the temporary file path of the image
+        imageFilePath = project.imageFilePath
+        #find the media type of the image
+        mediaType = "image/png"
+        return FileResponse(imageFilePath, media_type=mediaType)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+#

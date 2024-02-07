@@ -30,5 +30,30 @@ class Project(BaseModel):
     selfdestructtime: Union[str, None] = None
     created: Union[str, None] = None
     lastModified: Union[str, None] = None
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.points = pointList(points=[])
+        self.imageFilePath = tempfile.NamedTemporaryFile().name
+        self.georeferencedFilePath = tempfile.NamedTemporaryFile().name
+        self.selfdestructtime = "never"
+        self.created = "never"
+        self.lastModified = "never"
+        self.crs = "EPSG:4326"
+    
+    def delete(self):
+        import os
+        os.remove(self.imageFilePath)
+        os.remove(self.georeferencedFilePath)
+        self.imageFilePath = None
+        self.georeferencedFilePath = None
+        self.selfdestructtime = None
+        self.created = None
+        self.lastModified = None
+        self.crs = None
+        self.points = None
+        self.description = None
+        self.name = None
+        self.id = None
+    
 
 
