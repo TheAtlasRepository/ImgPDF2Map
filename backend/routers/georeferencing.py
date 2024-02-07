@@ -185,4 +185,22 @@ async def getImage(projectId: int):
         return FileResponse(imageFilePath, media_type=mediaType)
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
-#
+
+#route to georeference the image of a project
+@router.get("/{projectId}/georef")
+async def georefImage(projectId: int):
+    #try to find the project by id and georeference the image
+    try:
+        project = Repo.getProject(projectId)
+        #get the temporary file path of the image
+        imageFilePath = project.imageFilePath
+        #get the points of the project
+        points = project.points.points
+        #georeference the image
+        georeferencedImage = georeferencer(imageFilePath, points)
+        #save the georeferenced image to the project
+        georeferencedImageFilePath = project.georeferencedFilePath
+        georeferencedImage.write(georeferencedImageFilePath)
+        return FileResponse(georeferencedImageFilePath, media_type="image/tiff")
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
