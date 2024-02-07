@@ -82,5 +82,3 @@ if %errorlevel% equ 0 (
 ) else (
     goto loop
 )
-
-```
