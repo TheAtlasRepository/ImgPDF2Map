@@ -1,36 +1,79 @@
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException
-from modules.georeferenser import add_gcp
-from modules.models import Point
+from modules.georeferenser import georeferencer
+from modules.models import *
+from typing import List
 #Router handles all requests to the georeferencing API
 router = APIRouter()
 
-#path: eks http://localhost:8000/georef
-@router.get("/", tags=["georeferencing"])
-async def root():
-    return {"message": "Hello World"}
 
-#route for georeferncing the gtiff uses the add_gcp function from georeferencer.py
-#function parameters: image: bytes, points: list[Point]
-@router.post("/", tags=["georeferencing"])
-async def georeference(file: UploadFile = File(...), points: list[Point] = Form(...)):
-    #check if file is a geotiff
-    if file.content_type != "image/tiff":
-        raise HTTPException(status_code=400, detail="File is not a geotiff")
-    #check if points is a list
-    if not isinstance(points, list):
-        raise HTTPException(status_code=400, detail="Points is not a list")
-    #check if points is a list of Point models
-    if not all(isinstance(point, Point) for point in points):
-        raise HTTPException(status_code=400, detail="Points is not a list of Point models")
-    #add gcp to image
-    gdf = add_gcp(file.file, points)
-    #check if gdf is None
-    if gdf is None:
-        raise HTTPException(status_code=400, detail="Not enough points")
-    #return as gtiff file
-    return gdf.to_file("georeferenced.tif", driver="GTiff")
+#GeorefProject path: /georef/project
+#route to create and or get georef a project id
+@router.post("/")
+async def georefProject(project: Project):
+    #todo: create a new project and return the id
+    #tempreturn not implemented
+    return {"id": 1}
 
-#path: eks http://localhost:8000/georef/1
-@router.get("/{id}", tags=["georeferencing"])
-async def get_point(id: int):
-    return {"message": "Hello World"}
+#route update project details
+@router.put("/{projectId}")
+async def updateProject(projectId: int):
+    #todo: find project by id and update it
+    #tempreturn not implemented
+    return {"id": projectId}
+
+#route to delete a project
+@router.delete("/{projectId}")
+async def deleteProject(projectId: int):
+    #todo: find project by id and delete it
+    #tempreturn not implemented
+    return {"id": projectId}
+
+#route to get a project by id
+@router.get("/{projectId}")
+async def getProject(projectId: int):
+    #todo: find project by id and return it
+    #tempreturn not implemented
+    return {"id": projectId}
+
+
+#route to add a point to a project
+@router.post("/{projectId}/point")
+async def addPoint(projectId: int, point: Point):
+    #todo: find project by id and add point to it's list of points
+    #tempreturn not implemented
+    return {"id": projectId}
+
+#route to update a point
+@router.put("/{projectId}/point/{pointId}")
+async def updatePoint(projectId: int, pointId: int, point: Point):
+    #todo: find project by id and update point by id
+    #tempreturn not implemented
+    return {"id": projectId}
+
+#route to delete a point
+@router.delete("/{projectId}/point/{pointId}")
+async def deletePoint(projectId: int, pointId: int):
+    #todo: find project by id and delete point by id
+    #tempreturn not implemented
+    return {"id": projectId}
+
+#route to get all points of a project
+@router.get("/{projectId}/point")
+async def getPoints(projectId: int):
+    #todo: find project by id and return all points
+    #tempreturn not implemented
+    return {"id": projectId}
+
+#route to get a point by id
+@router.get("/{projectId}/point/{pointId}")
+async def getPoint(projectId: int, pointId: int):
+    #todo: find project by id and return point by id
+    #tempreturn not implemented
+    return {"id": projectId}
+
+#route to upload an image
+@router.post("/{projectId}/image")
+async def uploadImage(projectId: int, image: UploadFile = File(...)):
+    #todo: find project by id and upload image, give the path to project, return success
+    #tempreturn not implemented
+    return {"id": projectId}

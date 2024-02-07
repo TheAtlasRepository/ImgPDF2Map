@@ -31,7 +31,7 @@ async def root():
 app.router.include_router(converters.router, prefix="/converter", tags=["converter"])
 
 #Goereferencing routes
-app.router.include_router(georeferencing.router, prefix="/georef")
+app.router.include_router(georeferencing.router, prefix="/project", tags=["georeferencing"])
 
 # if __name__ == "__main__": run unicorn server
 if __name__ == "__main__":
