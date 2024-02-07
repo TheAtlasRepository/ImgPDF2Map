@@ -1,2 +1,2 @@
 # FILEPATH: /c:/Users/tymyt/Desktop/Repos/ImgPDF2Map/backend/routers/__init__.py
-from .georeferencing import *
+from .georeferencing import router

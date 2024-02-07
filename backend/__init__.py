@@ -10,3 +10,6 @@ from routers import *
 
 from fastapi import FastAPI, APIRouter
 from routers import *
+from localrepository import *
+from modules import *
+

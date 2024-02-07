@@ -23,7 +23,8 @@ app.add_middleware(
 # Default test route
 @router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    #redirect to the documentation
+    return {"message": "Welcome to the georeferencing API. Please refer to the documentation for more information. at /docs or /redoc"}
 
 #adding the routers to the app
 
@@ -31,7 +32,7 @@ async def root():
 app.router.include_router(converters.router, prefix="/converter", tags=["converter"])
 
 #Goereferencing routes
-app.router.include_router(georeferencing.router, prefix="/project", tags=["georeferencing"])
+app.router.include_router(georeferencing.router)
 
 # if __name__ == "__main__": run unicorn server
 if __name__ == "__main__":

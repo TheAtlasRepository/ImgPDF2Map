@@ -20,7 +20,7 @@ class pointList(BaseModel):
 
 
 class Project(BaseModel):
-    id: int
+    id: int = None
     name: str
     description: Optional[str] = None
     points: Union[pointList, None] = None
