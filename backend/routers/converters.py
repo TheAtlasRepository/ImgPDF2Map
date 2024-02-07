@@ -18,11 +18,11 @@ router = APIRouter()
 async def pdf2png(file: UploadFile = File(...), page_number: int = 1):
     #failsafe checks
     if file.content_type != 'application/pdf':
-        raise HTTPException(status_code=400, detail='File must be a .pdf file')
+        raise HTTPException(status_code=415, detail='File must be a .pdf file')
     if page_number < 0:
-        raise HTTPException(status_code=400, detail='Page number must be greater than 0')
+        raise HTTPException(status_code=403, detail='Page number must be greater than 0')
     if page_number > 100:
-        raise HTTPException(status_code=400, detail='Page number must be less than 100')
+        raise HTTPException(status_code=413, detail='Page number must be less than 100')
     
     #create temporary file to store pdf
     temp_pdf = tempfile.NamedTemporaryFile(delete=False)
@@ -52,11 +52,11 @@ async def image2png(file: UploadFile = File(...)):
     
     #failsafe checks
     if not file.content_type.startswith('image/'):
-        raise HTTPException(status_code=400, detail='File must be an image')
+        raise HTTPException(status_code=415, detail='File must be an image')
     if file.content_type == 'image/png':
-        raise HTTPException(status_code=400, detail='File is already a .png file')
+        raise HTTPException(status_code=403, detail='File is already a .png file')
     if file.content_type in unsupported_types:
-        raise HTTPException(status_code=400, detail=f'File is a {file.content_type} file, which is not supported')
+        raise HTTPException(status_code=415, detail=f'File is a {file.content_type} file, which is not supported')
     
     #create a temporary file to store input image
     temp_image = tempfile.NamedTemporaryFile(delete=False)
