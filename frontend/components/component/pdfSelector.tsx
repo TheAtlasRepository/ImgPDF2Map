@@ -51,26 +51,13 @@ export default function PdfSelect() {
   const handlePageSelection = (pageNumber: number) => {
     setSelectedPage(pageNumber);
     // perform logic for the selected page
-    // selectPageForConversion(pageNumber);
+    selectPageForConversion(pageNumber);
     console.log(`page ${pageNumber} selected for georeferecing`);
   };
 
   //TODO Check if this needs another function
   async function selectPageForConversion(pageNumber: number) {
-    const response = await fetch("/pdf2png", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ page_number: pageNumber }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    console.log(data);
+    router.push(`/Conversion?pageNumber=${pageNumber}`);
   }
 
   return (
@@ -81,49 +68,51 @@ export default function PdfSelect() {
           <p>Select which page you want to use from your PDF (max one page)</p>
         </div>
       </div>
-      <div className="flex items-center justify-center">
-        <Document
-          file={file}
-          onLoadSuccess={onDocumentLoadSuccess}
-          onLoadError={handlePdfError}
-        >
-          <Page
-            renderAnnotationLayer={false}
-            renderTextLayer={false}
-            pageNumber={selectedPage}
-          />
-        </Document>
-      </div>
-      <div className="flex justify-center">
-        <button
-          className="mt-4 w-full bg-blue-600 text-white mx-2"
-          type="button"
-          onClick={() => handlePageSelection(selectedPage)}
-        >
-          Select Page
-        </button>
-      </div>
       <div>
-        <p>
-          Page {selectedPage || (numPages ? 1 : "--")} of {numPages || "--"}
-        </p>
-        <div className="flex justify-center mb-2">
+        <div className="flex justify-center">
           <button
             className="mt-4 w-full bg-blue-600 text-white mx-2"
             type="button"
-            disabled={selectedPage <= 1}
-            onClick={previousPage}
+            onClick={() => handlePageSelection(selectedPage)}
           >
-            Previous
+            Select Page
           </button>
-          <button
-            className="mt-4 w-full bg-blue-600 text-white mx-2 "
-            type="button"
-            disabled={selectedPage >= numPages}
-            onClick={nextPage}
-          >
-            Next
-          </button>
+        </div>
+        <div>
+          <p className="flex justify-center">
+            Page {selectedPage || (numPages ? 1 : "--")} of {numPages || "--"}
+          </p>
+          <div className="flex justify-center mb-2">
+            <button
+              className="mt-4 w-full bg-blue-600 text-white mx-2"
+              type="button"
+              disabled={selectedPage <= 1}
+              onClick={previousPage}
+            >
+              Previous
+            </button>
+            <button
+              className="mt-4 w-full bg-blue-600 text-white mx-2"
+              type="button"
+              disabled={selectedPage >= numPages}
+              onClick={nextPage}
+            >
+              Next
+            </button>
+          </div>
+          <div className="flex items-center justify-center">
+            <Document
+              file={file}
+              onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={handlePdfError}
+            >
+              <Page
+                renderAnnotationLayer={false}
+                // renderTextLayer={false}
+                pageNumber={selectedPage}
+              />
+            </Document>
+          </div>
         </div>
       </div>
     </div>
