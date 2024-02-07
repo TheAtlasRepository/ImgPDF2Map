@@ -1,15 +1,16 @@
 @echo off
 
 ::Place this file in the root folder of the project
-::Change the following paths to match your local installation
-::Remember to change the pahs at the bottom of the file as well
 
-::Check if conda is system installation or user installation
 
 set condapath=C:\%homepath%\miniconda3\Scripts\activate.bat
 set envname=ImgPDF2Map
 set repopath=.
 
+type boot_utilities\logo.txt
+echo:
+
+rem Check if conda is system installation or user installation
 if exist %condapath% (
     echo Conda found in user directory
 ) else if exist C:\programdata\miniconda3 (
@@ -25,13 +26,17 @@ if not exist %repopath%\frontend (
     echo Frontend folder not found
     exit /b
 )
+if not exist %repopath%\backend (
+    echo Backend folder not found
+    exit /b
+)
 
 rem Check if .env.local file exists
 if not exist %repopath%\frontend\.env.local (
     call boot_utilities\create_env.bat
 )
 
-rem try to start conda base environment
+rem Try to start conda base environment
 call %condapath% base
 if %errorlevel% equ 0 (
     echo Conda base environment is now active.
@@ -57,11 +62,11 @@ if %errorlevel% equ 0 (
 )
 echo Conda environment %envname% is now active.
 
-:: Enter path to local installation 
+rem Start frontend and backend in seperate cmd windows
 start cmd /k "cd %repopath%\frontend && yarn install -s && yarn dev"
 start cmd /k "cd %repopath%\backend && pip install --quiet -r requirements.txt && uvicorn main:app --reload"
 
-:: check if server is running every second if not successfull after 20 seconds exit, if successfull open browser
+rem Check if server is running every second if not successfull after 20 seconds exit, if successfull open browser
 setlocal
 set /a count=0
 :loop
