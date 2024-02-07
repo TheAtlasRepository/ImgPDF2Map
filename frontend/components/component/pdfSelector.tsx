@@ -55,7 +55,7 @@ export default function PdfSelect() {
     console.log(`page ${pageNumber} selected for georeferecing`);
   };
 
-  //TODO Check if this needs another function
+  // sends page number to conversion page
   async function selectPageForConversion(pageNumber: number) {
     router.push(`/Conversion?pageNumber=${pageNumber}`);
   }
@@ -108,7 +108,7 @@ export default function PdfSelect() {
             >
               <Page
                 renderAnnotationLayer={false}
-                // renderTextLayer={false}
+                //renderTextLayer={false}
                 pageNumber={selectedPage}
               />
             </Document>
