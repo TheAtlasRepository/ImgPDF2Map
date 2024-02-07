@@ -29,7 +29,6 @@ if not exist %repopath%\backend (
     echo Backend folder not found
     exit /b
 )
-
 rem Check if .env.local file exists
 if not exist %repopath%\frontend\.env.local (
     call boot_utilities\create_env.bat
