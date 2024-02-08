@@ -25,6 +25,9 @@ export default function PdfSelect() {
   const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setSelectedPage(1);
+    if (numPages === 1) {
+      selectPageForConversion(1);
+    }
   };
 
   function changePage(offset: number) {
