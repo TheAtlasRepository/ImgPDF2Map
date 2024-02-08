@@ -39,21 +39,24 @@ class Project(BaseModel):
         self.created = "never"
         self.lastModified = "never"
         self.crs = "EPSG:4326"
-    
     def delete(self):
-        import os
-        os.remove(self.imageFilePath)
-        os.remove(self.georeferencedFilePath)
-        self.imageFilePath = None
-        self.georeferencedFilePath = None
-        self.selfdestructtime = None
-        self.created = None
-        self.lastModified = None
-        self.crs = None
-        self.points = None
-        self.description = None
-        self.name = None
-        self.id = None
-    
+        #deleiting the temporary files
+        try:
+            import os
+            os.remove(self.imageFilePath)
+            os.remove(self.georeferencedFilePath)
+        except:
+            #try to remove the files using tempfile methods
+            try:
+                #open the files
+                with open(self.imageFilePath, "r+w", closefd=True) as file:
+                    file.close()
+                with open(self.georeferencedFilePath, "r+w", closefd=True) as file:
+                    file.close()
+            except:
+                raise Exception(status_code=500, detail="Could not delete the project files")
+        return
+    def __del__(self):
+        self.delete()
 
 

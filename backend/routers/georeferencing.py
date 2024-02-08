@@ -47,14 +47,14 @@ async def updateProject(projectId: int):
 async def deleteProject(projectId: int):
     #try to find the project by id and delete it
     try:
-        #find the project by id
-        project = Repo.getProject(projectId)
-        #run the delete method of the project
-        project.delete()
+        #find the project by id and remove it
         Repo.removeProject(projectId)
         return {"ProjectID": projectId}
     except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+        if e.status_code == 500:
+            raise HTTPException(status_code=500, detail=str(e))
+        else:
+            raise HTTPException(status_code=404, detail=str(e))
     
 
 #route to get a project by id
