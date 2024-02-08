@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
 export default function ImageMap({ src }: { src: string }) {
-  const [transform, setTransform] = useState({ x: 0, y: 0 });
+  const [transform, setTransform] = useState({ x: 0, y: 0});
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -13,8 +13,8 @@ export default function ImageMap({ src }: { src: string }) {
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging) return;
-    const deltaX = event.clientX - dragStart.x; // speed of drag
-    const deltaY = event.clientY - dragStart.y; // speed of drag
+    const deltaX = (event.clientX - dragStart.x);// speed of drag
+    const deltaY = (event.clientY - dragStart.y); // speed of drag
     setTransform((prevTransform) => ({
       x: prevTransform.x + deltaX,
       y: prevTransform.y + deltaY,
@@ -33,19 +33,13 @@ export default function ImageMap({ src }: { src: string }) {
   };
 
   useEffect(() => {
-    const container = document.getElementById("image-container");
+    const container = document.getElementById('image-container');
     if (container) {
-      container.addEventListener(
-        "wheel",
-        handleMouseWheel as unknown as EventListener
-      );
+      container.addEventListener('wheel', handleMouseWheel as unknown as EventListener);
     }
     return () => {
       if (container) {
-        container.removeEventListener(
-          "wheel",
-          handleMouseWheel as unknown as EventListener
-        );
+        container.removeEventListener('wheel', handleMouseWheel as unknown as EventListener);
       }
     };
   }, []);
@@ -54,9 +48,9 @@ export default function ImageMap({ src }: { src: string }) {
     <div
       className="flex h-full"
       style={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
+        position: 'relative',
+        width: '100%',
+        height: '100%',
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
@@ -65,12 +59,16 @@ export default function ImageMap({ src }: { src: string }) {
     >
       <div
         style={{
-          position: "absolute",
+          position: 'absolute',
           transform: `translate(${transform.x}px, ${transform.y}px) scale(${zoomLevel})`,
-          overflow: "auto",
+          overflow: 'auto',
         }}
       >
-        <img src={src} alt="Image" onDragStart={(e) => e.preventDefault()} />
+        <img
+          src={src}
+          alt="Image"
+          onDragStart={(e) => e.preventDefault()}
+        />
       </div>
     </div>
   );
