@@ -1,9 +1,7 @@
-from fastapi import APIRouter, File, UploadFile, Form, HTTPException
+from fastapi import APIRouter, File, UploadFile, HTTPException
 from fastapi.responses import FileResponse
-from modules.georeferenser import georeferencer
 from modules.models import *
 from typing import List
-from typing_extensions import Annotated
 from localrepository import Projects
 
 #Router handles all requests to the georeferencing API/ depending on the singelton repository of app in main.py
@@ -11,7 +9,10 @@ from localrepository import Projects
 router = APIRouter(
     prefix="/project",
     tags=["georeferencing"],
-    responses={404: {"description": "Not found"}},
+    responses={404: {"description": "Not found"},
+                415: {"description": "Unsupported media type"},
+                400: {"description": "Bad request"}
+               },
 )
 
 #adding the singleton repository to the router to be able to access the projects
@@ -27,7 +28,7 @@ async def georefProject(project: Project):
         #get the created project and return it's id
         return {"id": project.id}
     except:
-        raise HTTPException(status_code=404, detail="Project could not be created")
+        raise HTTPException(status_code=400, detail="Project could not be created")
 
 #route update project details
 @router.put("/{projectId}")
@@ -51,7 +52,7 @@ async def deleteProject(projectId: int):
         #run the delete method of the project
         project.delete()
         Repo.removeProject(projectId)
-        return {"id": projectId}
+        return {"ProjectID": projectId}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
     
@@ -83,7 +84,7 @@ async def addPoint(projectId: int, point: Point):
             point.id = find_higest_id(project.points.points) + 1
             project.points.points.append(point)
         Repo.updateProject(projectId, project)
-        return {"id": projectId}
+        return {"Project":{{"id": projectId}},"Point":{{"id": point.id}}}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -108,7 +109,7 @@ async def updatePoint(projectId: int, pointId: int, point: Point):
                 point.id = pointId
                 project.points.points[i] = point
                 Repo.updateProject(projectId, project)
-                return {"id": projectId}
+                return {"Project":{{"id": projectId}},"Point":{{"id": point.id}}}
         raise Exception("Point not found")
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -123,7 +124,7 @@ async def deletePoint(projectId: int, pointId: int):
             if project.points.points[i].id == pointId:
                 project.points.points.pop(i)
                 Repo.updateProject(projectId, project)
-                return {"id": projectId}
+                return {"Project":{{"id": projectId}},"Point":{{"id": pointId}}}
         raise Exception("Point not found")
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -155,7 +156,7 @@ async def getPoint(projectId: int, pointId: int):
 
 #route to upload an image /specify only accept png
 @router.post("/{projectId}/image")
-async def uploadImage(projectId: int, file: UploadFile):
+async def uploadImage(projectId: int, file: UploadFile = File(...)):
     #try to find the project by id and upload an image
     try:
         #check if the file is a png
@@ -165,7 +166,7 @@ async def uploadImage(projectId: int, file: UploadFile):
         #save the image to the project
         with open(project.imageFilePath, "wb") as buffer:
             buffer.write(file.file.read())
-        return {"id": projectId}
+        return {"Project":{"ProjectID": projectId, "Image": file.filename}}
     except Exception as e:
         if e.status_code == 415:
             raise e
@@ -186,21 +187,4 @@ async def getImage(projectId: int):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-#route to georeference the image of a project
-@router.get("/{projectId}/georef")
-async def georefImage(projectId: int):
-    #try to find the project by id and georeference the image
-    try:
-        project = Repo.getProject(projectId)
-        #get the temporary file path of the image
-        imageFilePath = project.imageFilePath
-        #get the points of the project
-        points = project.points.points
-        #georeference the image
-        georeferencedImage = georeferencer(imageFilePath, points)
-        #save the georeferenced image to the project
-        georeferencedImageFilePath = project.georeferencedFilePath
-        georeferencedImage.write(georeferencedImageFilePath)
-        return FileResponse(georeferencedImageFilePath, media_type="image/tiff")
-    except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+
