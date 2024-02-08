@@ -3,6 +3,8 @@ from fastapi.responses import FileResponse
 from modules.models import *
 from typing import List
 from localrepository import Projects
+#import the georeferencer function from the georeferencer module path ../modules/georeferencer.py
+from modules.georeferencer import georeferencer as georef
 
 #Router handles all requests to the georeferencing API/ depending on the singelton repository of app in main.py
 #The router is included in the main.py and the routes are added to the router
@@ -188,3 +190,21 @@ async def getImage(projectId: int):
         raise HTTPException(status_code=404, detail=str(e))
 
 
+#route to georeference the image of a project
+@router.get("/{projectId}/georef")
+async def georefImage(projectId: int):
+    #try to find the project by id and georeference the image
+    try:
+        project = Repo.getProject(projectId)
+        #get the temporary file path of the image
+        imageFilePath = project.imageFilePath
+        #get the points of the project
+        points = project.points.points
+        #georeference the image
+        georeferencedImage = georef.georeferencer(imageFilePath, points)
+        #save the georeferenced image to the project
+        georeferencedImageFilePath = project.georeferencedFilePath
+        georeferencedImage.write(georeferencedImageFilePath)
+        return FileResponse(georeferencedImageFilePath, media_type="image/tiff")
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
