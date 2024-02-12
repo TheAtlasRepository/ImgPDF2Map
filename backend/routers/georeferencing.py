@@ -4,7 +4,7 @@ from modules.models import *
 from typing import List
 from localrepository import Projects
 #import the georeferencer function from the georeferencer module path ../modules/georeferencer.py
-from modules.georeferencer import georeferencer as georef
+from modules import georefrencer as georef
 
 #Router handles all requests to the georeferencing API/ depending on the singelton repository of app in main.py
 #The router is included in the main.py and the routes are added to the router
@@ -87,6 +87,29 @@ async def addPoint(projectId: int, point: Point):
             project.points.points.append(point)
         Repo.updateProject(projectId, project)
         return {"Project":{{"id": projectId}},"Point":{{"id": point.id}}}
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+@router.post("/{projectId}/points")
+async def add_points(projectId: int, pointlist: pointList):
+    try:
+        #setup list of point ids for return
+        ids = list()
+        project = Repo.getProject(projectId)
+        for point in pointlist:
+            if project.points is None:
+                #check if the points attribute is None and create a new pointList
+                project.points = pointList()
+                #set the id of the point
+                point.id = 1
+                
+            else:
+                #set the id of the point
+                point.id = find_higest_id(project.points.points) + 1
+                project.points.points.append(point)
+            ids.append(point.id)
+        Repo.updateProject(projectId, project)
+        return {"Project":{{"id": projectId}},"Points":{{"ids": ids}}}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
