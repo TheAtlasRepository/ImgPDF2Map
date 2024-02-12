@@ -10,7 +10,6 @@ export default function Editor() {
   const [wasSideBySide, setWasSideBySide] = useState(false);
   const [isCrop, setIsCrop] = useState(false);
 
-
   const handleSave = () => {
     setIsAutoSaved(true);
   };
@@ -24,16 +23,16 @@ export default function Editor() {
 
   const handleToggleCrop = () => {
     if (!isCrop) {
-        setWasSideBySide(isSideBySide); // Save the current value of isSideBySide
-        setIsSideBySide(false); // Set isSideBySide to false when cropping is activated
+      setWasSideBySide(isSideBySide); // Save the current value of isSideBySide
+      setIsSideBySide(false); // Set isSideBySide to false when cropping is activated
     } else {
-        setIsSideBySide(wasSideBySide); // Restore the value of isSideBySide when cropping is deactivated
+      setIsSideBySide(wasSideBySide); // Restore the value of isSideBySide when cropping is deactivated
     }
 
     setIsCrop((prevCrop) => !prevCrop); // Toggle the value of isCrop
 
     console.log(isCrop); // Log the value of isSideBySide
-  }
+  };
 
   return (
     <div className="flex flex-col h-screen bg-white">
@@ -46,7 +45,9 @@ export default function Editor() {
             className="text-xl font-semibold bg-transparent border-none outline-none"
             placeholder="Project name" // Add placeholder attribute
           />
-          {isAutoSaved && <span className="text-sm text-gray-500">Auto saved</span>}
+          {isAutoSaved && (
+            <span className="text-sm text-gray-500">Auto saved</span>
+          )}
         </div>
         <div className="flex items-center space-x-4">
           <Button
@@ -60,8 +61,8 @@ export default function Editor() {
             Overlay
           </Button>
           <Button className="bg-gray-200" variant="secondary">
-              <TargetIcon className="text-gray-500" />
-              <span>Coordinates</span>
+            <TargetIcon className="text-gray-500" />
+            <span>Coordinates</span>
           </Button>
           <Button
             className={`${isCrop ? "bg-blue-500" : "bg-gray-700"}`}
@@ -76,13 +77,24 @@ export default function Editor() {
           Continue
         </Button>
       </div>
-      {isSideBySide ? <SplitView /> : <div className={`flex flex-col items-center justify-center flex-1 ${!isCrop ? "bg-gray-100" : "bg-gray-500"}`}>
-        <div className="flex items-center justify-center w-full">
+      {isSideBySide ? (
+        <SplitView />
+      ) : (
+        <div
+          className={`flex flex-col items-center justify-center flex-1 ${
+            !isCrop ? "bg-gray-100" : "bg-gray-500"
+          }`}
+        >
+          <div className="flex items-center justify-center w-full">
             <div className="w-1/2 flex justify-center items-center">
-            <ImageEdit src={localStorage.getItem('pdfData')!} editBool={isCrop} />
+              <ImageEdit
+                src={localStorage.getItem("pdfData")!}
+                editBool={isCrop}
+              />
+            </div>
           </div>
         </div>
-      </div>}
+      )}
     </div>
   );
 }
