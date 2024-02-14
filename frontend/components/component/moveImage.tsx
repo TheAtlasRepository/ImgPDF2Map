@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 
-export default function ImageMap({ src }: { src: string }) {
+interface ImageMapProps {
+  src: string;
+  children?: React.ReactNode;
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+}
+
+export default function ImageMap({ src, children, onClick }: ImageMapProps) {
   const [transform, setTransform] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -73,6 +79,7 @@ export default function ImageMap({ src }: { src: string }) {
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
+      onClick={onClick}
       id="image-container"
     >
       <div
@@ -89,6 +96,7 @@ export default function ImageMap({ src }: { src: string }) {
           // style={{ width: "100%", height: "100%", objectFit: "contain" }}
         />
       </div>
+      {children}
     </div>
   );
 }
