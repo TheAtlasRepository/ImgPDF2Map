@@ -34,8 +34,8 @@ export default function SplitView() {
   };
 
   //image states
-  const [transform, setTransform] = useState({ x: 0, y: 0 });
-  const [zoomLevel, setZoomLevel] = useState(1);
+  // const [transform, setTransform] = useState({ x: 0, y: 0 });
+  // const [zoomLevel, setZoomLevel] = useState(1);
 
   type ImageMarker = {
     pixelCoordinates: [number, number];
@@ -49,13 +49,15 @@ export default function SplitView() {
     const y = event.clientY - rect.top; // y position within the element.
 
     // Adjust the pixel coordinates based on the image's transformation
-    const adjustedX = (x - transform.x) / zoomLevel;
-    const adjustedY = (y - transform.y) / zoomLevel;
+    // const adjustedX = (x - transform.x) / zoomLevel;
+    // const adjustedY = (y - transform.y) / zoomLevel;
 
-    setImageMarkers([
-      ...imageMarkers,
-      { pixelCoordinates: [adjustedX, adjustedY] },
-    ]);
+    //   setImageMarkers([
+    //     ...imageMarkers,
+    //     { pixelCoordinates: [adjustedX, adjustedY] },
+    //   ]);
+
+    setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
   };
 
   return (
