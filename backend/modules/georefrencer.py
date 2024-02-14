@@ -26,12 +26,13 @@ def georeferencer(tempFilePath, points: pointList):
     #x and y are the pixel coordinates
     #lat and lon are the geographic coordinates from mapbox projection
     crs = defaultCrs
-    transform = createTransform(points, crs)
+    transform = createTransform(points)
 
     # update the transform in the tiff file
-    with rio.open(tiffFile, "r+") as tiff:
-        tiff.transform = transform
-
+    with rio.open(tiffFile, "r+") as src:
+        src.crs = crs
+        src.transform = transform
+        src.write_transform(transform)
     # return transformed tiff
     return tiffFile
         
@@ -42,17 +43,6 @@ def png2geotiff(tempFilePath):
     bands = [1, 2, 3] # I assume that you have only 3 band i.e. no alpha channel in your PNG
     data = dataset.read(bands)
 
-    # create the output transform
-    west, south, east, north = (-180, -90, 180, 90)
-    transform = rio.transform.from_bounds(
-        west, 
-        south, 
-        east, 
-        north, 
-        data.shape[1], 
-        data.shape[2]
-    )
-
     # set the output image kwargs
     kwargs = {
         "driver": "GTiff",
@@ -61,8 +51,7 @@ def png2geotiff(tempFilePath):
         "count": len(bands), 
         "dtype": data.dtype, 
         "nodata": 0,
-        "transform": transform, 
-        "crs": "EPSG:4326"
+        "crs": defaultCrs
     }
 
     #creating tempfile
@@ -75,15 +64,15 @@ def png2geotiff(tempFilePath):
     return temp_file
 
 #function to create the transform from points
-def createTransform(PointList : pointList, crs: str):
+def createTransform(PointList : pointList):
     #check if the pointlist contains at least 3 points
     if len(PointList.points) < 3:
         raise Exception("Not enough points to create a transform")
     #create the GCPs
     gcps = []
     for point in PointList.points:
-        gcps.append(GCP(point.lon, point.lat, point.x, point.y))
+        gcps.append(GCP(row=point.row, col=point.col, x=point.lon, y=point.lat, id=point.id, info=point.name))
     #create the transform
-    transform = from_gcps(gcps, crs)
+    transform = from_gcps(gcps)
     #return the transform object
     return transform

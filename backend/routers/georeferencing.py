@@ -201,8 +201,8 @@ async def georefImage(projectId: int):
         project = Repo.getProject(projectId)
         #get the temporary file path of the image
         imageFilePath = project.imageFilePath
-        #get the points of the project
-        points = project.points.points
+        #get the pointsList of the project
+        points = project.points
         #georeference the image
         georeferencedImage = georef.georeferencer(imageFilePath, points)
         #save the georeferenced image to the project

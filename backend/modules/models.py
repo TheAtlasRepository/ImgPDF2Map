@@ -7,8 +7,8 @@ import tempfile
 class Point(BaseModel):
     lat: float
     lon: float
-    x: int
-    y: int
+    row: int
+    col: int
     error: Union[None, float] = None
     id: Union[int,None] = None
     name: str
@@ -61,7 +61,7 @@ class Project(BaseModel):
     
     def uploadImage(self, image: UploadFile):
         #create temporary file
-        
+
         with open(self.imageFilePath, "wb") as file:
             file.write(image.file.read())
         return
