@@ -5,6 +5,7 @@ from typing import List
 from localrepository import Projects
 #import the georeferencer function from the georeferencer module path ../modules/georeferencer.py
 from modules import georefrencer as georef
+from GeorefTestFiles import createTestProject as cts
 
 #Router handles all requests to the georeferencing API/ depending on the singelton repository of app in main.py
 #The router is included in the main.py and the routes are added to the router
@@ -24,7 +25,7 @@ Repo = router.projects
 #GeorefProject path: /georef/project
 #route to create and or get georef a project id
 @router.post("/")
-async def georefProject(project: Project):
+async def createProject(project: Project):
     try:
         Repo.addProject(project)
         #get the created project and return it's id
@@ -90,28 +91,6 @@ async def addPoint(projectId: int, point: Point):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-@router.post("/{projectId}/points")
-async def add_points(projectId: int, pointlist: pointList):
-    try:
-        #setup list of point ids for return
-        ids = list()
-        project = Repo.getProject(projectId)
-        for point in pointlist:
-            if project.points is None:
-                #check if the points attribute is None and create a new pointList
-                project.points = pointList()
-                #set the id of the point
-                point.id = 1
-                
-            else:
-                #set the id of the point
-                point.id = find_higest_id(project.points.points) + 1
-                project.points.points.append(point)
-            ids.append(point.id)
-        Repo.updateProject(projectId, project)
-        return {"Project":{{"id": projectId}},"Points":{{"ids": ids}}}
-    except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
 
 def find_higest_id(points: List[Point]):
     highest = 0
@@ -216,6 +195,7 @@ async def getImage(projectId: int):
 #route to georeference the image of a project
 @router.get("/{projectId}/georef")
 async def georefImage(projectId: int):
+
     #try to find the project by id and georeference the image
     try:
         project = Repo.getProject(projectId)
@@ -231,3 +211,15 @@ async def georefImage(projectId: int):
         return FileResponse(georeferencedImageFilePath, media_type="image/tiff")
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+    
+#route to create a test project
+@router.post("/test", tags=["test"])
+async def createTestProject():
+    #create a test project
+    try:
+        rp = Repo
+        #create a test project
+        id = cts(rp)
+        return {"status": "Test project created", "id": id}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

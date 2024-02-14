@@ -1,27 +1,32 @@
 import rasterio as rio
 from rasterio.enums import Resampling
 from rasterio.plot import show
+from rasterio.transform import from_gcps
+from rasterio.control import GroundControlPoint as GCP
 import numpy as np
 import tempfile
+from .models import Point, pointList
 
 #imports of self-written models
 from .models import Point
 
+#mapbox projection crs for web mercator: EPSG:3857
+defaultCrs = 'EPSG:3857'
+
 #parameters: tempFilePath, points: list[Point], crs: str
 #returns: georeferenced image of type gtiff
-def georeferencer(tempFilePath, points):
+def georeferencer(tempFilePath, points: pointList):
     # check if points contain at least 3 point models
 
     #first convert png to tiff
     tiffFile = png2geotiff(tempFilePath)
 
-    # create gcps from points latitude
-    gcps = []
-    for point in points:
-        gcps.append(rio.control.GroundControlPoint(point.x, point.y, point.longitude, point.latitude))
-
-    # create the georeferencing transform
-    transform = rio.transform.from_origin(gcps[0].lon, gcps[0].lat, gcps[1].x - gcps[0].x, gcps[2].y - gcps[0].y)
+    #crate the transform from points
+    #points have the fields x, y, lat, lon
+    #x and y are the pixel coordinates
+    #lat and lon are the geographic coordinates from mapbox projection
+    crs = defaultCrs
+    transform = createTransform(points, crs)
 
     # update the transform in the tiff file
     with rio.open(tiffFile, "r+") as tiff:
@@ -69,3 +74,16 @@ def png2geotiff(tempFilePath):
     #returning the new written file
     return temp_file
 
+#function to create the transform from points
+def createTransform(PointList : pointList, crs: str):
+    #check if the pointlist contains at least 3 points
+    if len(PointList.points) < 3:
+        raise Exception("Not enough points to create a transform")
+    #create the GCPs
+    gcps = []
+    for point in PointList.points:
+        gcps.append(GCP(point.lon, point.lat, point.x, point.y))
+    #create the transform
+    transform = from_gcps(gcps, crs)
+    #return the transform object
+    return transform

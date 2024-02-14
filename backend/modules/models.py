@@ -5,8 +5,8 @@ import tempfile
 
 #geografic point
 class Point(BaseModel):
-    latitude: float
-    longitude: float
+    lat: float
+    lon: float
     x: int
     y: int
     error: Union[None, float] = None
@@ -58,5 +58,12 @@ class Project(BaseModel):
         return
     def __del__(self):
         self.delete()
+    
+    def uploadImage(self, image: UploadFile):
+        #create temporary file
+        
+        with open(self.imageFilePath, "wb") as file:
+            file.write(image.file.read())
+        return
 
 
