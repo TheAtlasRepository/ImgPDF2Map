@@ -27,9 +27,9 @@ Repo = router.projects
 @router.post("/")
 async def createProject(project: Project):
     try:
-        Repo.addProject(project)
+        id = Repo.addProject(project)
         #get the created project and return it's id
-        return {"id": project.id}
+        return {"id": id}
     except:
         raise HTTPException(status_code=400, detail="Project could not be created")
 
