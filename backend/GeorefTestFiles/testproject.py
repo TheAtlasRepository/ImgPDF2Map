@@ -3,8 +3,8 @@ from typing import List
 import json
 import os
 #setting up the path to the test image and test points
-TestImgName = "testImg1.png"
-TestPointsName = "tpImg1.json"
+TestImgName = "galdopiggenturkartp3.png"
+TestPointsName = "tpgaldopiggenturkartp3.json"
 
 
 TestImgRelativePath = os.path.join("./sampleImg", TestImgName)
