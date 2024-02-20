@@ -205,10 +205,10 @@ async def georefImage(projectId: int):
         points = project.points
         #georeference the image
         georeferencedImage = georef.georeferencer(imageFilePath, points)
-        #save the georeferenced image to the project
-        georeferencedImageFilePath = project.georeferencedFilePath
-        georeferencedImage.write(georeferencedImageFilePath)
-        return FileResponse(georeferencedImageFilePath, media_type="image/tiff")
+        #open the projetcs georeferencedFilePath and write the georeferenced image to it
+        with open(project.georeferencedFilePath, "wb") as file:
+            file.write(open(georeferencedImage, "rb").read())
+        return FileResponse(project.georeferencedFilePath, media_type="image/tiff")
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
     
