@@ -6,7 +6,7 @@ from rasterio.crs import CRS #importing CRS for the default crs
 from .models import pointList #importing the pointList model
 
 #mapbox projection crs for web mercator: EPSG:3857
-defaultCrs = 'EPSG:3857'
+defaultCrs = 'EPSG:4326'
 
 #checking if /tmp folder exists
 def getTmpFolderPath():
@@ -31,6 +31,12 @@ def getUniqeFileName(suffix, length=8):
             raise Exception("Could not create a unique file name")
         i += 1
 
+def removeFile(filePath):
+    #remove the file if it exists
+    if os.path.isfile(filePath):
+        os.remove(filePath)
+
+
 
 #function to create Rasterio GCPs from a list of points
 def createGcps(PointList : pointList):
@@ -44,7 +50,7 @@ def createGcps(PointList : pointList):
     return gcps
 
 #Main georeferencer function
-def georeferencer(tempFilePath, points: pointList)->str: 
+def georeferencer(tempFilePath, points: pointList, crs: str = defaultCrs)->str: 
     #create the GCPs
     gcps = createGcps(points)
 
@@ -86,9 +92,11 @@ def georeferencer(tempFilePath, points: pointList)->str:
     #set the transform
     dataset.transform = transform
     #set the crs
-    dataset.crs = CRS.from_string(defaultCrs)
+    dataset.crs = CRS.from_string(crs)
     #save the file
     dataset.close()
+    #remove the temporary file
+    removeFile(tempFPath)
     #return the path to the georeferenced file
     return path
 

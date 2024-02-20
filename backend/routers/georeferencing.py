@@ -194,7 +194,7 @@ async def getImage(projectId: int):
 
 #route to georeference the image of a project
 @router.get("/{projectId}/georef")
-async def georefImage(projectId: int):
+async def georefImage(projectId: int, crs: str = None):
 
     #try to find the project by id and georeference the image
     try:
@@ -204,10 +204,18 @@ async def georefImage(projectId: int):
         #get the pointsList of the project
         points = project.points
         #georeference the image
-        georeferencedImage = georef.georeferencer(imageFilePath, points)
+        georeferencedImage = None
+        if crs is None:
+            georeferencedImage = georef.georeferencer(imageFilePath, points)
+        else:
+            georeferencedImage = georef.georeferencer(imageFilePath, points, crs)
+        if georeferencedImage is None:
+            raise Exception("Image could not be georeferenced")
         #open the projetcs georeferencedFilePath and write the georeferenced image to it
         with open(project.georeferencedFilePath, "wb") as file:
             file.write(open(georeferencedImage, "rb").read())
+            #remove the temporary file
+            georef.removeFile(georeferencedImage)
         return FileResponse(project.georeferencedFilePath, media_type="image/tiff")
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))

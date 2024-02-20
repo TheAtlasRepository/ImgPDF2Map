@@ -34,7 +34,7 @@ class Project(BaseModel):
         super().__init__(**data)
         self.points = pointList(points=[])
         self.imageFilePath = tempfile.NamedTemporaryFile().name
-        self.georeferencedFilePath = tempfile.NamedTemporaryFile().name
+        self.georeferencedFilePath = tempfile.NamedTemporaryFile(suffix='.tiff').name
         self.selfdestructtime = "never"
         self.created = "never"
         self.lastModified = "never"
