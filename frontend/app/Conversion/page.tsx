@@ -32,39 +32,8 @@ export default function Page() {
             // Get the file type
             const fileType = parsedData.type;
 
-            // This has a lot of duplication, should perhaps be refactored
-            if (fileType === "application/pdf") {
-              const pageNumber = searchParam.get("pageNumber");
-              // Make API call for PDF file
-              axios
-                .post(
-                  `http://localhost:8000/converter/pdf2png?page_number=${
-                    pageNumber || 1
-                  }`,
-                  formData,
-                  {
-                    headers: {
-                      "Content-Type": "multipart/form-data",
-                    },
-                    responseType: "blob", // Tell axios to expect a Blob
-                  }
-                )
-                .then((response) => {
-                  // Create a Blob URL from the returned file
-                  const fileURL = URL.createObjectURL(response.data);
-
-                  // Save the Blob URL to local storage
-                  window.localStorage.setItem("pdfData", fileURL);
-
-                  //push to Editor
-                  router.push("/Editor");
-                })
-                .catch((error) => {
-                  if (error.response && error.response.status === 400) {
-                    goToUpload("The file you uploaded is not supported.");
-                  }
-                });
-            } else if (fileType === "image/png") {
+            // Handle different the different file types
+            if (fileType === "image/png") {
               // Create a Blob URL from the fetched Blob
               const fileURL = URL.createObjectURL(blob);
 
@@ -73,37 +42,62 @@ export default function Page() {
 
               //push to Editor
               router.push("/Editor");
+
+              // Pass the Blob to the handleFileUpload function
+              handleFileConversion(null, null, blob);
+            } else if (fileType === "application/pdf") {
+              const pageNumber = searchParam.get("pageNumber");
+              // Make API call for PDF file
+              handleFileConversion(`http://localhost:8000/converter/pdf2png?page_number=${pageNumber || 1}`, formData);
             } else if (fileType.startsWith("image/")) {
               // Make a different API call for other image files
-              axios
-                .post("http://localhost:8000/converter/image2png", formData, {
-                  headers: {
-                    "Content-Type": "multipart/form-data",
-                  },
-                  responseType: "blob", // Tell axios to expect a Blob
-                })
-                .then((response) => {
-                  // Create a Blob URL from the returned file
-                  const fileURL = URL.createObjectURL(response.data);
-
-                  // Save the Blob URL to local storage
-                  window.localStorage.setItem("pdfData", fileURL);
-
-                  //push to Editor
-                  router.push("/Editor");
-                })
-                .catch((error) => {
-                  // This is mainly added in case the user uploads a file with a header that starts with image/,
-                  // but is not supported by the backend, e.g. SVG
-                  if (error.response && error.response.status === 400) {
-                    goToUpload("The file you uploaded is not supported.");
-                  }
-                });
+              handleFileConversion("http://localhost:8000/converter/image2png", formData);
+            } else {
+              goToUpload("The file you uploaded is not supported.");
             }
           });
       }
     }
   }, []);
+
+  // Function to handle file conversion
+  // Url is the API endpoint to convert the file
+  // formData is the file data
+  // blob is the Blob of the file
+  function handleFileConversion(url: string | null, formData: any, blob: Blob | null = null) {
+    // If no URL is provided, we assume the file is already a PNG Blob and go straight to the Editor
+    if (url === null) {
+      //push to Editor
+      router.push("/Editor");
+      return;
+    }
+
+    // Make API call to convert the file
+    axios
+    .post(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      responseType: "blob", // Tell axios to expect a Blob
+    })
+    .then((response) => {
+      // Create a Blob URL from the returned file
+      const fileURL = blob ? URL.createObjectURL(blob) : URL.createObjectURL(response.data);
+
+      // Save the Blob URL to local storage
+      window.localStorage.setItem("pdfData", fileURL);
+
+      //push to Editor
+      router.push("/Editor");
+    })
+    .catch((error) => {
+      if (error.response && error.response.status === 415) {
+        goToUpload("The file type you uploaded is not supported.");
+      } else {
+        goToUpload("An error occurred.");
+      }
+    });
+  }
 
   // Function to push to UploadFile with an error message
   function goToUpload(string = "An error occurred.") {
