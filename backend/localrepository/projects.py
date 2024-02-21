@@ -8,6 +8,7 @@ class Projects:
         project.id = self.nextId
         self.nextId += 1
         self.projects.append(project)
+        return project.id
     def getProjects(self):
         return self.projects
     def getProject(self, id):

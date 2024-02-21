@@ -6,6 +6,18 @@ export default function ImageMap({ src }: { src: string }) {
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [zoomLevel, setZoomLevel] = useState(1);
 
+  //size of imgs container
+  const [imgSize, setImgSize] = useState({ width: 0, height: 0 });
+
+  //sets size of img container relative to size of img
+  useEffect(() => {
+    const img = new Image();
+    img.src = src;
+    img.onload = () => {
+      setImgSize({ width: img.width, height: img.height });
+    };
+  }, [src]);
+
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     setIsDragging(true);
     setDragStart({ x: event.clientX, y: event.clientY });
@@ -55,8 +67,8 @@ export default function ImageMap({ src }: { src: string }) {
       className="flex h-full"
       style={{
         position: "relative",
-        width: "100%",
-        height: "100%",
+        width: imgSize.width / 4,
+        height: imgSize.height / 4,
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
@@ -70,7 +82,12 @@ export default function ImageMap({ src }: { src: string }) {
           overflow: "auto",
         }}
       >
-        <img src={src} alt="Image" onDragStart={(e) => e.preventDefault()} />
+        <img
+          src={src}
+          alt="Image"
+          onDragStart={(e) => e.preventDefault()}
+          // style={{ width: "100%", height: "100%", objectFit: "contain" }}
+        />
       </div>
     </div>
   );
