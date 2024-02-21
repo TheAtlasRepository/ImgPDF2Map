@@ -1,7 +1,7 @@
 # API router for file conversion
 import os
 
-from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi import APIRouter, File, UploadFile, HTTPException, Query
 from fastapi.responses import FileResponse
 
 from pdf2image import convert_from_path
@@ -77,3 +77,49 @@ async def image2png(file: UploadFile = File(...)):
 
     #return PNG
     return FileResponse(temp_png.name, media_type='image/png', filename=image_name)
+
+#route to crop a .png image
+# p1x is left side of image, p1y is top side of image, combined they are top left corner
+# p2x is right side of image, p2y is bottom side of image, combined they are bottom right corner
+@router.post('/cropPng')
+async def cropPng(
+    file: UploadFile = File(...), 
+    p1x: int = Query(0, description="X coordinate of the first point"), 
+    p1y: int = Query(0, description="Y coordinate of the first point"), 
+    p2x: int = Query(16, description="X coordinate of the second point"), 
+    p2y: int = Query(16, description="Y coordinate of the second point")
+):
+    """
+    **Crops a PNG**
+
+    p1x is left side of image, p1y is top side of image, combined they are top left corner
+
+    p2x is right side of image, p2y is bottom side of image, combined they are bottom right corner
+    """
+    #failsafe checks
+    if file.content_type != 'image/png':
+        raise HTTPException(status_code=415, detail='File is not a .png file')
+    
+    try:
+        #Read and write image to a temporary file
+        temp_image = tempfile.NamedTemporaryFile(delete=False)
+        temp_image.write(await file.read())
+        temp_image.close()
+
+        # Open the image file
+        image = Image.open(temp_image.name)
+
+        # Crop image
+        cropped_image = image.crop((p1x, p1y, p2x, p2y))
+
+        # Save cropped image to a new temporary file
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as temp:
+            cropped_image.save(temp.name, 'PNG')
+            temp_path = temp.name
+
+        # Delete the original temporary file
+        os.remove(temp_image.name)
+
+        return FileResponse(temp_path, media_type="image/png")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
