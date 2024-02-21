@@ -3,6 +3,9 @@ from fastapi.responses import FileResponse
 from modules.models import *
 from typing import List
 from localrepository import Projects
+#import the georeferencer function from the georeferencer module path ../modules/georeferencer.py
+from modules import georefrencer as georef
+from GeorefTestFiles import createTestProject as cts
 
 #Router handles all requests to the georeferencing API/ depending on the singelton repository of app in main.py
 #The router is included in the main.py and the routes are added to the router
@@ -22,11 +25,11 @@ Repo = router.projects
 #GeorefProject path: /georef/project
 #route to create and or get georef a project id
 @router.post("/")
-async def georefProject(project: Project):
+async def createProject(project: Project):
     try:
-        Repo.addProject(project)
+        id = Repo.addProject(project)
         #get the created project and return it's id
-        return {"id": project.id}
+        return {"id": id}
     except:
         raise HTTPException(status_code=400, detail="Project could not be created")
 
@@ -87,6 +90,7 @@ async def addPoint(projectId: int, point: Point):
         return {"Project":{{"id": projectId}},"Point":{{"id": point.id}}}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
 
 def find_higest_id(points: List[Point]):
     highest = 0
@@ -188,3 +192,42 @@ async def getImage(projectId: int):
         raise HTTPException(status_code=404, detail=str(e))
 
 
+#route to georeference the image of a project
+@router.get("/{projectId}/georef")
+async def georefImage(projectId: int, crs: str = None):
+
+    #try to find the project by id and georeference the image
+    try:
+        project = Repo.getProject(projectId)
+        #get the temporary file path of the image
+        imageFilePath = project.imageFilePath
+        #get the pointsList of the project
+        points = project.points
+        #georeference the image
+        georeferencedImage = None
+        if crs is None:
+            georeferencedImage = georef.georeferencer(imageFilePath, points)
+        else:
+            georeferencedImage = georef.georeferencer(imageFilePath, points, crs)
+        if georeferencedImage is None:
+            raise Exception("Image could not be georeferenced")
+        #open the projetcs georeferencedFilePath and write the georeferenced image to it
+        with open(project.georeferencedFilePath, "wb") as file:
+            file.write(open(georeferencedImage, "rb").read())
+            #remove the temporary file
+            georef.removeFile(georeferencedImage)
+        return FileResponse(project.georeferencedFilePath, media_type="image/tiff")
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+#route to create a test project
+@router.post("/test", tags=["test"])
+async def createTestProject():
+    #create a test project
+    try:
+        rp = Repo
+        #create a test project
+        id = cts(rp)
+        return {"status": "Test project created", "id": id}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
