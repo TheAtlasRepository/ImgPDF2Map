@@ -2,10 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  --background-dark: #0e101a;
+  --text-primary: #0e101b;
+  --text-secondary: #3e5468;
+  --card-gray: #F4F6F9;
 }
 
 @media (prefers-color-scheme: light) {
@@ -18,15 +24,46 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background: #FFF;
 }
 
-.logo {
-  font-size: 24px;
-  transition: all 0.5s ease;
+.btn-nav {
+  --tw-text-opacity: 1;
+  color: rgb(148 163 184 / var(--tw-text-opacity));
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  border-radius: 0.25rem;
+  margin-right: 1.5rem;
+}
+
+.btn-nav:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+}
+
+.btn-nav-active {
+  color: rgb(255 255 255 / var(--tw-text-opacity));
+  --tw-bg-opacity: 1;
+  background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+}
+
+.background-dark {
+  background-color: var(--background-dark);
+}
+
+.text-primary {
+  color: var(--text-primary);
+  font-family: Inter,sans-serif;
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+  font-family: Inter,sans-serif;
+}
+
+.card {
+  background-color: var(--card-gray);
+  border-radius: 10px;
 }
