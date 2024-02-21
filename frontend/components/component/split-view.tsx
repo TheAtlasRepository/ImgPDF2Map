@@ -52,15 +52,15 @@ export default function SplitView() {
     const y = event.clientY - rect.top; // y position within the element.
 
     // Adjust the pixel coordinates based on the image's transformation
-    const adjustedX = (x - transform.x) / zoomLevel;
-    const adjustedY = (y - transform.y) / zoomLevel;
+    // const adjustedX = (x - transform.x) / zoomLevel;
+    // const adjustedY = (y - transform.y) / zoomLevel;
 
-    setImageMarkers([
-      ...imageMarkers,
-      { pixelCoordinates: [adjustedX, adjustedY] },
-    ]);
-
-    // setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
+    // setImageMarkers([
+    //   ...imageMarkers,
+    //   { pixelCoordinates: [adjustedX, adjustedY] },
+    // ]);
+    setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
+    // console.log(imageMarkers);
   };
 
   return (
@@ -133,7 +133,12 @@ export default function SplitView() {
                   transform: "translate(-50%, -85%)", // Center the marker
                 }}
               >
-                📍
+                <Image
+                  src="/map-pin.svg"
+                  alt="map-pin"
+                  width={30}
+                  height={30}
+                />
               </div>
             ))}
           </ImageMap>
