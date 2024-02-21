@@ -1,16 +1,39 @@
-import React, { useState, useEffect } from "react";
+import { init } from "next/dist/compiled/webpack/webpack";
+import React, { useState, useEffect, use } from "react";
 
 interface ImageMapProps {
   src: string;
   children?: React.ReactNode;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+
+  // variables for dragging and zooming
+  zoomLevel: number;
+  transform: { x: number; y: number };
+  setTransform: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
+  setZoomLevel: React.Dispatch<React.SetStateAction<number>>;
+
+  setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
+  initialIsDragging: boolean;
 }
 
-export default function ImageMap({ src, children, onClick }: ImageMapProps) {
-  const [transform, setTransform] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
+export default function ImageMap({
+  src,
+  children,
+  onClick,
+  setIsDragging,
+  initialIsDragging,
+
+  setTransform,
+  setZoomLevel,
+  transform,
+  zoomLevel,
+}: ImageMapProps) {
+  // const [transform, setTransform] = useState({ x: 0, y: 0 });
+  // const [isDragging, setIsDragging] = useState(false);
+  //local state for dragging
+  const [localIsDragging, setLocalIsDragging] = useState(initialIsDragging);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [zoomLevel, setZoomLevel] = useState(1);
+  // const [zoomLevel, setZoomLevel] = useState(1);
 
   //size of imgs container
   const [imgSize, setImgSize] = useState({ width: 0, height: 0 });
@@ -24,24 +47,36 @@ export default function ImageMap({ src, children, onClick }: ImageMapProps) {
     };
   }, [src]);
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    setIsDragging(true);
-    setDragStart({ x: event.clientX, y: event.clientY });
+  const setDragState = (bool: boolean) => {
+    setIsDragging(bool);
+    setLocalIsDragging(bool);
   };
+  // Update local state when prop changes
+  useEffect(() => {
+    setLocalIsDragging(initialIsDragging);
+  }, [initialIsDragging]);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
-    const deltaX = event.clientX - dragStart.x; // speed of drag
-    const deltaY = event.clientY - dragStart.y; // speed of drag
-    setTransform((prevTransform) => ({
-      x: prevTransform.x + deltaX,
-      y: prevTransform.y + deltaY,
-    }));
-    setDragStart({ x: event.clientX, y: event.clientY });
+    if (initialIsDragging) {
+      const deltaX = event.clientX - dragStart.x; // speed of drag
+      const deltaY = event.clientY - dragStart.y; // speed of drag
+      setTransform((prevTransform) => ({
+        x: prevTransform.x + deltaX,
+        y: prevTransform.y + deltaY,
+      }));
+      setDragStart({ x: event.clientX, y: event.clientY });
+    }
   };
 
   const handleMouseUp = () => {
-    setIsDragging(false);
+    // setIsDragging(false);
+    setDragState(false);
+  };
+
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    setDragState(true);
+    console.log(setIsDragging);
+    setDragStart({ x: event.clientX, y: event.clientY });
   };
 
   const handleMouseWheel = (event: React.WheelEvent<HTMLDivElement>) => {
@@ -50,6 +85,7 @@ export default function ImageMap({ src, children, onClick }: ImageMapProps) {
     setZoomLevel((prevZoomLevel) => prevZoomLevel + zoomDelta);
   };
 
+  //event listener for mouse wheel
   useEffect(() => {
     const container = document.getElementById("image-container");
     if (container) {

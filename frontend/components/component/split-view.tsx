@@ -34,8 +34,10 @@ export default function SplitView() {
   };
 
   //image states
-  // const [transform, setTransform] = useState({ x: 0, y: 0 });
-  // const [zoomLevel, setZoomLevel] = useState(1);
+  const [transform, setTransform] = useState({ x: 0, y: 0 });
+  const [zoomLevel, setZoomLevel] = useState(1);
+
+  const [isDragging, setIsDragging] = useState(false);
 
   type ImageMarker = {
     pixelCoordinates: [number, number];
@@ -44,20 +46,21 @@ export default function SplitView() {
   const [imageMarkers, setImageMarkers] = useState<ImageMarker[]>([]);
 
   const addImageMarker = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (isDragging) return;
     const rect = (event.target as Element).getBoundingClientRect();
     const x = event.clientX - rect.left; // x position within the element.
     const y = event.clientY - rect.top; // y position within the element.
 
     // Adjust the pixel coordinates based on the image's transformation
-    // const adjustedX = (x - transform.x) / zoomLevel;
-    // const adjustedY = (y - transform.y) / zoomLevel;
+    const adjustedX = (x - transform.x) / zoomLevel;
+    const adjustedY = (y - transform.y) / zoomLevel;
 
-    //   setImageMarkers([
-    //     ...imageMarkers,
-    //     { pixelCoordinates: [adjustedX, adjustedY] },
-    //   ]);
+    setImageMarkers([
+      ...imageMarkers,
+      { pixelCoordinates: [adjustedX, adjustedY] },
+    ]);
 
-    setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
+    // setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
   };
 
   return (
@@ -112,8 +115,13 @@ export default function SplitView() {
           <ImageMap
             src={localStorage.getItem("pdfData")!}
             onClick={addImageMarker}
-            // setTransform={setTransform}
-            // setZoomLevel={setZoomLevel}
+            //transforms passed to imagemap component for image manipulation
+            setTransform={setTransform}
+            setZoomLevel={setZoomLevel}
+            transform={transform}
+            zoomLevel={zoomLevel}
+            setIsDragging={setIsDragging}
+            initialIsDragging={isDragging}
           >
             {imageMarkers.map((marker, index) => (
               <div
@@ -122,7 +130,7 @@ export default function SplitView() {
                   position: "absolute",
                   left: `${marker.pixelCoordinates[0]}px`,
                   top: `${marker.pixelCoordinates[1]}px`,
-                  transform: "translate(-50%, -50%)", // Center the marker
+                  transform: "translate(-50%, -85%)", // Center the marker
                 }}
               >
                 📍
