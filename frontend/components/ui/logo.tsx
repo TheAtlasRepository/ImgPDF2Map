@@ -10,7 +10,7 @@ function Logo() {
             setTimeout(() => {
                 setText(prevText => prevText === 'IMG  ' ? 'PDF  ' : 'IMG  ');
                 setOpacity('opacity-100');
-            }, 1000);
+            }, 500);
         }, 5000);
         return () => clearInterval(interval);
     }, []);

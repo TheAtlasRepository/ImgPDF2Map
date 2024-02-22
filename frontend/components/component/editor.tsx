@@ -9,6 +9,7 @@ export default function Editor() {
   const [isSideBySide, setIsSideBySide] = useState(false); // Add state for side by side toggle
   const [wasSideBySide, setWasSideBySide] = useState(false);
   const [isCrop, setIsCrop] = useState(false);
+  const [imageSrc, setImageSrc] = useState(localStorage.getItem("pdfData")!); // Keeps track of image URL
 
   const handleSave = () => {
     setIsAutoSaved(true);
@@ -32,6 +33,12 @@ export default function Editor() {
     setIsCrop((prevCrop) => !prevCrop); // Toggle the value of isCrop
 
     console.log(isCrop); // Log the value of isSideBySide
+  };
+
+  // Update the image source when the user has cropped the image, and close the crop tool
+  const handleCrop = () => {
+    setImageSrc(localStorage.getItem("pdfData")!);
+    handleToggleCrop();
   };
 
   return (
@@ -82,14 +89,14 @@ export default function Editor() {
       ) : (
         <div
           className={`flex flex-col items-center justify-center flex-1 ${
-            !isCrop ? "bg-gray-100" : "bg-gray-500"
+            !isCrop ? "bg-gray-100" : "bg-gray-400"
           }`}
         >
           <div className="flex items-center justify-center w-full">
             <div className="w-1/2 flex justify-center items-center">
               <ImageEdit
-                src={localStorage.getItem("pdfData")!}
                 editBool={isCrop}
+                onCrop={handleCrop} // When the user has cropped the image
               />
             </div>
           </div>

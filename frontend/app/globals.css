@@ -25,6 +25,7 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: #FFF;
+  font-family: Inter,sans-serif;
 }
 
 .btn-nav {
