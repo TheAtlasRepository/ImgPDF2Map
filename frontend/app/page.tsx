@@ -1,5 +1,6 @@
 'use client';
 import UploadFileComp from '../components/component/upload-file';
+import UploadPipeline from '@/components/component/uploadPipeline';
 import Navbar from '../components/ui/navbar';
 
 export default function Home() {
@@ -10,7 +11,7 @@ export default function Home() {
       />
       
       <div className="items-center py-10 justify-between">
-        <UploadFileComp />
+        <UploadPipeline />
       </div>
 
       <div className="flex justify-center p-2 py-10">
