@@ -89,7 +89,7 @@ export default function Editor() {
       ) : (
         <div
           className={`flex flex-col items-center justify-center flex-1 ${
-            !isCrop ? "bg-gray-100" : "bg-gray-500"
+            !isCrop ? "bg-gray-100" : "bg-gray-400"
           }`}
         >
           <div className="flex items-center justify-center w-full">

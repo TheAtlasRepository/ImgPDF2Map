@@ -72,13 +72,24 @@ export default function ImageEdit({ editBool, onCrop }: { editBool: boolean, onC
 
     // When the user requests to cancel the crop
     const handleCancelCrop = () => {
-        // Todo: Cancel the crop
+        // Reset the crop state, use max width and height
+        setCrop({
+            unit: '%',
+            x: 0,
+            y: 0,
+            width: 100,
+            height: 100,
+        });
+        onCrop();
     };
 
     return (
         <>
             {editBool ? (
-                <div className="flex flex-col justify-items-center">
+                <div className="flex flex-col justify-items-center card p-10 shadow-lg">
+                    <div>
+                        <h1 className="text-2xl font-bold mb-4 text-primary">Crop Image</h1>
+                    </div>
                     <div>
                         <ReactCrop
                             crop={crop}
@@ -87,15 +98,15 @@ export default function ImageEdit({ editBool, onCrop }: { editBool: boolean, onC
                             <img src={imageSrc} alt="Image" />
                         </ReactCrop>
                     </div>
-                    <div className="">
+                    <div className="flex flex-row justify-end">
                         <Button
-                            className="btn bg-red-600"
+                            className="btn bg-red-600 hover:bg-red-700"
                             onClick={handleCancelCrop}
                         >
                             Cancel Crop
                         </Button>
                         <Button
-                            className="btn bg-green-600"
+                            className="btn ml-2 bg-green-600 hover:bg-green-700"
                             onClick={handleApplyCrop}
                         >
                             Apply Crop
