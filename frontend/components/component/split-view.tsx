@@ -50,17 +50,22 @@ export default function SplitView() {
     const rect = (event.target as Element).getBoundingClientRect();
     const x = event.clientX - rect.left; // x position within the element.
     const y = event.clientY - rect.top; // y position within the element.
-
-    // Adjust the pixel coordinates based on the image's transformation
-    // const adjustedX = (x - transform.x) / zoomLevel;
-    // const adjustedY = (y - transform.y) / zoomLevel;
-
-    // setImageMarkers([
-    //   ...imageMarkers,
-    //   { pixelCoordinates: [adjustedX, adjustedY] },
-    // ]);
     setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
     // console.log(imageMarkers);
+  };
+
+  const adjustMarkerPositions = (
+    pixelCoordinates: [number, number],
+    transform: { x: number; y: number },
+    zoomLevel: number
+  ): { left: string; top: string } => {
+    const adjustedX = pixelCoordinates[0] + transform.x;
+    const adjustedY = pixelCoordinates[1] + transform.y;
+
+    return {
+      left: `${adjustedX}px`,
+      top: `${adjustedY}px`,
+    };
   };
 
   return (
@@ -128,9 +133,14 @@ export default function SplitView() {
                 key={index}
                 style={{
                   position: "absolute",
-                  left: `${marker.pixelCoordinates[0]}px`,
-                  top: `${marker.pixelCoordinates[1]}px`,
+                  // left: `${marker.pixelCoordinates[0]}px`,
+                  // top: `${marker.pixelCoordinates[1]}px`,
                   transform: "translate(-50%, -85%)", // Center the marker
+                  ...adjustMarkerPositions(
+                    marker.pixelCoordinates,
+                    transform,
+                    zoomLevel
+                  ),
                 }}
               >
                 <Image
@@ -138,6 +148,7 @@ export default function SplitView() {
                   alt="map-pin"
                   width={30}
                   height={30}
+                  onDragStart={(e) => e.preventDefault()}
                 />
               </div>
             ))}

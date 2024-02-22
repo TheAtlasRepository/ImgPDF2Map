@@ -28,12 +28,9 @@ export default function ImageMap({
   transform,
   zoomLevel,
 }: ImageMapProps) {
-  // const [transform, setTransform] = useState({ x: 0, y: 0 });
-  // const [isDragging, setIsDragging] = useState(false);
   //local state for dragging
   const [localIsDragging, setLocalIsDragging] = useState(initialIsDragging);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  // const [zoomLevel, setZoomLevel] = useState(1);
 
   //size of imgs container
   const [imgSize, setImgSize] = useState({ width: 0, height: 0 });
@@ -69,13 +66,15 @@ export default function ImageMap({
   };
 
   const handleMouseUp = () => {
-    // setIsDragging(false);
+    // //short timeout to prevent click event from firing after drag
+    // setTimeout(() => {
+    //   setDragState(false);
+    // }, 10);
     setDragState(false);
   };
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
     setDragState(true);
-    console.log(setIsDragging);
     setDragStart({ x: event.clientX, y: event.clientY });
   };
 
