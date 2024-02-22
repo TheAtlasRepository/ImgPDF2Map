@@ -36,8 +36,8 @@ export default function Editor() {
   };
 
   // Update the image source when the user has cropped the image, and close the crop tool
-  const handleCrop = (blobUrl: string) => {
-    setImageSrc(blobUrl);
+  const handleCrop = () => {
+    setImageSrc(localStorage.getItem("pdfData")!);
     handleToggleCrop();
   };
 
@@ -95,7 +95,6 @@ export default function Editor() {
           <div className="flex items-center justify-center w-full">
             <div className="w-1/2 flex justify-center items-center">
               <ImageEdit
-                src={imageSrc}
                 editBool={isCrop}
                 onCrop={handleCrop} // When the user has cropped the image
               />

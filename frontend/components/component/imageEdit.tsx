@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import axios from 'axios';
 
-export default function ImageEdit({ src , editBool, onCrop }: { src: string, editBool: boolean, onCrop: (blobUrl: string) => void }) {
+export default function ImageEdit({ editBool, onCrop }: { editBool: boolean, onCrop: () => void }) {
     const [crop, setCrop] = useState<Crop>(); 
-    const [imageSrc, setImageSrc] = useState(src); // State variable for blob URL
+    const [imageSrc, setImageSrc] = useState(localStorage.getItem("pdfData")!); // Keeps track of image URL
 
     // When the user requests to apply the crop
     const handleApplyCrop = async () => {
@@ -47,11 +47,12 @@ export default function ImageEdit({ src , editBool, onCrop }: { src: string, edi
             // Convert the new Blob to a Blob URL
             const blobUrl = URL.createObjectURL(newBlob);
 
-            // Update the source URL
-            setImageSrc(blobUrl);
-
-            // Notify the parent component that the image has been cropped
-            onCrop(blobUrl);
+            // Update the source URL of the image
+            window.localStorage.setItem("pdfData", blobUrl);
+            
+            // Tell the current component and parent component that the image has been cropped
+            setImageSrc(localStorage.getItem("pdfData")!);
+            onCrop();
 
             // Reset the crop state, use max width and height
             setCrop({
