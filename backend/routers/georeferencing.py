@@ -219,7 +219,31 @@ async def georefImage(projectId: int, crs: str = None):
         return FileResponse(project.georeferencedFilePath, media_type="image/tiff")
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
-    
+
+#route 
+@router.get("/{projectId}/georef/tiff")
+async def adjustGeoref(projectId: int):
+    #try to find the project by id and adjust the georeferenced image
+    try:
+        project = Repo.getProject(projectId)
+        #get the temporary file path of the image
+        imageFilePath = project.georeferencedFilePath
+        #get the pointsList of the project
+        points = project.points
+        #georeference the image
+        georeferencedImage = georef.adjustGeoreferencedImage(imageFilePath, points)
+        if georeferencedImage is None:
+            raise Exception("Image could not be georeferenced")
+        #open the projetcs georeferencedFilePath and write the georeferenced image to it
+        with open(project.georeferencedFilePath, "wb") as file:
+            file.write(open(georeferencedImage, "rb").read())
+            #remove the temporary file
+            georef.removeFile(georeferencedImage)
+        return FileResponse(project.georeferencedFilePath, media_type="image/tiff")
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
 #route to create a test project
 @router.post("/test", tags=["test"])
 async def createTestProject():

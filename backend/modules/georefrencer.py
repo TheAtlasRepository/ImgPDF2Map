@@ -100,4 +100,20 @@ def georeferencer(tempFilePath, points: pointList, crs: str = defaultCrs)->str:
     #return the path to the georeferenced file
     return path
 
+#function to adjust the georeferenced image with a new point in addition to the old points
+def adjustGeoreferencedImage(tempFilePath, points: pointList, crs: str = defaultCrs)->str:
+    #create the GCPs
+    gcps = createGcps(points)
+    #open the georeferenced file
+    dataset = rio.open(tempFilePath, "r+")
+    #create the transform
+    transform = from_gcps(gcps)
+    #set the transform
+    dataset.transform = transform
+    #set the crs
+    dataset.crs = CRS.from_string(crs)
+    #save the file
+    dataset.close()
+    #return the path to the georeferenced file
+    return tempFilePath
 
