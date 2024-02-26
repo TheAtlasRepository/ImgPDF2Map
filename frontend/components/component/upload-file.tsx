@@ -3,16 +3,21 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function UploadFile() {
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Add state for error message
-  const router = useRouter();
-  const [fileType, setFileType] = useState("");
+type UploadFileProps = {
+  clearStateRequest: () => void;
+  onFileUpload: (fileUrl: string, fileType: string) => void;
+};
+
+const UploadFile: React.FC<UploadFileProps> = ({ onFileUpload, clearStateRequest }) => {
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fileName, setFileName] = useState("");
   const params = useSearchParams();
 
+
   useEffect(() => {
+    // If there is an error message in the URL, set the error message state to the value in the URL
     if (params.get("e")) {
-      setErrorMessage(params.get("e") as string);
+      handleErrorMsg(params.get("e") as string);
     }
   });
 
@@ -41,42 +46,48 @@ export default function UploadFile() {
   // Check if file type is supported
   const checkFileType = (file: File) => {
     if (file) {
-      setErrorMessage(null); // Clear any existing error message
-      setFileType(file.type);
+      // Clear any existing error message and set file type and name
+      handleErrorMsg("");
       setFileName(file.name);
+
+      // Return if file type is not supported
+      if (file.type !== 'application/pdf' && !file.type.startsWith('image/')) {
+        handleErrorMsg("File type not supported.");
+        return;
+      }
 
       // Read and save file to local storage
       const reader = new FileReader();
       reader.onload = () => {
-        const blob = new Blob([reader.result as string], { type: file.type });
-        localStorage.setItem(
-          "pdfData",
-          JSON.stringify({
-            url: URL.createObjectURL(blob),
-            type: blob.type,
-          })
-        );
+          const blob = new Blob([reader.result as string], { type: file.type });
+          const fileUrl = URL.createObjectURL(blob);
+          localStorage.setItem(
+              "pdfData",
+              JSON.stringify({
+                  url: fileUrl,
+                  type: blob.type,
+              })
+          );
+
+          // Call onFileUpload with the file type and the file URL
+          onFileUpload(fileUrl, file.type);
       };
       reader.readAsArrayBuffer(file);
 
       // Delete previous PDF if it exists
       if (localStorage.getItem("pdfData")) {
-        URL.revokeObjectURL(localStorage.getItem("pdfData")!);
-        localStorage.removeItem("pdfData");
-      }
-
-      // Route based on file type
-      if (file.type === "application/pdf") {
-        // Push to PdfSelect, where the PDF will be displayed
-        router.push("/PdfSelect");
-      } else if (file.type.startsWith("image/")) {
-        // Push to Conversion, where the image will be converted to PNG
-        router.push("/Conversion");
+          URL.revokeObjectURL(localStorage.getItem("pdfData")!);
+          localStorage.removeItem("pdfData");
       }
     } else {
-      setErrorMessage("File type not supported.");
+      handleErrorMsg("File type not supported.");
     }
   };
+
+  const handleErrorMsg = (e: string) => {
+    clearStateRequest();
+    setErrorMessage(e);
+  }
 
   return (
     <div className="mx-auto w-1/4">
@@ -163,3 +174,5 @@ function FolderUploadIcon(props: any) {
     </svg>
   );
 }
+
+export default UploadFile;
