@@ -1,4 +1,3 @@
-import { init } from "next/dist/compiled/webpack/webpack";
 import React, { useState, useEffect, use } from "react";
 
 interface ImageMapProps {
@@ -81,7 +80,10 @@ export default function ImageMap({
   const handleMouseWheel = (event: React.WheelEvent<HTMLDivElement>) => {
     event.preventDefault();
     const zoomDelta = event.deltaY > 0 ? -0.1 : 0.1;
-    setZoomLevel((prevZoomLevel) => prevZoomLevel + zoomDelta);
+    const minZoom = 0.1;
+    setZoomLevel((prevZoomLevel) =>
+      Math.max(prevZoomLevel + zoomDelta, minZoom)
+    );
   };
 
   //event listener for mouse wheel
@@ -108,8 +110,8 @@ export default function ImageMap({
       className="flex h-full"
       style={{
         position: "relative",
-        width: imgSize.width / 4,
-        height: imgSize.height / 4,
+        width: imgSize.width,
+        height: imgSize.height,
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
