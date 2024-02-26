@@ -20,6 +20,14 @@ export default function SplitView() {
     "mapbox://styles/mapbox/streets-v12"
   );
 
+  type GeoCoordinates = [number, number];
+
+  type imageCoordinates = [number, number];
+
+  const [georefMarkerPairs, setGeorefMarkerPairs] = useState<
+    { latLong: GeoCoordinates; pixelCoords: imageCoordinates }[]
+  >([]);
+
   const handleStyleChange = (newStyle: string) => {
     setMapStyle(newStyle);
   };
@@ -27,10 +35,18 @@ export default function SplitView() {
   const [mapMarkers, setMapMarkers] = useState<
     { geoCoordinates: GeoCoordinates }[]
   >([]);
-  type GeoCoordinates = [number, number];
 
   const addMapMarker = (geoCoordinates: GeoCoordinates) => {
+    if (mapMarkers.length >= 3) return;
     setMapMarkers([...mapMarkers, { geoCoordinates }]);
+
+    if (georefMarkerPairs.length < 3) {
+      setGeorefMarkerPairs([
+        ...georefMarkerPairs,
+        { latLong: geoCoordinates, pixelCoords: [0, 0] },
+      ]);
+    }
+    console.log(georefMarkerPairs);
   };
 
   //image states
@@ -47,13 +63,45 @@ export default function SplitView() {
 
   const addImageMarker = (event: React.MouseEvent<HTMLDivElement>) => {
     if (isDragging) return;
+    if (imageMarkers.length >= 3) return;
     const rect = (event.target as Element).getBoundingClientRect();
     const x = event.clientX - rect.left; // x position within the element.
     const y = event.clientY - rect.top; // y position within the element.
     setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
     // console.log(imageMarkers);
+
+    const updatedPairs = [...georefMarkerPairs];
+    updatedPairs[georefMarkerPairs.length - 1].pixelCoords = [x, y];
+    setGeorefMarkerPairs(updatedPairs);
   };
 
+  const renderGeorefPairTable = () => {
+    if (!georefMarkerPairs.length) return null;
+    return (
+      <table>
+        <thead>
+          <tr>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Pixel X</th>
+            <th>Pixel Y</th>
+          </tr>
+        </thead>
+        <tbody>
+          {georefMarkerPairs.map((pair, index) => (
+            <tr key={index}>
+              <td>{pair.latLong[0]}</td>
+              <td>{pair.latLong[1]}</td>
+              <td>{pair.pixelCoords[0]}</td>
+              <td>{pair.pixelCoords[1]}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  };
+
+  //adjust marker positions based on image manipulation
   const adjustMarkerPositions = (
     pixelCoordinates: [number, number],
     transform: { x: number; y: number },
@@ -153,6 +201,7 @@ export default function SplitView() {
               </div>
             ))}
           </ImageMap>
+          <div className="absolute bottom-0">{renderGeorefPairTable()}</div>
         </Allotment.Pane>
       </Allotment>
     </div>
