@@ -101,9 +101,24 @@ def georeferencer(tempFilePath, points: pointList, crs: str = defaultCrs)->str:
     return path
 
 #function to adjust the georeferenced image with a new point in addition to the old points
-def adjustGeoreferencedImage(tempFilePath, points: pointList, crs: str = defaultCrs)->str:
+def adjustGeoreferencedImage(innFilePath, points: pointList, crs: str = defaultCrs)->str:
+    #safty check
+    if len(points.points) < 3:
+        raise Exception("Not enough points to create a transform")
+    if not os.path.isfile(innFilePath):
+        raise Exception("File not found")
+    #check if the file is a tiff file and has data
+    with rio.open(innFilePath, "r") as file:
+        if file.count == 0:
+            raise Exception("File has no data")
     #create the GCPs
     gcps = createGcps(points)
+    #create file in the temp folder
+    filename = getUniqeFileName('tiff')
+    tempFilePath = f"temp/{filename}"
+    #write the file
+    with open(tempFilePath, "wb") as file:
+        file.write(open(innFilePath, "rb").read())
     #open the georeferenced file
     dataset = rio.open(tempFilePath, "r+")
     #create the transform

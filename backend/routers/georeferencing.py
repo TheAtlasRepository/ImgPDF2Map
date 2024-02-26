@@ -234,7 +234,7 @@ async def adjustGeoref(projectId: int):
         georeferencedImage = georef.adjustGeoreferencedImage(imageFilePath, points)
         if georeferencedImage is None:
             raise Exception("Image could not be georeferenced")
-        #open the projetcs georeferencedFilePath and write the georeferenced image to it
+        #open the projetcs georeferencedFilePath and overwrite with the adjusted georeferenced image
         with open(project.georeferencedFilePath, "wb") as file:
             file.write(open(georeferencedImage, "rb").read())
             #remove the temporary file
