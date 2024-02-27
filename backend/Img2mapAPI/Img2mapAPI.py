@@ -1,8 +1,16 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import *
 
-app = FastAPI()
+
+
+
+
+app = FastAPI(
+    title="Img2Map API",
+    description="API for converting and georeferencing images",
+)
+
 router = APIRouter()
 
 origins = [
@@ -18,6 +26,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 #todo: add routes to router
 # Default test route
