@@ -1,36 +1,89 @@
+from fastapi import UploadFile
+from typing import List
 from pdf2image import convert_from_path
-import tempfile
 from PIL import Image
-
+from PIL.Image import Image
+from .FileHelper import getUniqeFileName, removeFile
+from typing import Tuple
 
 #function to convert a .pdf page to .png
-def pdf2png(file, page_number):
-    #failsafe checks
-    if file.content_type != 'application/pdf':
-        raise Exception('File must be a .pdf file')
-    if page_number < 0:
-        raise Exception('Body content must be at least 1 page')
-    if page_number > 100:
-        raise Exception('Page number must be less than 100')
-    
-    with open(file.filename, 'wb') as f:
-        f.write(file.read())
-    
-    #create temporary file to store pdf
-    temp_pdf = tempfile.NamedTemporaryFile(delete=False)
-    temp_pdf.write(file.read())
-    temp_pdf.close()
-
-    #making the name of the image
+async def pdf2png(file: UploadFile, page_number) -> Tuple[str, str]:
+    """
+    Converts a .pdf file to a .png file.
+    :param file: .pdf file to convert
+    :param page_number: page number to convert
+    :return: Tuple of the path to the .png file and the name of the .png file
+    """
+    #local setup
+    tempPdf = getUniqeFileName('pdf') 
+    tempImage = getUniqeFileName('png') 
     image_name = file.filename[:-4] +'p'+ str(page_number) + '.png'
+    #save the .pdf file
+    with open(tempPdf, 'w+b') as pdf:
+        pdf.write(await file.read())
+    #convert the .pdf to .png
+    img = open(tempImage, 'w+b')
+    images: List[Image] = convert_from_path(tempPdf)
+    images[page_number-1].save(img, 'PNG')
+    images[page_number-1].close()
+    img.close()
+    removeFile(tempPdf)
+    return tempImage, image_name
 
-    #convert pdf to image
-    images = convert_from_path(temp_pdf.name)
+#function to convert an image to .png
+async def image2png(file: UploadFile) -> Tuple[str, str]:
+    """
+    Converts an image file to a .png file.
+    :param file: image file to convert
+    :return: Tuple of the path to the .png file and the name of the .png file
+    """
+    #local setup
+    inputImage = getUniqeFileName('png')
+    image_name = file.filename[:-4] + '.png'
+    #save the image
+    with open(inputImage, 'w+b') as img:
+        img.write(await file.read())
+    with Image.open(inputImage) as image:
+        #convert the image to .png
+        tempImage = getUniqeFileName('png')
+        image.save(tempImage, 'PNG')
+    removeFile(inputImage)
+    return tempImage, image_name
 
-    #make temporary file to store image
-    temp_image = tempfile.NamedTemporaryFile(delete=False)
-    images[page_number-1].save(temp_image.name, 'PNG')
-    temp_image.close()
+#function to check if a file is an image and is not a .png file or a file that PIL can't convert to .png
+def isImage(file: UploadFile) -> bool:
+    """
+    Checks if a file is an image and is not a file that PIL can't convert to .png.
+    :param file: file to check
+    :return: True if the file is an image and is not a .png file or a file that PIL can't convert to .png, False otherwise
+    """
+    #file types that PIL can't convert to png, but have image headers
+    unsupported_types = ['image/svg+xml', 'image/ERF', 'image/NRW', 'image/ORF', 'image/PEF', 'image/RAF', 'image/RW2']
+    if not file.content_type.startswith('image/'):
+        return False
+    if file.content_type in unsupported_types:
+        return False
+    return True
 
-    #return image
-    return temp_image.name, image_name
+#function to crop a .png image
+def cropPng(file: UploadFile, p1x: int, p1y: int, p2x: int, p2y: int) -> Tuple[str, str]:
+    """
+    Crops a .png image.
+    :param image: .png image to crop
+    :param p1x: X coordinate of the first point
+    :param p1y: Y coordinate of the first point
+    :param p2x: X coordinate of the second point
+    :param p2y: Y coordinate of the second point
+    :return: cropped .png image and the name of the cropped .png image
+    """
+    # Open the image file
+    image = Image.open(file.file)
+    # Crop image and save it to a new temporary file
+    image.crop((p1x, p1y, p2x, p2y))
+    tempImage = getUniqeFileName('png')
+    with open(tempImage, 'w+b') as img:
+        image.save(img, 'PNG')
+        image.close()
+    newfileName = file.filename[:-4] + 'cropped.png'
+    return tempImage, newfileName
+    
