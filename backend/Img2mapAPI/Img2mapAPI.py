@@ -1,6 +1,7 @@
 from fastapi import FastAPI, APIRouter, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from .routers import *
+from .dependencies import *
 
 
 
@@ -11,6 +12,18 @@ app = FastAPI(
     description="API for converting and georeferencing images",
 )
 
+<<<<<<< HEAD
+
+
+
+
+app = FastAPI(
+    title="Img2Map API",
+    description="API for converting and georeferencing images",
+)
+
+=======
+>>>>>>> 73586585e6b4f1f65314c08874e3ee58fe0dd88a
 router = APIRouter()
 
 origins = [
