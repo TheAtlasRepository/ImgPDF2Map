@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
-from Routers import georeferencing ,converters
+from .routers import *
 
 app = FastAPI()
 router = APIRouter()
@@ -32,4 +32,4 @@ async def root():
 app.router.include_router(converters.router, prefix="/converter", tags=["converter"])
 
 #Goereferencing routes
-app.router.include_router(georeferencing.router)
+app.router.include_router(georefProject.router)

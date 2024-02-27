@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Union
 
-#geografic point
+
 class Point(BaseModel):
      lat: float
      lng: float

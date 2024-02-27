@@ -1,4 +1,5 @@
 from . import FileHelper
 from . import ImageHelper
 from . import FileStorage
-from StorageHandler import *
+from . import localrepository
+from . import GeorefTestFiles

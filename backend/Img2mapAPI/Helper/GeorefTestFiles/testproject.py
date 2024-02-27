@@ -1,4 +1,4 @@
-from modules.models import *
+from ...models import *
 from typing import List
 import json
 import os

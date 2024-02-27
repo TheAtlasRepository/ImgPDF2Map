@@ -1,14 +1,6 @@
 from . import Img2mapAPI
-from . import Routers
-from . import Models
-from . import Utils
-import Routers
+from . import routers
+from . import models
+from . import helper
 
-#This is the MainPackage __init__.py file
-#This file is the entry point for the MainPackage application
-from fastapi import FastAPI, APIRouter
-from fastapi.middleware.cors import CORSMiddleware
-from Routers import georeferencing ,converters
-
-
-
+__all__ = ["Img2mapAPI", "routers", "models", "helper"]

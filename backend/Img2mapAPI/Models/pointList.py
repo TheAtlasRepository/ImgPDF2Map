@@ -1,7 +1,7 @@
 from typing import List
 from pydantic import BaseModel
-from .point import Point
+from .Point import Point
 # model for the pointList
 
-class pointList(BaseModel):
+class PointList(BaseModel):
     points: List[Point] = []

@@ -1,26 +1,35 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from fastapi.responses import FileResponse
-from modules.models import *
 from typing import List
-from localrepository import Projects
-#import the georeferencer function from the georeferencer module path ../modules/georeferencer.py
-from modules import georefrencer as georef
-from GeorefTestFiles import createTestProject as cts
+
+#internal imports
+from ..models.Project import Project
+from ..models.PointList import PointList
+from ..models.Point import Point
+from ..helper.localrepository.projects import Projects
+from ..managers import georefrencer as georef
+from ..helper.GeorefTestFiles.testproject import createTestProject as cts
+
 
 #Router handles all requests to the georeferencing API/ depending on the singelton repository of app in main.py
 #The router is included in the main.py and the routes are added to the router
 router = APIRouter(
     prefix="/project",
-    tags=["georeferencing"],
-    responses={404: {"description": "Not found"},
-                415: {"description": "Unsupported media type"},
-                400: {"description": "Bad request"}
-               },
+    tags=["Georeferencing Project"],
 )
 
 #adding the singleton repository to the router to be able to access the projects
 router.projects = Projects()
 Repo = router.projects
+
+#function to find the highest id of a list of points
+def find_higest_id(points: List[Point]):
+    highest = 0
+    for point in points:
+        if point.id > highest:
+            highest = point.id
+    return highest
+
 
 #GeorefProject path: /georef/project
 #route to create and or get georef a project id
@@ -79,7 +88,7 @@ async def addPoint(projectId: int, point: Point):
         project = Repo.getProject(projectId)
         if project.points is None:
             #check if the points attribute is None and create a new pointList
-            project.points = pointList()
+            project.points = PointList()
             #set the id of the point
             point.id = 1
         else:
@@ -92,12 +101,7 @@ async def addPoint(projectId: int, point: Point):
         raise HTTPException(status_code=404, detail=str(e))
 
 
-def find_higest_id(points: List[Point]):
-    highest = 0
-    for point in points:
-        if point.id > highest:
-            highest = point.id
-    return highest
+
 
 
 #route to update a point

@@ -1,23 +1,25 @@
-from typing import Optional, Union
+from typing import Optional, Union, List
 from fastapi import UploadFile
 from pydantic import BaseModel
 import tempfile
-from .pointList import pointList
+from .PointList import PointList
+from .Point import Point
 
 class Project(BaseModel):
     id: int = None
     name: str
     description: Optional[str] = None
-    points: Union[pointList, None] = None
+    points: Union[PointList, None] = None
     crs: Union[str, None] = None
     imageFilePath: Union[str, None] = None
     georeferencedFilePath: Union[str, None] = None
     selfdestructtime: Union[str, None] = None
     created: Union[str, None] = None
     lastModified: Union[str, None] = None
+    
     def __init__(self, **data):
         super().__init__(**data)
-        self.points = pointList(points=[])
+        self.points = PointList(points=[])
         self.imageFilePath = tempfile.NamedTemporaryFile().name
         self.georeferencedFilePath = tempfile.NamedTemporaryFile(suffix='.tiff').name
         self.selfdestructtime = "never"

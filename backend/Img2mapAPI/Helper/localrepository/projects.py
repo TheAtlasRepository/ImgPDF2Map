@@ -1,3 +1,4 @@
+
 #this is a singleton class in which we store all the projects
 class Projects:
     _instance = None

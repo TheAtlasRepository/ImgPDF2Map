@@ -3,7 +3,7 @@ import rasterio as rio #importing rasterio for georeferencing
 from rasterio.transform import from_gcps #importing from_gcps to create a transform from GCPs
 from rasterio.control import GroundControlPoint as GCP 
 from rasterio.crs import CRS #importing CRS for the default crs
-from .models import pointList #importing the pointList model
+from ..models import PointList #importing the pointList model
 
 #mapbox projection crs for web mercator: EPSG:3857
 defaultCrs = 'EPSG:4326'
@@ -39,7 +39,7 @@ def removeFile(filePath):
 
 
 #function to create Rasterio GCPs from a list of points
-def createGcps(PointList : pointList):
+def createGcps(PointList : PointList):
     #check if the pointlist contains at least 3 points
     if len(PointList.points) < 3:
         raise Exception("Not enough points to create a transform")
@@ -50,7 +50,7 @@ def createGcps(PointList : pointList):
     return gcps
 
 #Main georeferencer function
-def georeferencer(tempFilePath, points: pointList, crs: str = defaultCrs)->str: 
+def georeferencer(tempFilePath, points: PointList, crs: str = defaultCrs)->str: 
     #create the GCPs
     gcps = createGcps(points)
 
@@ -101,7 +101,7 @@ def georeferencer(tempFilePath, points: pointList, crs: str = defaultCrs)->str:
     return path
 
 #function to adjust the georeferenced image with a new point in addition to the old points
-def adjustGeoreferencedImage(innFilePath, points: pointList, crs: str = defaultCrs)->str:
+def adjustGeoreferencedImage(innFilePath, points: PointList, crs: str = defaultCrs)->str:
     #safty check
     if len(points.points) < 3:
         raise Exception("Not enough points to create a transform")
