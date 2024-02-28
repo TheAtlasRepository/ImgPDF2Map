@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Map, NavigationControl, GeolocateControl, Marker } from "react-map-gl";
 import type { MapRef } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -19,6 +19,9 @@ export default function SplitView() {
   const [mapStyle, setMapStyle] = useState(
     "mapbox://styles/mapbox/streets-v12"
   );
+  const handleStyleChange = (newStyle: string) => {
+    setMapStyle(newStyle);
+  };
 
   type GeoCoordinates = [number, number];
 
@@ -28,76 +31,159 @@ export default function SplitView() {
     { latLong: GeoCoordinates; pixelCoords: imageCoordinates }[]
   >([]);
 
-  const handleStyleChange = (newStyle: string) => {
-    setMapStyle(newStyle);
-  };
-
   const [mapMarkers, setMapMarkers] = useState<
     { geoCoordinates: GeoCoordinates }[]
   >([]);
 
+  const [waitingForImageMarker, setWaitingForImageMarker] = useState(false);
+  const [waitingForMapMarker, setWaitingForMapMarker] = useState(false);
+
   const addMapMarker = (geoCoordinates: GeoCoordinates) => {
+    if (waitingForImageMarker) return;
+    //limit to 3 markers initially
     if (mapMarkers.length >= 3) return;
+
     setMapMarkers([...mapMarkers, { geoCoordinates }]);
 
-    if (georefMarkerPairs.length < 3) {
-      setGeorefMarkerPairs([
-        ...georefMarkerPairs,
-        { latLong: geoCoordinates, pixelCoords: [0, 0] },
-      ]);
-    }
-    console.log(georefMarkerPairs);
+    setGeorefMarkerPairs([
+      ...georefMarkerPairs,
+      { latLong: geoCoordinates, pixelCoords: [0, 0] },
+    ]);
+
+    setWaitingForImageMarker(true);
+    setWaitingForMapMarker(false);
   };
 
   //image states
   const [transform, setTransform] = useState({ x: 0, y: 0 });
   const [zoomLevel, setZoomLevel] = useState(1);
-
   const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   type ImageMarker = {
-    pixelCoordinates: [number, number];
+    pixelCoordinates: imageCoordinates;
   };
+
+  //print isdragging to console when state is changed
+  useEffect(() => {
+    console.log(isDragging);
+  }, [isDragging]);
 
   const [imageMarkers, setImageMarkers] = useState<ImageMarker[]>([]);
 
-  const addImageMarker = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (isDragging) return;
-    if (imageMarkers.length >= 3) return;
-    const rect = (event.target as Element).getBoundingClientRect();
-    const x = event.clientX - rect.left; // x position within the element.
-    const y = event.clientY - rect.top; // y position within the element.
-    setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
-    // console.log(imageMarkers);
+  // const addImageMarker = (event: React.MouseEvent<HTMLDivElement>) => {
+  //   if (waitingForMapMarker) return;
+  //   console.log(isDragging);
+  //   if (isDragging) return;
+  //   //limit to 3 markers initially
+  //   if (imageMarkers.length >= 3) return;
+  //   const rect = (event.target as Element).getBoundingClientRect();
+  //   const x = event.clientX - rect.left; // x position within the element.
+  //   const y = event.clientY - rect.top; // y position within the element.
+  //   setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
+  //   // console.log(imageMarkers);
 
+  //   // Update the last pair in the array with the pixel coordinates
+  //   const updatedPairs = [...georefMarkerPairs];
+
+  //   // Check if there are any pairs in the array
+  //   if (updatedPairs.length > 0) {
+  //     // Get the last pair in the array
+  //     const lastPair = updatedPairs[updatedPairs.length - 1];
+
+  //     // Check if latLong is not set, if it isnt set it to 0,0
+  //     if (!lastPair.latLong) {
+  //       lastPair.latLong = [0, 0]; // or set it to the desired default value
+  //       lastPair.pixelCoords = [x, y];
+  //       setGeorefMarkerPairs(updatedPairs);
+  //       //else set pixelCoords
+  //     } else {
+  //       lastPair.pixelCoords = [x, y];
+  //       setGeorefMarkerPairs(updatedPairs);
+  //     }
+  //   }
+
+  //   setWaitingForMapMarker(true);
+  //   setWaitingForImageMarker(false);
+  // };
+
+  const [calculatedDragDistance, setCalculatedDragDistance] = useState(0);
+  const addImageMarker = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (waitingForMapMarker) return;
+    if (isDragging) return;
+
+    //get the x and y coordinates of the click event
+    const rect = (event.target as Element).getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    //calculate the start position of the drag
+    setCalculatedDragDistance(
+      Math.sqrt(Math.pow(dragStart.x - x, 2) + Math.pow(dragStart.y - y, 2))
+    );
+
+    //calculate the distance between the start and end of the drag
+    const distance = Math.sqrt(
+      Math.pow(dragStart.x - x, 2) + Math.pow(dragStart.y - y, 2)
+    );
+
+    //difference between dragdistance and distance, shows amount of pixels dragged
+    const dragDifference = Math.abs(distance - calculatedDragDistance);
+    //if distance is greater than 0.1 pixels, consider it a drag
+    if (dragDifference > 0.1) {
+      console.log("dragging");
+      console.log("distance dragged:", dragDifference);
+      return;
+    }
+    // limit to 3 markers initially
+    if (imageMarkers.length >= 3) return;
+
+    //
+    setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
     const updatedPairs = [...georefMarkerPairs];
-    updatedPairs[georefMarkerPairs.length - 1].pixelCoords = [x, y];
-    setGeorefMarkerPairs(updatedPairs);
+    if (updatedPairs.length > 0) {
+      const lastPair = updatedPairs[updatedPairs.length - 1];
+      if (!lastPair.latLong) {
+        lastPair.latLong = [0, 0];
+        lastPair.pixelCoords = [x, y];
+        setGeorefMarkerPairs(updatedPairs);
+      } else {
+        lastPair.pixelCoords = [x, y];
+        setGeorefMarkerPairs(updatedPairs);
+      }
+    }
+
+    setWaitingForMapMarker(true);
+    setWaitingForImageMarker(false);
   };
 
   const renderGeorefPairTable = () => {
     if (!georefMarkerPairs.length) return null;
     return (
-      <table>
-        <thead>
-          <tr>
-            <th>Latitude</th>
-            <th>Longitude</th>
-            <th>Pixel X</th>
-            <th>Pixel Y</th>
-          </tr>
-        </thead>
-        <tbody>
-          {georefMarkerPairs.map((pair, index) => (
-            <tr key={index}>
-              <td>{pair.latLong[0]}</td>
-              <td>{pair.latLong[1]}</td>
-              <td>{pair.pixelCoords[0]}</td>
-              <td>{pair.pixelCoords[1]}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="">
+        <div className="absolute bottom-0 right-0">
+          <table className="table-auto w-full text-sm text-left">
+            <thead>
+              <tr>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Pixel X</th>
+                <th>Pixel Y</th>
+              </tr>
+            </thead>
+            <tbody>
+              {georefMarkerPairs.map((pair, index) => (
+                <tr key={index}>
+                  <td>{pair.latLong[0]}</td>
+                  <td>{pair.latLong[1]}</td>
+                  <td>{pair.pixelCoords[0]}</td>
+                  <td>{pair.pixelCoords[1]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     );
   };
 
@@ -175,6 +261,8 @@ export default function SplitView() {
             zoomLevel={zoomLevel}
             setIsDragging={setIsDragging}
             initialIsDragging={isDragging}
+            setDragStart={setDragStart}
+            dragStart={dragStart}
           >
             {imageMarkers.map((marker, index) => (
               <div
@@ -201,7 +289,7 @@ export default function SplitView() {
               </div>
             ))}
           </ImageMap>
-          <div className="absolute bottom-0">{renderGeorefPairTable()}</div>
+          <div>{renderGeorefPairTable()}</div>
         </Allotment.Pane>
       </Allotment>
     </div>

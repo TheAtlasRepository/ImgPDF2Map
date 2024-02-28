@@ -13,6 +13,8 @@ interface ImageMapProps {
 
   setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
   initialIsDragging: boolean;
+  setDragStart: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
+  dragStart: { x: number; y: number };
 }
 
 export default function ImageMap({
@@ -21,6 +23,8 @@ export default function ImageMap({
   onClick,
   setIsDragging,
   initialIsDragging,
+  setDragStart,
+  dragStart,
 
   setTransform,
   setZoomLevel,
@@ -28,8 +32,10 @@ export default function ImageMap({
   zoomLevel,
 }: ImageMapProps) {
   //local state for dragging
-  const [localIsDragging, setLocalIsDragging] = useState(initialIsDragging);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [localIsDragging, setLocalIsDragging] = useState(
+    Boolean(initialIsDragging)
+  );
+  // const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   //size of imgs container
   const [imgSize, setImgSize] = useState({ width: 0, height: 0 });
@@ -53,7 +59,7 @@ export default function ImageMap({
   }, [initialIsDragging]);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (initialIsDragging) {
+    if (localIsDragging) {
       const deltaX = event.clientX - dragStart.x; // speed of drag
       const deltaY = event.clientY - dragStart.y; // speed of drag
       setTransform((prevTransform) => ({
@@ -65,10 +71,6 @@ export default function ImageMap({
   };
 
   const handleMouseUp = () => {
-    // //short timeout to prevent click event from firing after drag
-    // setTimeout(() => {
-    //   setDragState(false);
-    // }, 10);
     setDragState(false);
   };
 
@@ -106,6 +108,7 @@ export default function ImageMap({
   }, []);
 
   return (
+    // <div style={{ width: imgSize.width / 2, height: imgSize.height / 2 }}>
     <div
       className="flex h-full"
       style={{
