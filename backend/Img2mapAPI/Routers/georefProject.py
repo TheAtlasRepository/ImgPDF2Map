@@ -10,13 +10,12 @@ from ..helper.localrepository.projects import Projects
 from ..managers import georefrencer as georef
 from ..helper.GeorefTestFiles.testproject import createTestProject as cts
 
-
-#Router handles all requests to the georeferencing API/ depending on the singelton repository of app in main.py
-#The router is included in the main.py and the routes are added to the router
 router = APIRouter(
     prefix="/project",
     tags=["Georeferencing Project"],
 )
+
+#TODO: Add a dependency class to handle errors and return the correct status code
 
 #adding the singleton repository to the router to be able to access the projects
 router.projects = Projects()
