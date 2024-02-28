@@ -12,7 +12,6 @@ interface ImageMapProps {
   setZoomLevel: React.Dispatch<React.SetStateAction<number>>;
 
   setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
-  initialIsDragging: boolean;
   setDragStart: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
   dragStart: { x: number; y: number };
 }
@@ -22,7 +21,6 @@ export default function ImageMap({
   children,
   onClick,
   setIsDragging,
-  initialIsDragging,
   setDragStart,
   dragStart,
 
@@ -32,9 +30,7 @@ export default function ImageMap({
   zoomLevel,
 }: ImageMapProps) {
   //local state for dragging
-  const [localIsDragging, setLocalIsDragging] = useState(
-    Boolean(initialIsDragging)
-  );
+  const [localIsDragging, setLocalIsDragging] = useState(false);
   // const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   //size of imgs container
@@ -53,10 +49,6 @@ export default function ImageMap({
     setIsDragging(bool);
     setLocalIsDragging(bool);
   };
-  // Update local state when prop changes
-  useEffect(() => {
-    setLocalIsDragging(initialIsDragging);
-  }, [initialIsDragging]);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
     if (localIsDragging) {

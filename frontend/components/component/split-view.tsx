@@ -15,7 +15,6 @@ export default function SplitView() {
   //mapbox states
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
   const mapRef = useRef<MapRef>(null);
-
   const [mapStyle, setMapStyle] = useState(
     "mapbox://styles/mapbox/streets-v12"
   );
@@ -23,14 +22,19 @@ export default function SplitView() {
     setMapStyle(newStyle);
   };
 
+  //georeferencing types
   type GeoCoordinates = [number, number];
-
   type imageCoordinates = [number, number];
+  type ImageMarker = {
+    pixelCoordinates: imageCoordinates;
+  };
 
+  //array of lonlat and pixel coordinates in pairs
   const [georefMarkerPairs, setGeorefMarkerPairs] = useState<
     { latLong: GeoCoordinates; pixelCoords: imageCoordinates }[]
   >([]);
 
+  //map states
   const [mapMarkers, setMapMarkers] = useState<
     { geoCoordinates: GeoCoordinates }[]
   >([]);
@@ -60,52 +64,12 @@ export default function SplitView() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
-  type ImageMarker = {
-    pixelCoordinates: imageCoordinates;
-  };
-
   //print isdragging to console when state is changed
   useEffect(() => {
-    console.log(isDragging);
+    console.log("Dragging:", isDragging);
   }, [isDragging]);
 
   const [imageMarkers, setImageMarkers] = useState<ImageMarker[]>([]);
-
-  // const addImageMarker = (event: React.MouseEvent<HTMLDivElement>) => {
-  //   if (waitingForMapMarker) return;
-  //   console.log(isDragging);
-  //   if (isDragging) return;
-  //   //limit to 3 markers initially
-  //   if (imageMarkers.length >= 3) return;
-  //   const rect = (event.target as Element).getBoundingClientRect();
-  //   const x = event.clientX - rect.left; // x position within the element.
-  //   const y = event.clientY - rect.top; // y position within the element.
-  //   setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
-  //   // console.log(imageMarkers);
-
-  //   // Update the last pair in the array with the pixel coordinates
-  //   const updatedPairs = [...georefMarkerPairs];
-
-  //   // Check if there are any pairs in the array
-  //   if (updatedPairs.length > 0) {
-  //     // Get the last pair in the array
-  //     const lastPair = updatedPairs[updatedPairs.length - 1];
-
-  //     // Check if latLong is not set, if it isnt set it to 0,0
-  //     if (!lastPair.latLong) {
-  //       lastPair.latLong = [0, 0]; // or set it to the desired default value
-  //       lastPair.pixelCoords = [x, y];
-  //       setGeorefMarkerPairs(updatedPairs);
-  //       //else set pixelCoords
-  //     } else {
-  //       lastPair.pixelCoords = [x, y];
-  //       setGeorefMarkerPairs(updatedPairs);
-  //     }
-  //   }
-
-  //   setWaitingForMapMarker(true);
-  //   setWaitingForImageMarker(false);
-  // };
 
   const [calculatedDragDistance, setCalculatedDragDistance] = useState(0);
   const addImageMarker = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -167,8 +131,8 @@ export default function SplitView() {
               <tr>
                 <th>Latitude</th>
                 <th>Longitude</th>
-                <th>Pixel X</th>
-                <th>Pixel Y</th>
+                <th>Map X</th>
+                <th>Map Y</th>
               </tr>
             </thead>
             <tbody>
@@ -260,7 +224,6 @@ export default function SplitView() {
             transform={transform}
             zoomLevel={zoomLevel}
             setIsDragging={setIsDragging}
-            initialIsDragging={isDragging}
             setDragStart={setDragStart}
             dragStart={dragStart}
           >
