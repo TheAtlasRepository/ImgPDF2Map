@@ -63,15 +63,9 @@ export default function SplitView() {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-
-  //print isdragging to console when state is changed
-  useEffect(() => {
-    console.log("Dragging:", isDragging);
-  }, [isDragging]);
-
   const [imageMarkers, setImageMarkers] = useState<ImageMarker[]>([]);
-
   const [calculatedDragDistance, setCalculatedDragDistance] = useState(0);
+
   const addImageMarker = (event: React.MouseEvent<HTMLDivElement>) => {
     if (waitingForMapMarker) return;
     if (isDragging) return;
@@ -157,8 +151,8 @@ export default function SplitView() {
     transform: { x: number; y: number },
     zoomLevel: number
   ): { left: string; top: string } => {
-    const adjustedX = pixelCoordinates[0] + transform.x;
-    const adjustedY = pixelCoordinates[1] + transform.y;
+    const adjustedX = pixelCoordinates[0] * zoomLevel + transform.x;
+    const adjustedY = pixelCoordinates[1] * zoomLevel + transform.y;
 
     return {
       left: `${adjustedX}px`,
@@ -252,7 +246,7 @@ export default function SplitView() {
               </div>
             ))}
           </ImageMap>
-          <div>{renderGeorefPairTable()}</div>
+          {renderGeorefPairTable()}
         </Allotment.Pane>
       </Allotment>
     </div>
