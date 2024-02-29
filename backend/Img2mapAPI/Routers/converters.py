@@ -1,8 +1,8 @@
 from fastapi import APIRouter, BackgroundTasks, File, UploadFile, HTTPException, Query
 from fastapi.responses import FileResponse
 #internal imports
-from ..helper.ImageHelper import *
-from ..helper.FileHelper import removeFile as delFile
+from ..utils.core.ImageHelper import *
+from ..utils.core.FileHelper import removeFile as delFile
 
 #API router for file conversion
 router = APIRouter()

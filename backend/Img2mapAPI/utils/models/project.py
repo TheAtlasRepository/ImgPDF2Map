@@ -2,8 +2,7 @@ from typing import Optional, Union, List
 from fastapi import UploadFile
 from pydantic import BaseModel
 import tempfile
-from .PointList import PointList
-from .Point import Point
+from .pointList import PointList
 
 class Project(BaseModel):
     id: int = None

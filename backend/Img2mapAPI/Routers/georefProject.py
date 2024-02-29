@@ -3,12 +3,12 @@ from fastapi.responses import FileResponse
 from typing import List
 
 #internal imports
-from ..models.Project import Project
-from ..models.PointList import PointList
-from ..models.Point import Point
-from ..helper.localrepository.projects import Projects
-from ..managers import georefrencer as georef
-from ..helper.GeorefTestFiles.testproject import createTestProject as cts
+from ..utils.models.project import Project
+from ..utils.models.pointList import PointList
+from ..utils.models.point import Point
+from ..utils.storage.localrepository.projects import Projects
+from ..utils.core import georefHelper as georef
+from ..devOnly.GeorefTestFiles.testproject import createTestProject as cts
 
 router = APIRouter(
     prefix="/project",
