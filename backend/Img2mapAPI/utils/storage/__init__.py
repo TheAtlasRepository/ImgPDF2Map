@@ -1,4 +1,4 @@
-from . import filestorage
-from . import storageHandler
+from . import files
+from . import data
 
 __ALL__ = ["filestorage", "storageHandler"]

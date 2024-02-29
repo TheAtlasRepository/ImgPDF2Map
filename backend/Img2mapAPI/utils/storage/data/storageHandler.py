@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Union 
+from typing import List, Union 
 
 #Abstract class for moving data to and from storage/DB and the API server
 class StorageHandler(ABC):
@@ -22,7 +22,7 @@ class StorageHandler(ABC):
         pass
 
     @abstractmethod
-    async def save(self, data, type: str, pkName:str = 'id')->int:
+    async def saveInStorage(self, data, type: str, pkName:str = 'id')->int:
         """
         Save data to storage and return the id of the saved data
         
@@ -58,7 +58,7 @@ class StorageHandler(ABC):
         pass
     
     @abstractmethod
-    async def fetchOne(self, id: int, type: str) -> Union[None, any]:
+    async def fetchOne(self, id: int, type: str) -> Union[None, dict]:
         """
         Fetch one data from storage
 
@@ -69,7 +69,7 @@ class StorageHandler(ABC):
         pass
 
     @abstractmethod
-    async def fetch(self, type: str, params: dict = {})->Union[None, any]:
+    async def fetch(self, type: str, params: dict = {})->Union[None ,List[dict], dict]:
         """
         Fetch data from storage
         
@@ -80,7 +80,7 @@ class StorageHandler(ABC):
         pass
 
     @abstractmethod
-    async def fetchAll(self, type: str)->Union[None, any]:
+    async def fetchAll(self, type: str)->Union[None, List[dict]]:
         """
         Fetch all data from storage
 

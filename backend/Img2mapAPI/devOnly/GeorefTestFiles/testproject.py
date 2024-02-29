@@ -1,4 +1,5 @@
 from ...utils.models import *
+from ...utils.projectHandler import ProjectHandler
 from typing import List
 import json
 import os
@@ -14,36 +15,29 @@ AbsolutePath = os.path.abspath(__file__)
 testPathImg = os.path.join(os.path.dirname(AbsolutePath), TestImgRelativePath)
 testPathPoints = os.path.join(os.path.dirname(AbsolutePath), TestPointsRelativePath)
 
-
-# creates a new project
-def createTestProject(repo: object):
-    testImg = testPathImg
-    testPoints = testPathPoints
-    rp = repo
-    # create a new project
+async def createTestProject(repo: ProjectHandler):
+    """Creates a new project with the test image and test points"""
+    testImg = testPathImg #path
+    testPoints = testPathPoints #path 
+    ProjHandler = repo #project handler /access point to work with the project
+    
+    #creating a new project
     project = Project(name="testproject")
-    # add the project to the repository
-    id = rp.addProject(project)
+    id = await ProjHandler.createProject(project)
 
-    #add points to the project from the testpoints.json file
+    #Extract the points from the json file and make a list of points
     JsonPoints = json.load(open(testPoints, "r"))
-    #create a list of points
     jsonPoints = JsonPoints["points"]
-    #add the points to the list
-    Pid = 1
-    getProject = rp.getProject(id)
+    Points: List[Point] = []
     for point in jsonPoints:
         #create a new point with the data from the json file as a map
         nPoint = Point(**point)
-        nPoint.id = Pid
-        getProject.points.points.append(nPoint)
-        Pid += 1
-    #update the project
-    rp.updateProject(id, getProject)
+        nPoint.projectId = id
+        Points.append(nPoint)
 
-    #open imageFilePath and write it with sample_640x426.png file
-    with open(getProject.imageFilePath, "wb") as file:
-        file.write(open(testImg, "rb").read())
-    #update the project
-    repo.updateProject(id, getProject)
+    #prosessing the image file to bytes
+    with open(testImg, "rb") as file:
+        inFile = file.read()
+        await ProjHandler.saveImageFile(id, file=inFile, fileType="image/png")
+    
     return id

@@ -3,15 +3,15 @@ from abc import ABC, abstractmethod
 
 class FileStorage(ABC):
     @abstractmethod
-    def save(self, data: bytes, suffix: str)->str:
+    async def saveFile(self, data: bytes, suffix: str)->str:
         pass
     @abstractmethod
-    def remove(self, path: str):
+    async def removeFile(self, path: str):
         pass
     @abstractmethod
-    def read(self, path: str)->bytes:
+    async def readFile(self, path: str)->bytes:
         pass
     @abstractmethod
-    def exists(self, path: str)->bool:
+    async def fileExists(self, path: str)->bool:
         pass
 

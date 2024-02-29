@@ -38,6 +38,8 @@ class Table:
             row {any} -- The row to be added
         """
         self._rows[id] = row
+        self._nextId += 1
+
 
     def getRow(self, id: int) -> any:
         """

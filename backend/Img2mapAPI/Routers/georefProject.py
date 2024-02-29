@@ -1,14 +1,16 @@
-from fastapi import APIRouter, File, UploadFile, HTTPException
+from fastapi import APIRouter, File, UploadFile, HTTPException, BackgroundTasks ,responses
 from fastapi.responses import FileResponse
 from typing import List
-
-#internal imports
+#internal imports:
 from ..utils.models.project import Project
-from ..utils.models.pointList import PointList
 from ..utils.models.point import Point
-from ..devOnly.localrepository.projects import Projects
-from ..utils.core import georefHelper as georef
-from ..devOnly.GeorefTestFiles.testproject import createTestProject as cts
+from ..utils.projectHandler import ProjectHandler
+from ..utils.storage.files.fileStorage import FileStorage
+from ..utils.storage.files.localFileStorage import LocalFileStorage
+from ..utils.storage.data.storageHandler import StorageHandler
+from ..utils.storage.data.localStorage import LocalStorage
+from ..devOnly.GeorefTestFiles.testproject import createTestProject as cts #test function
+from ..devOnly.localrepository.repository import Repository
 
 router = APIRouter(
     prefix="/project",
@@ -16,245 +18,146 @@ router = APIRouter(
 )
 
 #TODO: Add a dependency class to handle errors and return the correct status code
+_repository: Repository = Repository()
+_StorageHandler: StorageHandler = LocalStorage(_repository) 
+_Filestorage: FileStorage = LocalFileStorage()
 
-#adding the singleton repository to the router to be able to access the projects
-router.projects = Projects()
-Repo = router.projects
+_projectHandler = ProjectHandler(_Filestorage, _StorageHandler)
 
-#function to find the highest id of a list of points
-def find_higest_id(points: List[Point]):
-    highest = 0
-    for point in points:
-        if point.id > highest:
-            highest = point.id
-    return highest
-
-
-#GeorefProject path: /georef/project
-#route to create and or get georef a project id
 @router.post("/")
 async def createProject(project: Project):
+    """
+    Create a new project and return the id of the project
+    - only the name is required, the rest of the attributes are optional
+    """
     try:
-        id = Repo.addProject(project)
-        #get the created project and return it's id
+        id = await _projectHandler.createProject(project)
         return {"id": id}
-    except:
-        raise HTTPException(status_code=400, detail="Project could not be created")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f'Project could not be created: {str(e.with_traceback(None))}, {e.args}')
 
-#route update project details
 @router.put("/{projectId}")
 async def updateProject(projectId: int):
-    #try to find the project by id and update it
+    """ Update the project details and return the id of the project """
     try:
-        project = Repo.getProject(projectId)
-        Repo.updateProject(projectId, project)
-        return {"id": projectId}
+        if await _projectHandler.updateProject(projectId): return {"ProjectID": projectId}
+        else: raise HTTPException(status_code=404, detail="Project not found")
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-
-#route to delete a project
 @router.delete("/{projectId}")
-async def deleteProject(projectId: int):
-    #try to find the project by id and delete it
+async def deleteProject(projectId: int, backgroundTasks: BackgroundTasks):
+    """ Delete a project and return a message if the project was deleted"""
     try:
-        #find the project by id and remove it
-        Repo.removeProject(projectId)
-        return {"ProjectID": projectId}
+        backgroundTasks.add_task(_projectHandler.deleteProject, projectId)
+        return responses.Response(content="Deletion request of project accepted", status_code=202)
     except Exception as e:
         if e.status_code == 500:
             raise HTTPException(status_code=500, detail=str(e))
-        else:
-            raise HTTPException(status_code=404, detail=str(e))
-    
+        pass
 
-#route to get a project by id
 @router.get("/{projectId}")
 async def getProject(projectId: int):
-    #try to find the project by id and return it
-    try:
-        project = Repo.getProject(projectId)
-        return project
-    except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+    """ Get a project by id """
+    #try:
+    project = await _projectHandler.getProject(projectId)
+    return project
+    #except Exception as e:
+    #    raise HTTPException(status_code=404, detail=str(e))
 
-
-#route to add a point to a project
 @router.post("/{projectId}/point")
 async def addPoint(projectId: int, point: Point):
-    #try to find the project by id and add a point to it
+    """ Add a point to a project and return the id of the point"""
     try:
-        project = Repo.getProject(projectId)
-        if project.points is None:
-            #check if the points attribute is None and create a new pointList
-            project.points = PointList()
-            #set the id of the point
-            point.id = 1
-        else:
-            #set the id of the point
-            point.id = find_higest_id(project.points.points) + 1
-            project.points.points.append(point)
-        Repo.updateProject(projectId, project)
-        return {"Project":{{"id": projectId}},"Point":{{"id": point.id}}}
+        PointID = await _projectHandler.addPoint(projectId, point)
+        return {"Project":{{"id": projectId}},"Point":{{"id": PointID}}}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-
-
-
-
-#route to update a point
 @router.put("/{projectId}/point/{pointId}")
 async def updatePoint(projectId: int, pointId: int, point: Point):
-    #try to find the project by id and update a point by id
+    """ Update a point in a project and returns ids of the project and the point to show that the point was updated"""
     try:
-        project = Repo.getProject(projectId)
-        #find the point by id and update it
-        for i in range(len(project.points.points)):
-            if project.points.points[i].id == pointId:
-                #set the id of the point
-                point.id = pointId
-                project.points.points[i] = point
-                Repo.updateProject(projectId, project)
-                return {"Project":{{"id": projectId}},"Point":{{"id": point.id}}}
-        raise Exception("Point not found")
+        if await _projectHandler.updatePoint(projectId, pointId, point): return {"Project":{{"id": projectId}},"Point":{{"id": pointId}}}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-#route to delete a point
 @router.delete("/{projectId}/point/{pointId}")
-async def deletePoint(projectId: int, pointId: int):
-    #try to find the project by id and delete a point by id
+async def deletePoint(projectId: int, pointId: int, backgroundTasks: BackgroundTasks):
+    """ Delete a point from a project returns action status"""
     try:
-        project = Repo.getProject(projectId)
-        for i in range(len(project.points.points)):
-            if project.points.points[i].id == pointId:
-                project.points.points.pop(i)
-                Repo.updateProject(projectId, project)
-                return {"Project":{{"id": projectId}},"Point":{{"id": pointId}}}
-        raise Exception("Point not found")
+        kwargs = {"projectId": projectId, "pointId": pointId}
+        backgroundTasks.add_task(_projectHandler.removePoint, **kwargs)
+        return responses.Response(content="Deletion request of point accepted", status_code=202)
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-#route to get all points of a project
 @router.get("/{projectId}/point")
 async def getPoints(projectId: int):
-    #try to find the project by id and return all points
+    """ Get all points of a project"""
     try:
-        project = Repo.getProject(projectId)
-        if project.points is None:
-            return []
-        return project.points
+        points: List[Point] = await _projectHandler.getProjectPoints(projectId)
+        return points
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-#route to get a point by id
 @router.get("/{projectId}/point/{pointId}")
 async def getPoint(projectId: int, pointId: int):
-    #try to find the project by id and return a point by id
+    """ Get a point in a project by id's"""
     try:
-        project = Repo.getProject(projectId)
-        for point in project.points.points:
-            if point.id == pointId:
-                return point
-        raise Exception("Point not found")
+        point = await _projectHandler.getPoint(projectId, pointId)
+        return point
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-#route to upload an image /specify only accept png
 @router.post("/{projectId}/image")
 async def uploadImage(projectId: int, file: UploadFile = File(...)):
-    #try to find the project by id and upload an image
+    """ Upload an image to a project"""
     try:
-        #check if the file is a png
-        if file.content_type != "image/png":
-            raise HTTPException(status_code=415, detail="Only png files are accepted")
-        project = Repo.getProject(projectId)
-        #save the image to the project
-        with open(project.imageFilePath, "wb") as buffer:
-            buffer.write(file.file.read())
-        return {"Project":{"ProjectID": projectId, "Image": file.filename}}
+        await _projectHandler.saveImageFile(file, projectId, file.filename)
+        return {"status": "Image uploaded"}
     except Exception as e:
         if e.status_code == 415:
-            raise e
+            raise HTTPException(status_code=415, detail=str(e.args))
         else:
             raise HTTPException(status_code=404, detail=str(e))
 
-#route to get the image of a project
 @router.get("/{projectId}/image")
 async def getImage(projectId: int):
-    #try to find the project by id and return the image
+    """ Get the image of a project by id, returns the image file if found"""
     try:
-        project = Repo.getProject(projectId)
-        #get the temporary file path of the image
-        imageFilePath = project.imageFilePath
-        #find the media type of the image
+        imagepath = await _projectHandler.getImageFilePath(projectId)
         mediaType = "image/png"
-        return FileResponse(imageFilePath, media_type=mediaType)
+        return FileResponse(imagepath, media_type=mediaType)
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-
-#route to georeference the image of a project
-@router.get("/{projectId}/georef")
-async def georefImage(projectId: int, crs: str = None):
-
-    #try to find the project by id and georeference the image
+@router.get("/{projectId}/georef/initial")
+async def InitalgeorefImage(projectId: int, crs: str = None):
+    """ Georeference the image of a project by id, returns the georeferenced image file if found"""
     try:
-        project = Repo.getProject(projectId)
-        #get the temporary file path of the image
-        imageFilePath = project.imageFilePath
-        #get the pointsList of the project
-        points = project.points
-        #georeference the image
-        georeferencedImage = None
-        if crs is None:
-            georeferencedImage = georef.georeferencer(imageFilePath, points)
-        else:
-            georeferencedImage = georef.georeferencer(imageFilePath, points, crs)
-        if georeferencedImage is None:
-            raise Exception("Image could not be georeferenced")
-        #open the projetcs georeferencedFilePath and write the georeferenced image to it
-        with open(project.georeferencedFilePath, "wb") as file:
-            file.write(open(georeferencedImage, "rb").read())
-            #remove the temporary file
-            georef.removeFile(georeferencedImage)
-        return FileResponse(project.georeferencedFilePath, media_type="image/tiff")
+        await _projectHandler.georefPNGImage(projectId, crs)
+        imagepath = await _projectHandler.getGeoreferencedFilePath(projectId)
+        return FileResponse(imagepath, media_type="image/tiff")
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-#route 
-@router.get("/{projectId}/georef/tiff")
+@router.get("/{projectId}/georef/referenced")
 async def adjustGeoref(projectId: int):
-    #try to find the project by id and adjust the georeferenced image
+    """ re-georeference the image of a project by id, returns the georeferenced image file if found"""
     try:
-        project = Repo.getProject(projectId)
-        #get the temporary file path of the image
-        imageFilePath = project.georeferencedFilePath
-        #get the pointsList of the project
-        points = project.points
-        #georeference the image
-        georeferencedImage = georef.adjustGeoreferencedImage(imageFilePath, points)
-        if georeferencedImage is None:
-            raise Exception("Image could not be georeferenced")
-        #open the projetcs georeferencedFilePath and overwrite with the adjusted georeferenced image
-        with open(project.georeferencedFilePath, "wb") as file:
-            file.write(open(georeferencedImage, "rb").read())
-            #remove the temporary file
-            georef.removeFile(georeferencedImage)
-        return FileResponse(project.georeferencedFilePath, media_type="image/tiff")
+        await _projectHandler.adjustGeoref(projectId)
+        imagepath = await _projectHandler.getGeoreferencedFilePath(projectId)
+        return FileResponse(imagepath, media_type="image/tiff")
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-
-#route to create a test project
 @router.post("/test", tags=["test"])
 async def createTestProject():
-    #create a test project
+    """ Create a test project and return the id of the project 
+    """
     try:
-        rp = Repo
-        #create a test project
-        id = cts(rp)
+        id = await cts(_projectHandler)
         return {"status": "Test project created", "id": id}
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))

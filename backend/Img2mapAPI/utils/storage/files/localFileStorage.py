@@ -1,29 +1,33 @@
 import os
 import tempfile
-from .FileStorage import FileStorage
+from .fileStorage import FileStorage
+
+_tempPath = "./temp"
+if not os.path.exists(_tempPath):
+    os.makedirs(_tempPath)
 
 #File storage using the local file system
 class LocalFileStorage(FileStorage):
     #temp folder should be in main script folder
     _instance = None
-    _tempPath = "./temp"
+    tempPath = _tempPath
     tempFolder = tempfile.mkdtemp(dir=_tempPath)
    
-    def save(self, data: bytes, suffix: str)->str:
+    async def saveFile(self, data: bytes, suffix: str) -> str:
         #create a temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix, dir=self.tempFolder) as file:
             file.write(data)
             path = file.name
         return path
-    def remove(self, path: str):
+    async def removeFile(self, path: str):
         #remove the file
         os.remove(path)
-    def read(self, path: str)->bytes:
+    async def readFile(self, path: str)->bytes:
         #open the file
         with open(path, "rb") as file:
             data = file.read()
         return data
-    def exists(self, path: str)->bool:
+    async def fileExists(self, path: str)->bool:
         #check if the file exists
         return os.path.isfile(path)
     
@@ -38,19 +42,17 @@ class LocalFileStorage(FileStorage):
         #remove the temp folder
         os.rmdir(self.tempFolder)
         #remove the temp folder if it is empty
-        if len(os.listdir(self._tempPath)) == 0:
-            os.rmdir(self._tempPath)
+        if len(os.listdir(self.tempPath)) == 0:
+            os.rmdir(self.tempPath)
         
     def __exit__(self, exc_type, exc_value, traceback):
         #remove the temp folder
         os.rmdir(self.tempFolder)
         #remove the temp folder if it is empty
-        if len(os.listdir(self._tempPath)) == 0:
-            os.rmdir(self._tempPath)
+        if len(os.listdir(self.tempPath)) == 0:
+            os.rmdir(self.tempPath)
   
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
         return cls._instance
-    
-

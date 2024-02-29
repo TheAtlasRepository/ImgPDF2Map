@@ -24,10 +24,10 @@ class Repository:
     def __init__(self):
         self._tables = {}
         #adding the tables
-        self.addTable("projects", Table())
-        self.addTable("points", Table())
+        self.addTable("project", Table())
+        self.addTable("point", Table())
 
-    def addTable(self, name: str, table: Table) -> None:
+    def addTable(self, tableName: str, table: Table) -> None:
         """
         Adds a table to the repository
 
@@ -35,9 +35,9 @@ class Repository:
             name {str} -- The name of the table
             table {Table} -- The table to be added
         """
-        self._tables[name] = table
+        self._tables[tableName] = table
 
-    def getTable(self, name: str) -> Table:
+    async def getTable(self, tableName: str) -> Table:
         """
         Returns a table from the repository
 
@@ -47,29 +47,34 @@ class Repository:
         Returns:
             Table -- The table
         """
-        return self._tables[name]
+        return self._tables[tableName]
     
-    def fetchAll(self):
+    async def fetchAll(self):
         return self._tables
     
-    def removeTable(self, name: str):
-        del self._tables[name]
+    async def fetchAllRows(self, tableName: str):
+        return self._tables[tableName]._rows
+
+    async def removeTable(self, tableName: str):
+        del self._tables[tableName]
     
-    def updateTable(self, name: str, table: Table):
-        self._tables[name] = table
+    async def updateTable(self, tableName: str, table: Table):
+        self._tables[tableName] = table
     
-    def fetch(self, name: str):
-        if name == '*':
+    async def fetch(self, tableName: str):
+        if tableName == '*':
             return self._tables
-        return self._tables[name]
+        return self._tables[tableName]
     
-    def fetch(self, name: str, id: int):
-        return self._tables[name].getRow(id)
+    async def fetch(self, name: str, id: int):
+        table: Table = self._tables[name]
+        rowdict:dict = table.getRow(id)
+        return rowdict
     
     #query the database
-    def query(self, table: str, query: dict):
+    async def query(self, tableName: str, query: dict):
         #get the table
-        table = self._tables[table]
+        table: Table = self._tables[tableName]
         #get all the rows
         rows = table._rows
         #filter the rows
@@ -77,9 +82,9 @@ class Repository:
             rows = {k: v for k, v in rows.items() if k == key}
         return rows
   
-    def insert(self, table: str, pkcolumn: str, data: dict):
+    async def insert(self, tableName: str, pkcolumn: str, data: dict) -> int:
         #get the table
-        table = self._tables[table]
+        table: Table = self._tables[tableName]
         #find the next id update the data with it
         data[pkcolumn] = table._nextId
         #add the row
@@ -87,9 +92,9 @@ class Repository:
         return data[pkcolumn]
 
     #update the database
-    def update(self, table: str, id: int, data: dict):
+    async def update(self, tableName: str, id: int, data: dict):
         #get the table
-        table = self._tables[table]
+        table: Table = self._tables[tableName]
         #update the row
         table.updateRow(id, data)
 
