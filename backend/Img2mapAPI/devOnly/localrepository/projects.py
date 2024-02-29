@@ -30,6 +30,7 @@ class Projects:
                 self.projects[i] = project
                 return
         raise Exception("Project not found")
+    
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(Projects, cls).__new__(cls)

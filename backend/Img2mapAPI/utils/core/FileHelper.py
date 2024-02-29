@@ -6,13 +6,18 @@ def getTmpFolderPath():
         os.makedirs('./temp')
     return './temp'
 
-def getUniqeFileName(suffix, length=8):
+def getUniqeFileName(suffix : str, length=8):
     #create a random file name between 8 cha, xxxx-xxxx.
     import random
     import string
     #chec if temp folder exists
     if not os.path.exists('./temp'):
         getTmpFolderPath()
+
+    #remove the dot from the suffix if exists
+    if suffix[0] == '.':
+        suffix = suffix[1:]
+    suffix = suffix.lower()
     #check if the file name is unique in the temp folder
     i = 0
     while True:
@@ -30,3 +35,9 @@ def removeFile(filePath):
     #remove the file if it exists
     if os.path.isfile(filePath):
         os.remove(filePath)
+
+def createEmptyFile(suffix):
+    #create a temporary file
+    with open(getUniqeFileName(suffix), "w") as file:
+        file.write("")
+    return file.name

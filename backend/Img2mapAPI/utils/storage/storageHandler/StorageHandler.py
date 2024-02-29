@@ -1,29 +1,90 @@
 from abc import ABC, abstractmethod
+from typing import Union 
 
 #Abstract class for moving data to and from storage/DB and the API server
 class StorageHandler(ABC):
-    #abstract method for saving data, returns the id of the saved data. Takes the data and the type of the data as input
+    #abstarct fileds
+    db = None
+
+    #abstract methods
     @abstractmethod
-    def save(self, data, type: str)->int:
+    async def connect(self, db: str, user: str, password: str, host: str, port: int)->None:
+        """
+        Connect to the storage
+        
+        Arguments:
+            db {str} -- The name of the database
+            user {str} -- The username
+            password {str} -- The password
+            host {str} -- The host
+            port {int} -- The port
+        """
         pass
-    #abstract method for reading data, returns the data. Takes the id and the type of the data as input
+
     @abstractmethod
-    def fetchOne(self, id: int, type: str):
+    async def save(self, data, type: str, pkName:str = 'id')->int:
+        """
+        Save data to storage and return the id of the saved data
+        
+        Arguments:
+            data {any} -- The data to be saved
+            type {str} -- The type of the data / the table name / the model class name
+            pkName {str} -- The primary key name
+        return {int} -- The id of the saved data
+        """
         pass
-    #abstract method for removing data. Takes the id and the type of the data as input
+
     @abstractmethod
-    def remove(self, id: int, type: str):
+    async def remove(self, id: int, type: str)->None:
+        """
+        Remove data from storage
+
+        Arguments:
+            id {int} -- The id of the data
+            type {str} -- The type of the data / the table name / the model class name
+        """
         pass
-    #abstract method for updating data. Takes the id, the data and the type of the data as input
+
     @abstractmethod
-    def update(self, id: int, data, type: str):
-        pass
-    #abstract method for listing data. Takes the type of the data as input
-    @abstractmethod
-    def fetch(self, type: str, params: dict = {}):
-        pass
-    #abstract method for fetching all data. Takes the type of the data as input
-    @abstractmethod
-    def fetchAll(self, type: str):
+    async def update(self, id: int, data, type: str)->None:
+        """
+        Update data in storage
+        
+        Arguments:
+            id {int} -- The id of the data
+            data {any} -- The data to be updated
+            type {str} -- The type of the data / the table name / the model class name
+        """
         pass
     
+    @abstractmethod
+    async def fetchOne(self, id: int, type: str) -> Union[None, any]:
+        """
+        Fetch one data from storage
+
+        Arguments:
+            id {int} -- The id of the data
+            type {str} -- The type of the data / the table name / the model class name
+        """
+        pass
+
+    @abstractmethod
+    async def fetch(self, type: str, params: dict = {})->Union[None, any]:
+        """
+        Fetch data from storage
+        
+        Arguments:
+            type {str} -- The type of the data / the table name / the model class name
+            params {dict} -- The parameters to filter the data
+        """
+        pass
+
+    @abstractmethod
+    async def fetchAll(self, type: str)->Union[None, any]:
+        """
+        Fetch all data from storage
+
+        Arguments:
+            type {str} -- The type of the data / the table name / the model class name
+        """
+        pass

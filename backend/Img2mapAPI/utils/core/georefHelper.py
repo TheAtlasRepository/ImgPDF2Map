@@ -6,7 +6,6 @@ from rasterio.crs import CRS #importing CRS for the default crs
 from ..models import PointList #importing the pointList model
 from .FileHelper import getUniqeFileName, removeFile #importing the getUniqeFileName and removeFile functions from FileHelper
 
-#mapbox projection crs for web mercator: EPSG:3857
 defaultCrs = 'EPSG:4326'
 
 #function to create Rasterio GCPs from a list of points
@@ -14,8 +13,7 @@ def createGcps(PointList : PointList):
     #check if the pointlist contains at least 3 points
     if len(PointList.points) < 3:
         raise Exception("Not enough points to create a transform")
-    #create the GCPs
-    gcps = []
+    gcps = [] #create the GCPs list
     for point in PointList.points:
         gcps.append(GCP(row=point.row, col=point.col, x=point.lng, y=point.lat, id=point.id, info=point.name))
     return gcps
@@ -26,7 +24,7 @@ def georeferencer(tempFilePath, points: PointList, crs: str = defaultCrs)->str:
     gcps = createGcps(points)
 
     #create png file in the temp folder
-    filename = getUniqeFileName('png')
+    filename = getUniqeFileName('.png')
     tempFPath = f"temp/{filename}"
     #write the file
     with open(tempFPath, "wb") as file:
@@ -49,7 +47,7 @@ def georeferencer(tempFilePath, points: PointList, crs: str = defaultCrs)->str:
         "nodata": 0,
     }
     #filepath
-    path = f"temp/{getUniqeFileName('tiff')}"
+    path = f"temp/{getUniqeFileName('.tiff')}"
 
     #writing the data to the new file
     produced_file = rio.open(path, "w+", **kwargs)
@@ -74,8 +72,6 @@ def georeferencer(tempFilePath, points: PointList, crs: str = defaultCrs)->str:
 #function to adjust the georeferenced image with a new point in addition to the old points
 def adjustGeoreferencedImage(innFilePath, points: PointList, crs: str = defaultCrs)->str:
     #safty check
-    if len(points.points) < 3:
-        raise Exception("Not enough points to create a transform")
     if not os.path.isfile(innFilePath):
         raise Exception("File not found")
     #check if the file is a tiff file and has data
@@ -85,7 +81,7 @@ def adjustGeoreferencedImage(innFilePath, points: PointList, crs: str = defaultC
     #create the GCPs
     gcps = createGcps(points)
     #create file in the temp folder
-    filename = getUniqeFileName('tiff')
+    filename = getUniqeFileName('.tiff')
     tempFilePath = f"temp/{filename}"
     #write the file
     with open(tempFilePath, "wb") as file:

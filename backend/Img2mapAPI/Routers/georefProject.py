@@ -6,7 +6,7 @@ from typing import List
 from ..utils.models.project import Project
 from ..utils.models.pointList import PointList
 from ..utils.models.point import Point
-from ..utils.storage.localrepository.projects import Projects
+from ..devOnly.localrepository.projects import Projects
 from ..utils.core import georefHelper as georef
 from ..devOnly.GeorefTestFiles.testproject import createTestProject as cts
 
