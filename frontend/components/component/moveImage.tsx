@@ -10,6 +10,10 @@ interface ImageMapProps {
   transform: { x: number; y: number };
   setTransform: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
   setZoomLevel: React.Dispatch<React.SetStateAction<number>>;
+  imageSize: { width: number; height: number };
+  setImageSize: React.Dispatch<
+    React.SetStateAction<{ width: number; height: number }>
+  >;
 
   setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
   setDragStart: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
@@ -23,6 +27,8 @@ export default function ImageMap({
   setIsDragging,
   setDragStart,
   dragStart,
+  imageSize,
+  setImageSize,
 
   setTransform,
   setZoomLevel,
@@ -34,14 +40,14 @@ export default function ImageMap({
   // const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   //size of imgs container
-  const [imgSize, setImgSize] = useState({ width: 0, height: 0 });
+  // const [imgSize, setImgSize] = useState({ width: 0, height: 0 });
 
   //sets size of img container relative to size of img
   useEffect(() => {
     const img = new Image();
     img.src = src;
     img.onload = () => {
-      setImgSize({ width: img.width, height: img.height });
+      setImageSize({ width: img.width, height: img.height });
     };
   }, [src]);
 
@@ -105,8 +111,8 @@ export default function ImageMap({
       className="flex h-full"
       style={{
         position: "relative",
-        width: imgSize.width,
-        height: imgSize.height,
+        width: imageSize.width,
+        height: imageSize.height,
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}

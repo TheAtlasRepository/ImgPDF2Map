@@ -84,7 +84,7 @@ async def addPoint(projectId: int, point: Point):
             point.id = find_higest_id(project.points.points) + 1
             project.points.points.append(point)
         Repo.updateProject(projectId, project)
-        return {"Project":{{"id": projectId}},"Point":{{"id": point.id}}}
+        return {"Project":{"id": projectId},"Point":{"id": point.id}}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 

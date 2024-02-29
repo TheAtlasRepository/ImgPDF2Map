@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { use, useEffect, useRef, useState } from "react";
 import { Map, NavigationControl, GeolocateControl, Marker } from "react-map-gl";
 import type { MapRef } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -10,8 +10,16 @@ import GeocoderControl from "./geocoder-control";
 import MapStyleToggle from "./mapStyleToggle";
 import Image from "next/image";
 import mapboxgl from "mapbox-gl";
+import * as api from "./projectAPI";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function SplitView() {
+  //project states
+  const projectId = 5;
+  const [projectName, setProjectName] = useState("Project 1");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   //mapbox states
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
   const mapRef = useRef<MapRef>(null);
@@ -61,6 +69,7 @@ export default function SplitView() {
   //image states
   const [transform, setTransform] = useState({ x: 0, y: 0 });
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [imageMarkers, setImageMarkers] = useState<ImageMarker[]>([]);
@@ -96,8 +105,17 @@ export default function SplitView() {
     // limit to 3 markers initially
     if (imageMarkers.length >= 3) return;
 
+    // //TODO: FIX THIS SHIT, trying to adjust marker placement based on zoomlevel
+    // const centerX = imageSize.width / 2;
+    // const centerY = imageSize.height / 2;
+
+    // //adjust the marker position based on the transform and zoom level
+    // const adjustedX = centerX + (x - centerX) * zoomLevel;
+    // const adjustedY = centerY + (y - centerY) * zoomLevel;
     //
     setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
+
+    //update the last pair in the georefMarkerPairs array
     const updatedPairs = [...georefMarkerPairs];
     if (updatedPairs.length > 0) {
       const lastPair = updatedPairs[updatedPairs.length - 1];
@@ -110,7 +128,6 @@ export default function SplitView() {
         setGeorefMarkerPairs(updatedPairs);
       }
     }
-
     setWaitingForMapMarker(true);
     setWaitingForImageMarker(false);
   };
@@ -149,10 +166,18 @@ export default function SplitView() {
   const adjustMarkerPositions = (
     pixelCoordinates: [number, number],
     transform: { x: number; y: number },
-    zoomLevel: number
+    zoomLevel: number,
+    imageSize: { width: number; height: number }
   ): { left: string; top: string } => {
-    const adjustedX = pixelCoordinates[0] * zoomLevel + transform.x;
-    const adjustedY = pixelCoordinates[1] * zoomLevel + transform.y;
+    //defines the center of the image
+    const centerX = imageSize.width / 2;
+    const centerY = imageSize.height / 2;
+
+    //adjusts the marker position based on the transform and zoom level
+    const adjustedX =
+      centerX + (pixelCoordinates[0] - centerX) * zoomLevel + transform.x;
+    const adjustedY =
+      centerY + (pixelCoordinates[1] - centerY) * zoomLevel + transform.y;
 
     return {
       left: `${adjustedX}px`,
@@ -160,8 +185,73 @@ export default function SplitView() {
     };
   };
 
+  //useEffect to make API call when georefMarkerPairs changes and filter out pairs where latlong or pixelcoords is [0,0]
+  useEffect(() => {
+    //filter out pairs where latlong or pixelcoords is [0,0]
+    const validPairs = georefMarkerPairs.filter(
+      (pair) =>
+        pair.latLong[0] !== 0 &&
+        pair.latLong[1] !== 0 &&
+        pair.pixelCoords[0] !== 0 &&
+        pair.pixelCoords[1] !== 0
+    );
+    console.log("valid pairs:", validPairs);
+    // iterate through valid pairs and make API call
+    validPairs.forEach((pair) => {
+      const { latLong, pixelCoords } = pair;
+      api
+        .addMarkerPair(projectId, ...latLong, ...pixelCoords)
+        .then((data) => {
+          // handle success
+          console.log("Success:", data);
+        })
+        .catch((error) => {
+          // handle error
+          console.error("Error:", error.message);
+          // setErrorMessage(error.message);
+        });
+    });
+  }, [georefMarkerPairs]);
+
+  //function to add a new project
+  const addProject = (name: string) => {
+    if (!projectName) return;
+
+    //make API call to add project
+    api
+      .addProject(name)
+      .then((data) => {
+        // handle success
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        // handle error
+        console.error("Error:", error.message);
+        // setErrorMessage(error.message);
+      });
+  };
+
+  //call the addProject function when the component mounts
+  useEffect(() => {
+    let mounted = false;
+    if (!mounted) {
+      addProject(projectName);
+    }
+    return () => {
+      mounted = true;
+    };
+  }, []);
+
   return (
     <div className="h-screen">
+      <div>
+        {errorMessage && (
+          <Alert variant="destructive" className="mt-5">
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{errorMessage}</AlertDescription>
+          </Alert>
+        )}
+      </div>
       <Allotment onDragEnd={() => mapRef.current?.resize()}>
         <Allotment.Pane minSize={200}>
           <Map
@@ -220,6 +310,8 @@ export default function SplitView() {
             setIsDragging={setIsDragging}
             setDragStart={setDragStart}
             dragStart={dragStart}
+            setImageSize={setImageSize}
+            imageSize={imageSize}
           >
             {imageMarkers.map((marker, index) => (
               <div
@@ -232,7 +324,8 @@ export default function SplitView() {
                   ...adjustMarkerPositions(
                     marker.pixelCoordinates,
                     transform,
-                    zoomLevel
+                    zoomLevel,
+                    imageSize
                   ),
                 }}
               >
