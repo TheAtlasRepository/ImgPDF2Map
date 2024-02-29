@@ -12,6 +12,8 @@
     "@mapbox/mapbox-gl-geocoder": "^5.0.2",
     "@mapbox/search-js-react": "^1.0.0-beta.18",
     "@radix-ui/react-icons": "^1.3.0",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-radio-group": "^1.1.3",
     "@radix-ui/react-slot": "^1.0.2",
     "@types/mapbox-gl": "^2.7.20",
     "@windmill/react-ui": "^0.6.0",
