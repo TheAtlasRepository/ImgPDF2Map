@@ -117,9 +117,9 @@ const Conversion: React.FC<ConversionProps> = ({ fileType, fileUrl, pageNumber, 
   }
 
   return (
-    <div className="flex flex-col bg-white">
+    <div className="flex flex-col bg-white dark:bg-gray-800">
         <div className="mx-auto max-w-xl">
-            <div className="rounded-lg border-4 border-dashed p-10 py-20 text-center">
+            <div className="rounded-lg border-4 border-dashed p-10 py-20 text-center dark:border-gray-900">
                 <div className="p-10 text-center text-gray-400">
                     <h1>Getting your file ready</h1>
                     { isLargeFile && <p>This may take some time for larger files</p>}

@@ -96,7 +96,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ onFileUpload, clearStateRequest
         className="cursor-pointer"
       >
         <div
-          className="rounded-lg border-4 border-dashed border-lb p-10 py-20 text-center transition-all hover:bg-gray-100"
+          className="rounded-lg border-4 border-dashed border-lb p-10 py-20 text-center transition-all hover:bg-gray-100 dark:hover:bg-gray-900 dark:border-gray-900"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
@@ -118,7 +118,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ onFileUpload, clearStateRequest
           className="hidden"
         />
         <Button
-          className="mt-6 w-full bg-blue-600 text-white text-xl"
+          className="mt-6 w-full bg-blue-600 text-white text-xl dark:bg-blue-800 dark:hover:bg-blue-900"
           variant="blue"
         >
           Open a file
