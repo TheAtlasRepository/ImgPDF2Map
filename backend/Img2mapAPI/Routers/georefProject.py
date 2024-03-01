@@ -1,5 +1,5 @@
-from fastapi import APIRouter, File, UploadFile, HTTPException, BackgroundTasks ,responses
-from fastapi.responses import FileResponse
+from fastapi import APIRouter, File, UploadFile, HTTPException, BackgroundTasks 
+from fastapi.responses import FileResponse, Response
 from typing import List
 #internal imports:
 from ..utils.models.project import Project
@@ -36,11 +36,12 @@ async def createProject(project: Project):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f'Project could not be created: {str(e.with_traceback(None))}, {e.args}')
 
+#TODO: figure out why it is not properly updating the project (storageHandler? or devOnly/localrepository/repository.py?)
 @router.put("/{projectId}")
-async def updateProject(projectId: int):
+async def updateProject(projectId: int, project: Project):
     """ Update the project details and return the id of the project """
     try:
-        if await _projectHandler.updateProject(projectId): return {"ProjectID": projectId}
+        if await _projectHandler.updateProject(projectId, project): return {"ProjectID": projectId}
         else: raise HTTPException(status_code=404, detail="Project not found")
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -50,7 +51,7 @@ async def deleteProject(projectId: int, backgroundTasks: BackgroundTasks):
     """ Delete a project and return a message if the project was deleted"""
     try:
         backgroundTasks.add_task(_projectHandler.deleteProject, projectId)
-        return responses.Response(content="Deletion request of project accepted", status_code=202)
+        return Response(content="Deletion request of project accepted", status_code=202, media_type="text/plain", background=backgroundTasks)
     except Exception as e:
         if e.status_code == 500:
             raise HTTPException(status_code=500, detail=str(e))
@@ -59,18 +60,20 @@ async def deleteProject(projectId: int, backgroundTasks: BackgroundTasks):
 @router.get("/{projectId}")
 async def getProject(projectId: int):
     """ Get a project by id """
-    #try:
-    project = await _projectHandler.getProject(projectId)
-    return project
-    #except Exception as e:
-    #    raise HTTPException(status_code=404, detail=str(e))
+    try:
+        project = await _projectHandler.getProject(projectId)
+        return project
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
+#TODO: Fix This error: "'Point' object has no attribute 'col'", it is not getting the points from the route /project/{projectId}/point
 @router.post("/{projectId}/point")
 async def addPoint(projectId: int, point: Point):
     """ Add a point to a project and return the id of the point"""
     try:
-        PointID = await _projectHandler.addPoint(projectId, point)
-        return {"Project":{{"id": projectId}},"Point":{{"id": PointID}}}
+        innPoint = point
+        PointID = await _projectHandler.addPoint(projectId, innPoint)
+        return {"Project":{"id": projectId},"Point":{"id": PointID}}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -88,7 +91,7 @@ async def deletePoint(projectId: int, pointId: int, backgroundTasks: BackgroundT
     try:
         kwargs = {"projectId": projectId, "pointId": pointId}
         backgroundTasks.add_task(_projectHandler.removePoint, **kwargs)
-        return responses.Response(content="Deletion request of point accepted", status_code=202)
+        return Response(content="Deletion request of point accepted", status_code=202, media_type="text/plain", background=backgroundTasks)
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -114,13 +117,14 @@ async def getPoint(projectId: int, pointId: int):
 async def uploadImage(projectId: int, file: UploadFile = File(...)):
     """ Upload an image to a project"""
     try:
-        await _projectHandler.saveImageFile(file, projectId, file.filename)
+        await _projectHandler.saveImageFile(open(file,"r+b"), projectId, file.filename)
         return {"status": "Image uploaded"}
     except Exception as e:
-        if e.status_code == 415:
-            raise HTTPException(status_code=415, detail=str(e.args))
+        #check if e has a status code attribute
+        if hasattr(e, "status_code"):
+            raise HTTPException(status_code=e.status_code, detail=str(e))
         else:
-            raise HTTPException(status_code=404, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/{projectId}/image")
 async def getImage(projectId: int):
@@ -152,6 +156,7 @@ async def adjustGeoref(projectId: int):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
+#TODO: fix "'dict' object has no attribute '__dict__'" error
 @router.post("/test", tags=["test"])
 async def createTestProject():
     """ Create a test project and return the id of the project 

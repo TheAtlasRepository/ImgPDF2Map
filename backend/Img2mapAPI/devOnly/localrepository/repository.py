@@ -98,6 +98,13 @@ class Repository:
         #update the row
         table.updateRow(id, data)
 
+    #remove a row from the database
+    async def remove(self, tableName: str, id: int):
+        #get the table
+        table: Table = self._tables[tableName]
+        #remove the row
+        table.removeRow(id)
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(Repository, cls).__new__(cls)

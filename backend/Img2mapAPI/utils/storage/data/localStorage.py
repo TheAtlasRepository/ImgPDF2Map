@@ -22,13 +22,15 @@ class LocalStorage(StorageHandler):
         id = await self.repo.insert(type, pkName, data)
         return id
     
-    #implementing the abstract method
+
     async def remove(self, id: int, type: str):
-        self.repo.remove(type, id)
-    #implementing the abstract method
+        await self.repo.remove(type, id)
+
+    
     async def update(self, id: int, data: CoreModel, type: str):
-        self.repo.update(type, id, data.__dict__)
-    #implementing the abstract method
+        data = data.__dict__
+        await self.repo.update(type, id, data)
+
    
     async def fetchOne(self, id: int, type: str):
         ret = await self.repo.fetch(type, id)

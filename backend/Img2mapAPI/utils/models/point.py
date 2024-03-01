@@ -40,3 +40,4 @@ class Point(CoreModel):
                "projectId": self.projectId,
                "Idproj": self.Idproj
           }
+     

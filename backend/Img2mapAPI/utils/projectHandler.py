@@ -61,6 +61,7 @@ class ProjectHandler:
                 elif key not in specialFields:
                     if fetchedProjectDict[key] != innProject[key]:
                         fetchedProjectDict[key] = innProject[key]
+        #update the project in the storage
         self._StorageHandler.update(projectId, fetchedProjectDict, "project")
         return True
  
@@ -71,19 +72,21 @@ class ProjectHandler:
         """
         #find the project and remove it
         project = await self._StorageHandler.fetchOne(projectId, "project")
+
         if project is None:
             raise Exception("Project not found")
         #remove the image and georeferenced files
         if project["imageFilePath"] != "":
-            await self._FileStorage.remove(project["imageFilePath"])
+            await self._FileStorage.removeFile(project["imageFilePath"])
         if project["georeferencedFilePath"] != "":
-            await self._FileStorage.remove(project["georeferencedFilePath"])
+            await self._FileStorage.removeFile(project["georeferencedFilePath"])
+        
         #delete project points
         points = await self._StorageHandler.fetch("point", {"projectId": projectId})
         for point in points:
-            self._StorageHandler.remove(point["id"], "point")
+            await self._StorageHandler.remove(point["id"], "point")
         #remove the project
-        self._StorageHandler.remove(projectId, "project")
+        await self._StorageHandler.remove(projectId, "project")
     
     # Function to get a project by id
     async def getProject(self, projectId: int) -> Project:
@@ -116,7 +119,9 @@ class ProjectHandler:
         Get all points of a project
         """
         #Convert the data to a list of point objects
-        return [Point(**point) for point in self._StorageHandler.fetch("point", {"projectId": projectId})]
+        Points = await self._StorageHandler.fetch("point", {"projectId": projectId})
+        list: List[Point] = [Point(**point) for point in Points]
+        return list
     
     async def removePoint(self, projectId: int, pointId: int) -> bool:
         """
@@ -151,7 +156,9 @@ class ProjectHandler:
         """
         Add a point to a project
         """
-        if self.validatepoints([point]) == False:
+        list = []
+        list.append(point)
+        if self.validatepoints(list) == False: 
             raise Exception("Invalid point")
         #set the projectId of the point
         point.projectId = projectId
@@ -159,13 +166,25 @@ class ProjectHandler:
         point.error = None
         #find the next idproj = 1
         points = await self._StorageHandler.fetch("point", {"projectId": projectId})
-        points = [Point(**point) for point in points]
+        if points is None or points is []:
+            points = []
+        elif points is dict:
+            try:
+                points = [Point(**points)]
+            except:
+                points = []
+        else:
+            try:
+                points = [Point(**point) for point in points]
+            except:
+                points = []
+        
         if len(points) == 0:
             point.Idproj = 1
         else:
             point.Idproj = max([point.Idproj for point in points]) + 1
         #save the point to storage
-        dbid = await self._StorageHandler.save(point, "point")
+        dbid = await self._StorageHandler.saveInStorage(point, "point")
         return dbid
 
     async def updatePoint(self, projectId: int, pointId: int, point: Point) -> bool:
@@ -216,16 +235,19 @@ class ProjectHandler:
         point = Point(**point)
         return point
 
-    async def validatepoints(self, points: List[Point]) -> bool:
+    def validatepoints(self, points: List[Point]) -> bool:
         """
         Validate the points
         """
         #check if the points are valid
         for point in points:
-            if point.col is None or point.row is None:
+            #check if point has the required attributes
+            if hasattr(point, "lat") == False or hasattr(point, "lng") == False or hasattr(point, "col") == False or hasattr(point, "row") == False:
+                raise Exception("Failed to validate points attributes")
+                #return False
+            if point.lat is None or point.lng is None or point.col is None or point.row is None:
                 return False
-            if point.lat is None or point.lng is None:
-                return False
+            
         return True
     
     ### Files

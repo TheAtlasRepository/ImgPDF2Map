@@ -37,7 +37,6 @@ class LocalFileStorage(FileStorage):
             LocalFileStorage._instance = LocalFileStorage()
         return LocalFileStorage._instance
     
-    #shutdown cleanup
     def __del__(self):
         #remove the temp folder
         os.rmdir(self.tempFolder)
