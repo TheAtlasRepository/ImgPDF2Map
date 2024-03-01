@@ -16,7 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function SplitView() {
   //project states
-  const projectId = 5;
+  const [projectId, setProjectId] = useState(1);
   const [projectName, setProjectName] = useState("Project 1");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -223,22 +223,24 @@ export default function SplitView() {
       .then((data) => {
         // handle success
         console.log("Success:", data);
+        setProjectId(data.id);
+        console.log("project id:", projectId);
       })
       .catch((error) => {
         // handle error
         console.error("Error:", error.message);
-        // setErrorMessage(error.message);
+        setErrorMessage(error.message);
       });
   };
 
   //call the addProject function when the component mounts
   useEffect(() => {
-    let mounted = false;
-    if (!mounted) {
+    let mounted = true;
+    if (mounted) {
       addProject(projectName);
     }
     return () => {
-      mounted = true;
+      mounted = false;
     };
   }, []);
 
