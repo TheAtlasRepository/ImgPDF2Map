@@ -25,7 +25,7 @@ export default function Home() {
             </h1>
           </div>
           <div className="w-3/4 p-6 card dark:bg-gray-700">
-            <p className="text-lg text-secondary dark:text-gray-200">
+            <p className="text-lg text-secondary dark:text-white">
               Discover PDF/IMG2Map, the simplest solution for seamlessly georeferencing digital images and PDF files! 
               Effortlessly upload your documents and pinpoint specific locations by selecting reference points on the image. 
               By embedding geospatial metadata, you can transform your files into geographically accurate representations, 

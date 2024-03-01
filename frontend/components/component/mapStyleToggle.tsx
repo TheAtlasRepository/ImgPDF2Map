@@ -13,9 +13,9 @@ export default function MapStyleToggle({
 
   return (
     <div
-      className="flex flex-col items-left text-sm bg-white rounded-md shadow-md divide-x p-2"
+      className="flex flex-col items-left text-sm bg-white rounded-md shadow-md divide-x p-2 dark:bg-gray-800"
     >
-      <RadioGroup defaultValue="streets-v12" className="text-primary" onValueChange={handleChange}>
+      <RadioGroup defaultValue="streets-v12" className="text-primary dark:text-white" onValueChange={handleChange}>
         <div className="flex items-center space-x-2">
           <RadioGroupItem value="streets-v12" id="streets-v12"/>
           <Label htmlFor="streets-v12">Streets</Label>

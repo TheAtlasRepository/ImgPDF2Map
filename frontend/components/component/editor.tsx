@@ -58,21 +58,21 @@ export default function Editor() {
         </div>
         <div className="flex items-center space-x-4">
           <Button
-            className={`${isSideBySide ? "bg-blue-500" : "bg-blue-800"}`}
+            className={`${isSideBySide ? "bg-blue-500" : "bg-gray-700"} hover:bg-blue-800 dark:hover:bg-blue-800`}
             variant="toggle"
             onClick={handleToggleSideBySide} // Add onClick event handler
           >
             Side by side
           </Button>
-          <Button className="bg-blue-200" variant="secondary">
+          <Button className="bg-gray-200 dark:bg-gray-700 hover:bg-blue-800 dark:hover:bg-blue-800" variant="secondary">
             Overlay
           </Button>
-          <Button className="bg-gray-200" variant="secondary">
+          <Button className="bg-gray-200 dark:bg-gray-700 hover:bg-blue-800 dark:hover:bg-blue-800" variant="secondary">
             <TargetIcon className="text-gray-500" />
             <span>Coordinates</span>
           </Button>
           <Button
-            className={`${isCrop ? "bg-blue-500" : "bg-gray-700"}`}
+            className={`${isCrop ? "bg-blue-500" : "bg-gray-700"} hover:bg-blue-800 dark:hover:bg-blue-800`}
             variant="toggle"
             onClick={handleToggleCrop} // Add onClick event handler
           >
@@ -80,7 +80,7 @@ export default function Editor() {
             Crop
           </Button>
         </div>
-        <Button className="bg-gray-200" onClick={handleSave}>
+        <Button className="bg-gray-200 dark:bg-gray-700 dark:hover:bg-blue-800 dark:text-white" onClick={handleSave}>
           Continue
         </Button>
       </div>
@@ -89,7 +89,7 @@ export default function Editor() {
       ) : (
         <div
           className={`flex flex-col items-center justify-center flex-1 ${
-            !isCrop ? "bg-gray-100" : "bg-gray-400"
+            !isCrop ? "bg-gray-100 dark:bg-gray-900" : "bg-gray-400 dark:bg-gray-700"
           }`}
         >
           <div className="flex items-center justify-center w-full">
