@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import Logo from './logo';
 
 interface NavbarProps {
@@ -14,23 +15,23 @@ const Navbar: React.FC<NavbarProps> = ({ activePage }) => {
       <div className="flex items-center">
         <div className="flex items-center text-xs">
           <button className={`btn-nav ${activePage === 'Home' ? 'btn-nav-active' : ''}`}>
-            <a href="#">Home</a>  
+            <Link href="/">Home</Link>  
           </button>
 
           <button className={`btn-nav ${activePage === 'About' ? 'btn-nav-active' : ''}`}>
-            <a href="#">About</a>  
+            <Link href="/About">About</Link>  
           </button>
 
           <button className={`btn-nav ${activePage === 'Your Data' ? 'btn-nav-active' : ''}`}>
-            <a href="#">Your Data</a>  
+            <Link href="/Privacy">Your Data</Link>  
           </button>
 
           <button className={`btn-nav ${activePage === 'Contact' ? 'btn-nav-active' : ''}`}>
-            <a href="#">Contact</a>  
+            <Link href="/Contact">Contact</Link>  
           </button>
 
           <button className={`btn-nav ${activePage === 'Text & CSV To Map' ? 'btn-nav-active' : ''}`}>
-            <a href="#">Text & CSV To Map</a>  
+            <Link href="/Text2Map">Text & CSV To Map</Link>  
           </button>
         </div>
       </div>
