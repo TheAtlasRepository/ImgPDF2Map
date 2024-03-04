@@ -246,13 +246,21 @@ export default function SplitView() {
 
   return (
     <div className="h-screen">
-      <div>
+      <div className="">
         {errorMessage && (
           <Alert variant="destructive" className="mt-5">
             <AlertTitle>Error</AlertTitle>
             <AlertDescription>{errorMessage}</AlertDescription>
           </Alert>
         )}
+      </div>
+      <div className="flex justify-center">
+        <div className="fixed w-1/4 z-50">
+          <Alert variant={"default"} className="">
+            <AlertTitle>Georef guide</AlertTitle>
+            <AlertDescription>Place your first marker!</AlertDescription>
+          </Alert>
+        </div>
       </div>
       <Allotment onDragEnd={() => mapRef.current?.resize()}>
         <Allotment.Pane minSize={200}>
