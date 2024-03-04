@@ -88,6 +88,7 @@ export default function SplitView() {
   const [calculatedDragDistance, setCalculatedDragDistance] = useState(0);
 
   const addImageMarker = (event: React.MouseEvent<HTMLDivElement>) => {
+    console.log(waitingForMapMarker);
     if (waitingForMapMarker) return;
 
     //get the x and y coordinates of the click event
@@ -144,6 +145,7 @@ export default function SplitView() {
         );
       }
     });
+
     setWaitingForMapMarker(true);
     setWaitingForImageMarker(false);
   };
@@ -181,6 +183,7 @@ export default function SplitView() {
         pair.pixelCoords[0] !== 0 &&
         pair.pixelCoords[1] !== 0
     );
+    setHelpMessage("First marker placed, now place the second marker.");
     // iterate through valid pairs and make API call
     validPairs.forEach((pair) => {
       const { latLong, pixelCoords } = pair;
@@ -189,13 +192,13 @@ export default function SplitView() {
         .then((data) => {
           // handle success
           console.log("Success:", data);
-          setWaitingForImageMarker(false);
-          setWaitingForMapMarker(false);
+
+          setHelpMessage("Marker pair added successfully!");
         })
         .catch((error) => {
           // handle error
           console.error("Error:", error.message);
-          // setErrorMessage(error.message);
+          setErrorMessage(error.message);
         });
     });
   }, [georefMarkerPairs]);
@@ -226,7 +229,10 @@ export default function SplitView() {
     if (mounted) {
       addProject(projectName);
       setHelpMessage(
-        "Start by adding markers to the map in the area you want to georeference."
+        "Welcome to text to map! Click on either the map or the image to add a marker. Then click on the other to pair them. (both markers must be in the same location for best accuracy!)"
+      );
+      setErrorMessage(
+        "Zooming creates issues with marker placement, please avoid zooming."
       );
     }
     return () => {
@@ -271,12 +277,15 @@ export default function SplitView() {
         <div className="fixed w-2/5 z-50 m-4 text-center">
           <Alert variant={"help"} className="">
             <AlertDescription>{helpMessage}</AlertDescription>
-            {errorMessage && (
-              <Alert variant="destructive" className="p-1">
-                <AlertDescription>{errorMessage}</AlertDescription>
-              </Alert>
-            )}
           </Alert>
+          {errorMessage && (
+            <Alert
+              variant="destructive"
+              className="p-1 m-2 bg-white bg-opacity-75 p-2"
+            >
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
         </div>
       </div>
       <Allotment onDragEnd={() => mapRef.current?.resize()}>
