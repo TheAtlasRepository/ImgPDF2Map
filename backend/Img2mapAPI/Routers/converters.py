@@ -31,8 +31,9 @@ async def image2png(background_tasks: BackgroundTasks,file: UploadFile = File(..
     """ **Converts an image to a .png file.** """
     if file.content_type == 'image/png':
         raise HTTPException(status_code=400, detail='File is already a .png file')
-    if isImage(file) == False:
+    if isImageSupported(file) == False:
         raise HTTPException(status_code=415, detail=f'File is a {file.content_type} file, which is not supported')
+    
     try:
         (NewImageFile, image_name) = await image2png(file)
         background_tasks.add_task(delFile, NewImageFile) #create a background task to remove the temporary file

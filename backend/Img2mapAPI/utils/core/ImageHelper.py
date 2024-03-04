@@ -51,7 +51,7 @@ async def image2png(file: UploadFile) -> Tuple[str, str]:
     return tempImage, image_name
 
 #function to check if a file is an image and is not a .png file or a file that PIL can't convert to .png
-def isImage(file: UploadFile) -> bool:
+def isImageSupported(file: UploadFile) -> bool:
     """
     Checks if a file is an image and is not a file that PIL can't convert to .png.
     :param file: file to check
