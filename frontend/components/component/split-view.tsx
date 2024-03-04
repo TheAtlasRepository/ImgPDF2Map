@@ -11,7 +11,6 @@ import MapStyleToggle from "./mapStyleToggle";
 import Image from "next/image";
 import mapboxgl from "mapbox-gl";
 import * as api from "./projectAPI";
-import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function SplitView() {
