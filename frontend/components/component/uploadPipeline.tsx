@@ -30,9 +30,10 @@ function UploadPipeline() {
         <div>
             {
                 // If there is no fileType, show the upload file component
-                !fileType && 
+                !fileType &&
                 <UploadFile 
                     onFileUpload={handleFileUpload} 
+                    clearStateRequest={clearStates}
                 />
             }
             {

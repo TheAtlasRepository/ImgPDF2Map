@@ -7,9 +7,14 @@ import axios from 'axios';
 export default function ImageEdit({ editBool, onCrop }: { editBool: boolean, onCrop: () => void }) {
     const [crop, setCrop] = useState<Crop>(); 
     const [imageSrc, setImageSrc] = useState(localStorage.getItem("pdfData")!); // Keeps track of image URL
+    const [applyButtonText, setApplyButtonText] = useState('Apply Crop');
+    const [buttonsDisabled, setButtonsDisabled] = useState(false);
 
     // When the user requests to apply the crop
     const handleApplyCrop = async () => {
+        setApplyButtonText('Applying...');
+        setButtonsDisabled(true);
+
         // Make sure that there is crop data, return if not
         if (!crop) {
             console.log("No crop data!");
@@ -87,10 +92,12 @@ export default function ImageEdit({ editBool, onCrop }: { editBool: boolean, onC
                 // Log any errors
                 console.error('Error:', error);
             }
+
+            // Reset the apply button text
+            setApplyButtonText('Apply Crop');
+            setButtonsDisabled(false);
         };
         originalImage.src = imageSrc;
-
-        
     };
 
     // When the user requests to cancel the crop
@@ -125,14 +132,16 @@ export default function ImageEdit({ editBool, onCrop }: { editBool: boolean, onC
                         <Button
                             className="btn bg-red-600 hover:bg-red-700"
                             onClick={handleCancelCrop}
+                            disabled={buttonsDisabled}
                         >
                             Cancel Crop
                         </Button>
                         <Button
                             className="btn ml-2 bg-green-600 hover:bg-green-700"
                             onClick={handleApplyCrop}
+                            disabled={buttonsDisabled}
                         >
-                            Apply Crop
+                            {applyButtonText}
                         </Button>
                     </div>
                 </div>

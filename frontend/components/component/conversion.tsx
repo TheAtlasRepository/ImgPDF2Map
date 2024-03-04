@@ -1,6 +1,7 @@
 import { RotateLoader } from 'react-spinners';
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
+
 import axios from "axios";
 
 type ConversionProps = {
@@ -12,25 +13,33 @@ type ConversionProps = {
 
 const Conversion: React.FC<ConversionProps> = ({ fileType, fileUrl, pageNumber, clearStateRequest }) => {
   const router = useRouter();
+  const hasMadeApiCall = useRef(false);
+  const [isLargeFile, setLargeFile] = useState<boolean>(false);
+
 
   // Convert Image or PDF to PNG after component has been rendered on the client side.
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && !hasMadeApiCall.current) {
       const pdfDataFromLocalStorage = window.localStorage.getItem("pdfData");
 
       // Check if pdfData is already in local storage
       if (pdfDataFromLocalStorage !== null) {
         // Parse the data from local storage
         const parsedData = JSON.parse(pdfDataFromLocalStorage);
+        const fileType = parsedData.type;
 
         // Fetch the Blob from the URL
         fetch(parsedData.url)
           .then((res) => res.blob())
           .then((blob) => {
+            // Check if the file is larger than 1 MB
+            if (blob.size / (1024 * 1024) > 1) {
+              setLargeFile(true);
+            }
+
+            // Create a FormData object to send the file to the API
             const formData = new FormData();
-            formData.append("file", blob, "");
-            // Get the file type
-            const fileType = parsedData.type;
+            formData.append("file", blob, "");        
 
             // Handle different the different file types
             if (fileType === "image/png") {
@@ -56,6 +65,7 @@ const Conversion: React.FC<ConversionProps> = ({ fileType, fileUrl, pageNumber, 
             }
           });
       }
+      hasMadeApiCall.current = true; // Set to true so that the API call is only made once
     }
   }, []);
 
@@ -112,6 +122,7 @@ const Conversion: React.FC<ConversionProps> = ({ fileType, fileUrl, pageNumber, 
             <div className="rounded-lg border-4 border-dashed p-10 py-20 text-center">
                 <div className="p-10 text-center text-gray-400">
                     <h1>Getting your file ready</h1>
+                    { isLargeFile && <p>This may take some time for larger files</p>}
                 </div>
                 <RotateLoader color="#9CA3AF"/>
             </div>

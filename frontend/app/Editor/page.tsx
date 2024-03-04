@@ -2,7 +2,6 @@
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react';
 import Editor from '../../components/component/editor';
-import UploadFile from '../../components/component/upload-file';
 
 // This will be a component in the future
 
@@ -11,18 +10,22 @@ export default function Page() {
 
     // Initialize pdfData state variable
     const [pdfData, setPdfData] = useState<string | null>(null);
+    const pdfDataFromLocalStorage = window.localStorage.getItem('pdfData');
 
-    // Update pdfData after component has been rendered on the client side
     useEffect(() => {
+        // If pdfData is not null, set the pdfData state variable to the value of the pdfData key in localStorage
         if (typeof window !== 'undefined') {
-            const pdfDataFromLocalStorage = window.localStorage.getItem('pdfData');
             setPdfData(pdfDataFromLocalStorage !== null ? pdfDataFromLocalStorage : null);
         }
     }, []);
+      
+      
 
     return (
         <main>
-            {pdfData !== null ? <Editor /> : <UploadFile />}
+            {pdfData !== null && <Editor />}
         </main>
     );
 }
+
+

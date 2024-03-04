@@ -3,7 +3,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function UploadFile({ onFileUpload }: { onFileUpload: (fileUrl: string, fileType: string) => void }) {
+type UploadFileProps = {
+  clearStateRequest: () => void;
+  onFileUpload: (fileUrl: string, fileType: string) => void;
+};
+
+const UploadFile: React.FC<UploadFileProps> = ({ onFileUpload, clearStateRequest }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fileName, setFileName] = useState("");
   const params = useSearchParams();
@@ -12,7 +17,7 @@ export default function UploadFile({ onFileUpload }: { onFileUpload: (fileUrl: s
   useEffect(() => {
     // If there is an error message in the URL, set the error message state to the value in the URL
     if (params.get("e")) {
-      setErrorMessage(params.get("e") as string);
+      handleErrorMsg(params.get("e") as string);
     }
   });
 
@@ -42,8 +47,14 @@ export default function UploadFile({ onFileUpload }: { onFileUpload: (fileUrl: s
   const checkFileType = (file: File) => {
     if (file) {
       // Clear any existing error message and set file type and name
-      setErrorMessage(null);
+      handleErrorMsg("");
       setFileName(file.name);
+
+      // Return if file type is not supported
+      if (file.type !== 'application/pdf' && !file.type.startsWith('image/')) {
+        handleErrorMsg("File type not supported.");
+        return;
+      }
 
       // Read and save file to local storage
       const reader = new FileReader();
@@ -69,9 +80,14 @@ export default function UploadFile({ onFileUpload }: { onFileUpload: (fileUrl: s
           localStorage.removeItem("pdfData");
       }
     } else {
-      setErrorMessage("File type not supported.");
+      handleErrorMsg("File type not supported.");
     }
   };
+
+  const handleErrorMsg = (e: string) => {
+    clearStateRequest();
+    setErrorMessage(e);
+  }
 
   return (
     <div className="mx-auto w-1/4">
@@ -158,3 +174,5 @@ function FolderUploadIcon(props: any) {
     </svg>
   );
 }
+
+export default UploadFile;
