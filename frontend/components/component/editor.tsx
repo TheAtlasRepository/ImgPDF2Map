@@ -43,7 +43,7 @@ export default function Editor() {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      <div className="flex items-center justify-between p-4 bg-gray-800 shadow-md">
+      <div className="flex items-center justify-between p-4 background-dark shadow-md">
         <div className="items-center text-white">
           <input
             type="text"
@@ -89,7 +89,7 @@ export default function Editor() {
       ) : (
         <div
           className={`flex flex-col items-center justify-center flex-1 ${
-            !isCrop ? "bg-gray-100 dark:bg-gray-900" : "bg-gray-400 dark:bg-gray-700"
+            !isCrop ? "bg-gray-100 dark:bg-gray-900" : "bg-gray-400 dark:bg-gray-800"
           }`}
         >
           <div className="flex items-center justify-center w-full">

@@ -117,7 +117,7 @@ export default function ImageEdit({ editBool, onCrop }: { editBool: boolean, onC
     return (
         <>
             {editBool ? (
-                <div className="flex flex-col justify-items-center card p-10 shadow-lg dark:bg-gray-800">
+                <div className="flex flex-col justify-items-center card p-10 shadow-lg dark:bg-gray-900">
                     <div>
                         <h1 className="text-2xl font-bold mb-4 text-primary dark:text-white">Crop Image</h1>
                     </div>

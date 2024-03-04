@@ -66,9 +66,9 @@ const PdfSelect: React.FC<PdfSelectProps> = ({ fileUrl, onPageSelected, clearSta
 
   return (
     <div className="flex flex-row justify-center">
-      <div className="flex flex-col w-1/2 border shadow-lg card dark:bg-gray-900">
-        <div className=" top-0 left-0 right-0 z-50 flex items-center justify-center p-4 bg-gray-800 shadow-md rounded-t-lg">
-          <div className="items-center text-white">
+      <div className="flex flex-col w-1/2 border shadow-lg card dark:bg-gray-800 dark:border-gray-800">
+        <div className=" top-0 left-0 right-0 z-50 flex items-center justify-center p-4 bg-gray-700 shadow-md rounded-t-lg">
+          <div className="items-center text-white dark:text-gray-300">
             <p>Please select which page you would like to use from your PDF (max one page)</p>
           </div>
         </div>
@@ -102,7 +102,7 @@ const PdfSelect: React.FC<PdfSelectProps> = ({ fileUrl, onPageSelected, clearSta
                 Next
               </Button>
             </div>
-            <p className="flex justify-center text-secondary dark:text-white">
+            <p className="flex justify-center text-secondary dark:text-gray-300">
               Page {selectedPage || (numPages ? 1 : "--")} of {numPages || "--"}
             </p>
             <div className="flex items-center justify-center">
@@ -110,7 +110,7 @@ const PdfSelect: React.FC<PdfSelectProps> = ({ fileUrl, onPageSelected, clearSta
                 file={file}
                 onLoadSuccess={onDocumentLoadSuccess}
                 onLoadError={handlePdfError}
-                className="border m-2"
+                className="border m-2 mb-7 shadow-md dark:border-gray-900"
               >
                 <Page
                   renderAnnotationLayer={false}
