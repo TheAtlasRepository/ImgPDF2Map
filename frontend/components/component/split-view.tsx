@@ -19,6 +19,7 @@ export default function SplitView() {
   const [projectId, setProjectId] = useState(1);
   const [projectName, setProjectName] = useState("Project 1");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [helpMessage, setHelpMessage] = useState<string | null>(null);
 
   //mapbox states
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
@@ -53,7 +54,7 @@ export default function SplitView() {
   const addMapMarker = (geoCoordinates: GeoCoordinates) => {
     if (waitingForImageMarker) return;
     //limit to 3 markers initially
-    if (mapMarkers.length >= 3) return;
+    // if (mapMarkers.length >= 3) return;
 
     setMapMarkers([...mapMarkers, { geoCoordinates }]);
 
@@ -77,7 +78,7 @@ export default function SplitView() {
 
   const addImageMarker = (event: React.MouseEvent<HTMLDivElement>) => {
     if (waitingForMapMarker) return;
-    if (isDragging) return;
+    // if (isDragging) return;
 
     //get the x and y coordinates of the click event
     const rect = (event.target as Element).getBoundingClientRect();
@@ -100,6 +101,8 @@ export default function SplitView() {
     if (dragDifference > 0.1) {
       console.log("dragging");
       console.log("distance dragged:", dragDifference);
+      //reset the drag start
+      setDragStart({ x, y });
       return;
     }
     // limit to 3 markers initially
@@ -130,36 +133,6 @@ export default function SplitView() {
     }
     setWaitingForMapMarker(true);
     setWaitingForImageMarker(false);
-  };
-
-  const renderGeorefPairTable = () => {
-    if (!georefMarkerPairs.length) return null;
-    return (
-      <div className="">
-        <div className="absolute bottom-0 right-0">
-          <table className="table-auto w-full text-sm text-left">
-            <thead>
-              <tr>
-                <th>Latitude</th>
-                <th>Longitude</th>
-                <th>Map X</th>
-                <th>Map Y</th>
-              </tr>
-            </thead>
-            <tbody>
-              {georefMarkerPairs.map((pair, index) => (
-                <tr key={index}>
-                  <td>{pair.latLong[0]}</td>
-                  <td>{pair.latLong[1]}</td>
-                  <td>{pair.pixelCoords[0]}</td>
-                  <td>{pair.pixelCoords[1]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    );
   };
 
   //adjust marker positions based on image manipulation
@@ -238,27 +211,57 @@ export default function SplitView() {
     let mounted = true;
     if (mounted) {
       addProject(projectName);
+      setHelpMessage(
+        "Start by adding markers to the map in the area you want to georeference."
+      );
     }
     return () => {
       mounted = false;
     };
   }, []);
 
+  const renderGeorefPairTable = () => {
+    if (!georefMarkerPairs.length) return null;
+    return (
+      <div className="">
+        <div className="absolute bottom-0 right-0">
+          <table className="table-auto w-full text-sm text-left">
+            <thead>
+              <tr>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Map X</th>
+                <th>Map Y</th>
+              </tr>
+            </thead>
+            <tbody>
+              {georefMarkerPairs.map((pair, index) => (
+                <tr key={index}>
+                  <td>{pair.latLong[0]}</td>
+                  <td>{pair.latLong[1]}</td>
+                  <td>{pair.pixelCoords[0]}</td>
+                  <td>{pair.pixelCoords[1]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="h-screen">
-      <div className="">
-        {errorMessage && (
-          <Alert variant="destructive" className="mt-5">
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{errorMessage}</AlertDescription>
-          </Alert>
-        )}
-      </div>
+      <div className=""></div>
       <div className="flex justify-center">
-        <div className="fixed w-1/4 z-50">
-          <Alert variant={"default"} className="">
-            <AlertTitle>Georef guide</AlertTitle>
-            <AlertDescription>Place your first marker!</AlertDescription>
+        <div className="fixed w-1/4 z-50 m-4">
+          <Alert variant={"help"} className="">
+            <AlertDescription>{helpMessage}</AlertDescription>
+            {errorMessage && (
+              <Alert variant="destructive" className="p-1">
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
+            )}
           </Alert>
         </div>
       </div>
