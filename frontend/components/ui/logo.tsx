@@ -1,30 +1,19 @@
-import React, { useState, useEffect } from 'react';
+const Logo = () => {
+  let logoText = 'Image'; // Default text
 
-function Logo() {
-    const [text, setText] = useState('IMG  ');
-    const [opacity, setOpacity] = useState('opacity-100');
+  // Array of domains that will make the logo show "PDF"
+  const pdfDomains = ['https://url1.com', 'https://url2.com'];
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setOpacity('opacity-0');
-            setTimeout(() => {
-                setText(prevText => prevText === 'IMG  ' ? 'PDF  ' : 'IMG  ');
-                setOpacity('opacity-100');
-            }, 500);
-        }, 5000);
-        return () => clearInterval(interval);
-    }, []);
+  // If the current origin is in the array, change the text
+  if (typeof window !== 'undefined' && pdfDomains.includes(window.location.origin)) {
+    logoText = 'PDF';
+  }
 
-    return (
-<div className={`flex justify-center items-center text-l text-white`}>
-  <div className={`transition-all duration-500 ease-in-out ${opacity}`} style={{minWidth: '2.5em'}}>
-    <span className="font-bold">{text}</span>
-  </div>
-  <div>
-    <span>2 MAP</span>
-  </div>
-</div>
-    );
-}
+  return (
+    <div className={`flex justify-center items-center text-l text-white`}>
+      <span><b>{logoText}</b> To Map</span>
+    </div>
+  );
+};
 
 export default Logo;

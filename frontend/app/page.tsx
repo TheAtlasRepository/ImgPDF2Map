@@ -1,11 +1,10 @@
 'use client';
-import UploadFileComp from '../components/component/upload-file';
 import UploadPipeline from '@/components/component/uploadPipeline';
 import Navbar from '../components/ui/navbar';
 
 export default function Home() {
   return (
-    <main className="flex h-screen flex-col bg-white">
+    <main className="flex flex-col bg-white dark:bg-gray-900">
       <Navbar
         activePage="Home"
       />
@@ -17,7 +16,7 @@ export default function Home() {
       <div className="flex justify-center p-2 py-10">
         <div className="flex flex-row w-1/2 justify-between">
           <div className="w-1/4 p-6 pl-0 flex items-center justify-center h-full">
-            <h1 className="text-5xl font-bold text-primary">
+            <h1 className="text-5xl font-bold text-primary dark:text-gray-300">
               The <br />
               simplest <br />
               way to <br />
@@ -25,8 +24,8 @@ export default function Home() {
               reference<br />
             </h1>
           </div>
-          <div className="w-3/4 p-6 card">
-            <p className="text-lg text-secondary">
+          <div className="w-3/4 p-6 card dark:bg-gray-800">
+            <p className="text-lg text-secondary dark:text-gray-300">
               Discover PDF/IMG2Map, the simplest solution for seamlessly georeferencing digital images and PDF files! 
               Effortlessly upload your documents and pinpoint specific locations by selecting reference points on the image. 
               By embedding geospatial metadata, you can transform your files into geographically accurate representations, 
@@ -41,13 +40,13 @@ export default function Home() {
 
       <div className="flex justify-center p-2 py-10">
         <div className="flex flex-row w-1/2 justify-between">
-          <div className="w-3/4 p-6 card">
-            <p className="text-lg text-secondary">
+          <div className="w-3/4 p-6 card dark:bg-gray-800">
+            <p className="text-lg text-secondary dark:text-gray-300">
               This is a large textbox detailing a little transition to go try out the other service, Text/CSV 2 Map.
             </p>
           </div>
           <div className="w-1/4 p-6 pl-0 flex items-center justify-center h-full">
-            <h1 className="text-5xl font-bold text-primary">
+            <h1 className="text-5xl font-bold text-primary dark:text-gray-300">
               Need <br />
               more? <br />
             </h1>
@@ -58,15 +57,15 @@ export default function Home() {
       <div className="flex justify-center p-2 py-10">
         <div className="flex flex-row w-1/2 justify-between">
           <div className="w-1/4 p-6 pl-0 flex items-center justify-center h-full">
-            <h1 className="text-5xl font-bold text-primary">
+            <h1 className="text-5xl font-bold text-primary dark:text-gray-300">
               What <br />
               a load <br />
               of <br />
               bologna<br />
             </h1>
           </div>
-          <div className="w-3/4 p-6 card">
-            <p className="text-lg text-secondary">
+          <div className="w-3/4 p-6 card dark:bg-gray-800">
+            <p className="text-lg text-secondary dark:text-gray-300">
               Bologna, the vibrant capital of the Emilia-Romagna region in northern Italy, is a city steeped in history, 
               culture, and culinary delights. Renowned for its well-preserved medieval architecture, including the iconic Two Towers, 
               Bologna offers a charming blend of ancient streets and lively piazzas. Home to the oldest university in the Western world, 

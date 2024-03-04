@@ -116,11 +116,11 @@ export default function ImageEdit({ editBool, onCrop }: { editBool: boolean, onC
     return (
         <>
             {editBool ? (
-                <div className="flex flex-col justify-items-center card p-10 shadow-lg">
+                <div className="flex flex-col justify-items-center card p-10 shadow-lg dark:bg-gray-900">
                     <div>
-                        <h1 className="text-2xl font-bold mb-4 text-primary">Crop Image</h1>
+                        <h1 className="text-2xl font-bold mb-4 text-primary dark:text-white">Crop Image</h1>
                     </div>
-                    <div>
+                    <div className='mx-auto'>
                         <ReactCrop
                             crop={crop}
                             onChange={(newCrop) => setCrop(newCrop)}
@@ -130,14 +130,14 @@ export default function ImageEdit({ editBool, onCrop }: { editBool: boolean, onC
                     </div>
                     <div className="flex flex-row justify-end">
                         <Button
-                            className="btn bg-red-600 hover:bg-red-700"
+                            className="btn bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700 dark:text-white"
                             onClick={handleCancelCrop}
                             disabled={buttonsDisabled}
                         >
                             Cancel Crop
                         </Button>
                         <Button
-                            className="btn ml-2 bg-green-600 hover:bg-green-700"
+                            className="btn ml-2 bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700 dark:text-white"
                             onClick={handleApplyCrop}
                             disabled={buttonsDisabled}
                         >
