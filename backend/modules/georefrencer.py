@@ -131,4 +131,3 @@ def adjustGeoreferencedImage(innFilePath, points: pointList, crs: str = defaultC
     dataset.close()
     #return the path to the georeferenced file
     return tempFilePath
-

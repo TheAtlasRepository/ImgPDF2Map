@@ -1,6 +1,7 @@
 import { RotateLoader } from 'react-spinners';
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
+
 import axios from "axios";
 
 type ConversionProps = {
@@ -64,7 +65,6 @@ const Conversion: React.FC<ConversionProps> = ({ fileType, fileUrl, pageNumber, 
             }
           });
       }
-
       hasMadeApiCall.current = true; // Set to true so that the API call is only made once
     }
   }, []);

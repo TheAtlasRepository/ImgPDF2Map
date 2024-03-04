@@ -98,7 +98,6 @@ export default function ImageEdit({ editBool, onCrop }: { editBool: boolean, onC
             setButtonsDisabled(false);
         };
         originalImage.src = imageSrc;
-
     };
 
     // When the user requests to cancel the crop
