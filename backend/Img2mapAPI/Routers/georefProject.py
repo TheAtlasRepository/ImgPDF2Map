@@ -113,11 +113,14 @@ async def getPoint(projectId: int, pointId: int):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
+#TODO: fix the saving of the image file
 @router.post("/{projectId}/image")
 async def uploadImage(projectId: int, file: UploadFile = File(...)):
     """ Upload an image to a project"""
     try:
-        await _projectHandler.saveImageFile(file, projectId, file.filename)
+        with open(file.filename, "rb") as img:
+            file = img.read()
+            await _projectHandler.saveImageFile(file, projectId, file.filename)
         return {"status": "Image uploaded"}
     except Exception as e:
         #check if e has a status code attribute
@@ -125,7 +128,6 @@ async def uploadImage(projectId: int, file: UploadFile = File(...)):
             raise HTTPException(status_code=e.status_code, detail=str(e))
         else:
             raise HTTPException(status_code=500, detail=str(e))
-
 
 @router.get("/{projectId}/image")
 async def getImage(projectId: int):
@@ -137,6 +139,7 @@ async def getImage(projectId: int):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
+#TODO: fix the saving of the georeferenced image
 @router.get("/{projectId}/georef/initial")
 async def InitalgeorefImage(projectId: int, crs: str = None):
     """ Georeference the image of a project by id, returns the georeferenced image file if found"""
@@ -147,6 +150,7 @@ async def InitalgeorefImage(projectId: int, crs: str = None):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
+#TODO: fix the saving of the georeferenced image
 @router.get("/{projectId}/georef/referenced")
 async def adjustGeoref(projectId: int):
     """ re-georeference the image of a project by id, returns the georeferenced image file if found"""

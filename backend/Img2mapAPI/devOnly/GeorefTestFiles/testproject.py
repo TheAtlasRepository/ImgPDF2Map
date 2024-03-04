@@ -31,9 +31,12 @@ async def createTestProject(repo: ProjectHandler):
     Points: List[Point] = []
     for point in jsonPoints:
         #create a new point with the data from the json file as a map
-        nPoint = Point(**point)
+        nPoint = Point.model_construct(**point)
         nPoint.projectId = id
         Points.append(nPoint)
+    #save the points to the project
+    for point in Points:
+        await ProjHandler.addPoint(id, point)
 
     #prosessing the image file to bytes
     with open(testImg, "rb") as file:
