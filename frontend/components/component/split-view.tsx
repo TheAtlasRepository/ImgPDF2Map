@@ -12,6 +12,7 @@ import Image from "next/image";
 import mapboxgl from "mapbox-gl";
 import * as api from "./projectAPI";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 
 export default function SplitView() {
   //project states
@@ -281,9 +282,17 @@ export default function SplitView() {
           {errorMessage && (
             <Alert
               variant="destructive"
-              className="p-1 m-2 bg-white bg-opacity-75 p-2"
+              className="m-2 bg-white bg-opacity-75 p-2"
             >
               <AlertDescription>{errorMessage}</AlertDescription>
+              <Button
+                className="absolute top-0 right-5 m-0 p-0"
+                size={"icon"}
+                variant={"ghost"}
+                onClick={() => setErrorMessage(null)}
+              >
+                X
+              </Button>
             </Alert>
           )}
         </div>
