@@ -53,16 +53,28 @@ export default function SplitView() {
 
   const addMapMarker = (geoCoordinates: GeoCoordinates) => {
     if (waitingForImageMarker) return;
-    //limit to 3 markers initially
-    // if (mapMarkers.length >= 3) return;
 
     setMapMarkers([...mapMarkers, { geoCoordinates }]);
-
-    setGeorefMarkerPairs([
-      ...georefMarkerPairs,
-      { latLong: geoCoordinates, pixelCoords: [0, 0] },
-    ]);
-
+    setGeorefMarkerPairs((pairs) => {
+      const lastPair = pairs[pairs.length - 1];
+      if (
+        pairs.length === 0 ||
+        (lastPair.latLong[0] !== 0 &&
+          lastPair.latLong[1] !== 0 &&
+          lastPair.pixelCoords[0] !== 0 &&
+          lastPair.pixelCoords[1] !== 0)
+      ) {
+        // Add a new pair if the array is empty or the last pair is complete
+        return [...pairs, { latLong: geoCoordinates, pixelCoords: [0, 0] }];
+      } else {
+        // Update the last pair if it's incomplete
+        return pairs.map((pair, index) =>
+          index === pairs.length - 1
+            ? { ...pair, latLong: geoCoordinates }
+            : pair
+        );
+      }
+    });
     setWaitingForImageMarker(true);
     setWaitingForMapMarker(false);
   };
@@ -78,7 +90,6 @@ export default function SplitView() {
 
   const addImageMarker = (event: React.MouseEvent<HTMLDivElement>) => {
     if (waitingForMapMarker) return;
-    // if (isDragging) return;
 
     //get the x and y coordinates of the click event
     const rect = (event.target as Element).getBoundingClientRect();
@@ -105,10 +116,8 @@ export default function SplitView() {
       setDragStart({ x, y });
       return;
     }
-    // limit to 3 markers initially
-    if (imageMarkers.length >= 3) return;
 
-    // //TODO: FIX THIS SHIT, trying to adjust marker placement based on zoomlevel
+    // //TODO: FIX THIS, trying to adjust marker placement based on zoomlevel
     // const centerX = imageSize.width / 2;
     // const centerY = imageSize.height / 2;
 
@@ -118,19 +127,24 @@ export default function SplitView() {
     //
     setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
 
-    //update the last pair in the georefMarkerPairs array
-    const updatedPairs = [...georefMarkerPairs];
-    if (updatedPairs.length > 0) {
-      const lastPair = updatedPairs[updatedPairs.length - 1];
-      if (!lastPair.latLong) {
-        lastPair.latLong = [0, 0];
-        lastPair.pixelCoords = [x, y];
-        setGeorefMarkerPairs(updatedPairs);
+    setGeorefMarkerPairs((pairs) => {
+      const lastPair = pairs[pairs.length - 1];
+      if (
+        pairs.length === 0 ||
+        (lastPair.pixelCoords[0] !== 0 &&
+          lastPair.pixelCoords[1] !== 0 &&
+          lastPair.latLong[0] !== 0 &&
+          lastPair.latLong[1] !== 0)
+      ) {
+        // Add a new pair if the array is empty or the last pair is complete
+        return [...pairs, { latLong: [0, 0], pixelCoords: [x, y] }];
       } else {
-        lastPair.pixelCoords = [x, y];
-        setGeorefMarkerPairs(updatedPairs);
+        // Update the last pair if it's incomplete
+        return pairs.map((pair, index) =>
+          index === pairs.length - 1 ? { ...pair, pixelCoords: [x, y] } : pair
+        );
       }
-    }
+    });
     setWaitingForMapMarker(true);
     setWaitingForImageMarker(false);
   };
@@ -168,7 +182,6 @@ export default function SplitView() {
         pair.pixelCoords[0] !== 0 &&
         pair.pixelCoords[1] !== 0
     );
-    console.log("valid pairs:", validPairs);
     // iterate through valid pairs and make API call
     validPairs.forEach((pair) => {
       const { latLong, pixelCoords } = pair;
@@ -177,6 +190,8 @@ export default function SplitView() {
         .then((data) => {
           // handle success
           console.log("Success:", data);
+          setWaitingForImageMarker(false);
+          setWaitingForMapMarker(false);
         })
         .catch((error) => {
           // handle error
@@ -254,7 +269,7 @@ export default function SplitView() {
     <div className="h-screen">
       <div className=""></div>
       <div className="flex justify-center">
-        <div className="fixed w-1/4 z-50 m-4">
+        <div className="fixed w-2/5 z-50 m-4 text-center">
           <Alert variant={"help"} className="">
             <AlertDescription>{helpMessage}</AlertDescription>
             {errorMessage && (
