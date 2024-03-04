@@ -1,9 +1,10 @@
 #Abstract class for file storage
 from abc import ABC, abstractmethod
+from fastapi import UploadFile
 
 class FileStorage(ABC):
     @abstractmethod
-    async def saveFile(self, data: bytes, suffix: str)->str:
+    async def saveFile(self, data: UploadFile, suffix: str)->str:
         pass
     @abstractmethod
     async def removeFile(self, path: str):

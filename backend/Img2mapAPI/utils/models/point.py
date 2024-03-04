@@ -1,8 +1,7 @@
 from typing import Union, Optional
-from .coreModel import CoreModel
+from pydantic import BaseModel
 
-
-class Point(CoreModel):
+class Point(BaseModel):
      lat: float
      lng: float
      col: int
@@ -16,28 +15,16 @@ class Point(CoreModel):
      
      def __init__(self, **data):
           super().__init__(**data)
-          self.lat = 0
-          self.lng = 0
-          self.col = 0
-          self.row = 0
-          self.error = None
-          self.id = None
-          self.name = None
-          self.description = None
-          self.projectId = None
-          self.Idproj = None
+          self.lat = data.get('lat') if data.get('lat') is not None else 0
+          self.lng = data.get('lng') if data.get('lng') is not None else 0
+          self.col = data.get('col') if data.get('col') is not None else 0
+          self.row = data.get('row') if data.get('row') is not None else 0
+          self.error = data.get('error') if data.get('error') is not None else None
+          self.id = data.get('id') if data.get('id') is not None else None
+          self.name = data.get('name') if data.get('name') is not None else None
+          self.description = data.get('description') if data.get('description') is not None else None
+          self.projectId = data.get('projectId') if data.get('projectId') is not None else None
+          self.Idproj = data.get('Idproj') if data.get('Idproj') is not None else None
+
      
-     def __dict__(self):
-          return {
-               "lat": self.lat,
-               "lng": self.lng,
-               "col": self.col,
-               "row": self.row,
-               "error": self.error,
-               "id": self.id,
-               "name": self.name,
-               "description": self.description,
-               "projectId": self.projectId,
-               "Idproj": self.Idproj
-          }
      

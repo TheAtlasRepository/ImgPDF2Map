@@ -1,11 +1,10 @@
 from typing import Optional, Union, List
-from fastapi import UploadFile
 from pydantic import BaseModel
 from .pointList import PointList
-from .coreModel import CoreModel
 from ..core.FileHelper import createEmptyFile
+import datetime
 
-class Project(CoreModel):
+class Project(BaseModel):
     id: int = None
     name: str
     description: Optional[str] = None
@@ -19,28 +18,15 @@ class Project(CoreModel):
     
     def __init__(self, **data):
         super().__init__(**data)
-        self.points = PointList(points=[])
-        self.imageFilePath = ""
-        self.georeferencedFilePath = ""
-        self.selfdestructtime = "never"
-        self.created = "never"
-        self.lastModified = "never"
-        self.crs = "EPSG:4326"
+        self.points = data.get('points') if data.get('points') is not None else PointList()
+        self.imageFilePath = data.get('imageFilePath') if data.get('imageFilePath') is not None else None
+        self.georeferencedFilePath = data.get('georeferencedFilePath') if data.get('georeferencedFilePath') is not None else None
+        self.crs = data.get('crs') if data.get('crs') is not None else None
+        self.selfdestructtime = data.get('selfdestructtime') if data.get('selfdestructtime') is not None else None
+        self.created = data.get('created') if data.get('created') is not None else datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.lastModified = data.get('lastModified') if data.get('lastModified') is not None else datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.id = data.get('id') if data.get('id') is not None else None
+        self.name = data.get('name') if data.get('name') is not None else ''
+        self.description = data.get('description') if data.get('description') is not None else None
+            
     
-    def __dict__(self):
-        #convert the fields to a dictionary
-        dict = {
-            "id": self.id,
-            "name": self.name,
-            "description": self.description,
-            "points": self.points,
-            "crs": self.crs,
-            "imageFilePath": self.imageFilePath,
-            "georeferencedFilePath": self.georeferencedFilePath,
-            "selfdestructtime": self.selfdestructtime,
-            "created": self.created,
-            "lastModified": self.lastModified
-        }
-        #overriding the points field to convert it to a dictionary
-        dict["points"] = self.points.__dict__()
-        return dict

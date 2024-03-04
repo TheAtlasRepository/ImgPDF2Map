@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import List, Union 
+from typing import List, Union
+from pydantic import BaseModel
 
 #Abstract class for moving data to and from storage/DB and the API server
 class StorageHandler(ABC):
@@ -22,7 +23,7 @@ class StorageHandler(ABC):
         pass
 
     @abstractmethod
-    async def saveInStorage(self, data, type: str, pkName:str = 'id')->int:
+    async def saveInStorage(self, data: BaseModel, type: str, pkName:str = 'id')->int:
         """
         Save data to storage and return the id of the saved data
         
@@ -46,7 +47,7 @@ class StorageHandler(ABC):
         pass
 
     @abstractmethod
-    async def update(self, id: int, data, type: str)->None:
+    async def update(self, id: int, data: BaseModel, type: str)->None:
         """
         Update data in storage
         

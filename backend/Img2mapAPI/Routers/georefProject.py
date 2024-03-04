@@ -36,7 +36,6 @@ async def createProject(project: Project):
     except Exception as e:
         raise HTTPException(status_code=400, detail=f'Project could not be created: {str(e.with_traceback(None))}, {e.args}')
 
-#TODO: figure out why it is not properly updating the project (storageHandler? or devOnly/localrepository/repository.py?)
 @router.put("/{projectId}")
 async def updateProject(projectId: int, project: Project):
     """ Update the project details and return the id of the project """
@@ -51,6 +50,7 @@ async def deleteProject(projectId: int, backgroundTasks: BackgroundTasks):
     """ Delete a project and return a message if the project was deleted"""
     try:
         backgroundTasks.add_task(_projectHandler.deleteProject, projectId)
+        backgroundTasks.is_async = True
         return Response(content="Deletion request of project accepted", status_code=202, media_type="text/plain", background=backgroundTasks)
     except Exception as e:
         if e.status_code == 500:
@@ -66,14 +66,12 @@ async def getProject(projectId: int):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-#TODO: Fix This error: "'Point' object has no attribute 'col'", it is not getting the points from the route /project/{projectId}/point
 @router.post("/{projectId}/point")
-async def addPoint(projectId: int, point: Point):
+async def addPoint(projectId: int, innpoint: Point):
     """ Add a point to a project and return the id of the point"""
     try:
-        innPoint = point
-        PointID = await _projectHandler.addPoint(projectId, innPoint)
-        return {"Project":{"id": projectId},"Point":{"id": PointID}}
+        (PointID, Dbid) = await _projectHandler.addPoint(projectId, innpoint)
+        return {"Project":{"id": projectId},"Point":{"id": Dbid,"inProjectId": PointID}}
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -81,7 +79,10 @@ async def addPoint(projectId: int, point: Point):
 async def updatePoint(projectId: int, pointId: int, point: Point):
     """ Update a point in a project and returns ids of the project and the point to show that the point was updated"""
     try:
-        if await _projectHandler.updatePoint(projectId, pointId, point): return {"Project":{{"id": projectId}},"Point":{{"id": pointId}}}
+        if await _projectHandler.updatePoint(projectId, pointId, point):
+            return {"Project":{"id": projectId},"Point":{"id": pointId}}
+        else:
+            raise HTTPException(status_code=404, detail="Point not found")
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
@@ -89,8 +90,7 @@ async def updatePoint(projectId: int, pointId: int, point: Point):
 async def deletePoint(projectId: int, pointId: int, backgroundTasks: BackgroundTasks):
     """ Delete a point from a project returns action status"""
     try:
-        kwargs = {"projectId": projectId, "pointId": pointId}
-        backgroundTasks.add_task(_projectHandler.removePoint, **kwargs)
+        backgroundTasks.add_task(_projectHandler.removePoint, projectId, pointId)
         return Response(content="Deletion request of point accepted", status_code=202, media_type="text/plain", background=backgroundTasks)
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
@@ -117,7 +117,7 @@ async def getPoint(projectId: int, pointId: int):
 async def uploadImage(projectId: int, file: UploadFile = File(...)):
     """ Upload an image to a project"""
     try:
-        await _projectHandler.saveImageFile(open(file,"r+b"), projectId, file.filename)
+        await _projectHandler.saveImageFile(file, projectId, file.filename)
         return {"status": "Image uploaded"}
     except Exception as e:
         #check if e has a status code attribute
@@ -125,6 +125,7 @@ async def uploadImage(projectId: int, file: UploadFile = File(...)):
             raise HTTPException(status_code=e.status_code, detail=str(e))
         else:
             raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/{projectId}/image")
 async def getImage(projectId: int):
@@ -156,7 +157,6 @@ async def adjustGeoref(projectId: int):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-#TODO: fix "'dict' object has no attribute '__dict__'" error
 @router.post("/test", tags=["test"])
 async def createTestProject():
     """ Create a test project and return the id of the project 
@@ -166,3 +166,6 @@ async def createTestProject():
         return {"status": "Test project created", "id": id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+
+    

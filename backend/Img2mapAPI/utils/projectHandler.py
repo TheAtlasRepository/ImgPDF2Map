@@ -1,14 +1,19 @@
-# This is the project handeler file. It contains the functions to handle the project data.
+# This is the project handler file. It contains the functions to handle the project data.
 # The functions in this file are used to create, update, delete and get projects and points.
 # The project data is stored in a list in the router file.
 
 # Importing the required modules
 from typing import List, Union
+from fastapi import UploadFile, File
 from img2mapAPI.utils.models import Project, Point
 from .storage.files.fileStorage import FileStorage
 from .storage.data.storageHandler import StorageHandler
 from .core import georefHelper as georef
 import datetime
+#server console log
+import sys
+# python file object
+from io import BytesIO
 
 class ProjectHandler:
     _FileStorage: FileStorage = None
@@ -40,29 +45,39 @@ class ProjectHandler:
         """
         Update a project
         """
-        fetchedProject = await self._StorageHandler.fetchOne(projectId, "project")
+        fetchedProject: dict = await self._StorageHandler.fetchOne(projectId, "project")
         if fetchedProject is None:
             raise Exception("Project not found")
         #check fields that are not allowed to be updated
-        fetchedProject = Project(**fetchedProject)
+        fetchedProject= Project.model_construct(_fields_set=None, **fetchedProject)
         project.id = projectId
-        project.created = fetchedProject.created
+        Created = None
+        try:
+            Created = fetchedProject.created
+        except:
+            raise Exception("fetchOne did not return a project object")
+        try:
+            project.created = Created
+        except:
+            raise Exception("api object did not return a project object")
         project.lastModified = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         #compare the fetched project with the updated project and update allowed fields, points and image files are sent to other functions to be handled
-        innProject = project.__dict__
-        fetchedProjectDict = fetchedProject.__dict__
+        innProject: dict = dict(project)
+        fetchedProjectDict: dict = dict(fetchedProject)
         specialFields = ["id", "created", "lastModified", "points"]
         for key in fetchedProjectDict:
             if key in innProject:
                 if key == "points":
-                    self.updatePoints(projectId, project.points)
+                    if project.points is not None or project.points != []:
+                        await self.updatePoints(projectId, project.points)
                 #cheking special fields
                 elif key not in specialFields:
                     if fetchedProjectDict[key] != innProject[key]:
                         fetchedProjectDict[key] = innProject[key]
+        fetchedProject: Project = Project.model_construct(None, **fetchedProjectDict)
         #update the project in the storage
-        self._StorageHandler.update(projectId, fetchedProjectDict, "project")
+        await self._StorageHandler.update(projectId, fetchedProject, "project")
         return True
  
     # Function to delete a project
@@ -100,7 +115,7 @@ class ProjectHandler:
             raise Exception("Project not found")
         return project
 
-    # Function to get all projects
+    #TODO: not used in the current version, not manually tested
     async def getProjects(self) -> List[Project]:
         """
         Get all projects
@@ -112,34 +127,52 @@ class ProjectHandler:
             raise Exception("No projects found")
         return list
     
+    async def projectExists(self, projectId: int) -> bool:
+        """
+        Check if a project exists
+        """
+        project = await self._StorageHandler.fetchOne(projectId, "project")
+        if project is None or project == {}:
+            return False
+        return True
+
     ### Points
 
     async def getProjectPoints(self, projectId: int) -> List[Point]:
         """
         Get all points of a project
         """
+        if await self.projectExists(projectId) == False:
+            raise Exception("Project not found")
         #Convert the data to a list of point objects
-        Points = await self._StorageHandler.fetch("point", {"projectId": projectId})
-        list: List[Point] = [Point(**point) for point in Points]
+        params: dict = {"projectId": projectId}
+        Points = await self._StorageHandler.fetch("point", params)
+        if Points is None:
+            raise Exception("No points found")
+        list: List[Point] = [Point.model_construct(None ,**point) for point in Points]
+        if len(list) == 0:
+            raise Exception("points is empty")
         return list
     
     async def removePoint(self, projectId: int, pointId: int) -> bool:
         """
         Remove a point from a project
         """
-        points = await self._StorageHandler.fetch("point", {"projectId": projectId})
-        #check if the point exists and remove it
-        points = [Point(**point) for point in points]
-        for point in points:
-            if point.id == pointId:
-                self._StorageHandler.remove(point.id, "point")
-                return True
+        if await self.projectExists(projectId) == False:
+            raise Exception("Project not found")
+        params: dict = {"projectId": projectId, "Idproj": pointId}
+        points = await self._StorageHandler.fetch("point", params)
+        if points is not None and points != []:
+            await self._StorageHandler.remove(points[0]["id"], "point")
+            return True
         raise Exception("Point not found")
                 
     async def updatePoints(self, projectId: int, points: List[Point]) -> None:
         """
         Update the points of a project
         """
+        if await self.projectExists(projectId) == False:
+            raise Exception("Project not found")
         if self.validatepoints(points) == False:
             raise Exception("Invalid points")
         #existing points
@@ -147,16 +180,18 @@ class ProjectHandler:
         #comapre the points in storage with the updated points and update the points
         for point in points:
             if point.id is None | point.id == 0:
-                self.addPoint(projectId, point)
+              await self.addPoint(projectId, point)
             else:
                 #update the point in the storage
-                self.updatePoint(projectId, point.id, point)
+              await self.updatePoint(projectId, point.id, point)
 
     async def addPoint(self, projectId: int, point: Point) -> int:
         """
         Add a point to a project
         """
-        list = []
+        if await self.projectExists(projectId) == False:
+            raise Exception("Project not found")
+        list: List[Point] = []
         list.append(point)
         if self.validatepoints(list) == False: 
             raise Exception("Invalid point")
@@ -165,82 +200,95 @@ class ProjectHandler:
         point.id = None
         point.error = None
         #find the next idproj = 1
-        points = await self._StorageHandler.fetch("point", {"projectId": projectId})
-        if points is None or points is []:
-            points = []
-        elif points is dict:
-            try:
-                points = [Point(**points)]
-            except:
-                points = []
-        else:
-            try:
-                points = [Point(**point) for point in points]
-            except:
-                points = []
-        
-        if len(points) == 0:
+        points = await self._StorageHandler.fetch("point", {"projectId": projectId}) #format: List[dict] [{pointdict},{pointdict},{pointdict}]
+        if points is None or points == []:
             point.Idproj = 1
         else:
-            point.Idproj = max([point.Idproj for point in points]) + 1
+            iterator = 1
+            point.Idproj = 1
+            for p in points:
+                if p["Idproj"] >= point.Idproj:
+                    iterator += 1
+                    point.Idproj += 1
+
         #save the point to storage
-        dbid = await self._StorageHandler.saveInStorage(point, "point")
-        return dbid
+        dbid = await self._StorageHandler.saveInStorage(point, "point", "id")
+        if dbid is None:
+            raise Exception("Failed to save point")
+        return (point.Idproj, dbid)
 
     async def updatePoint(self, projectId: int, pointId: int, point: Point) -> bool:
         """
         Update a point of a project
         """
+        if await self.projectExists(projectId) == False:
+            raise Exception("Project not found")
         if self.validatepoints([point]) == False:
             raise Exception("Invalid point")
-        points = await self._StorageHandler.fetch("point", {"projectId": projectId})
-        #check if the point exists and get the point
-        points = [Point(**point) for point in points]
-        fetchedPoint = None
-        for p in points:
-            if p.Idproj == pointId:
-                fetchedPoint = p
-                break
-        if fetchedPoint is None:
+        
+        #find the point and update it
+        params: dict = {"projectId": projectId, "Idproj": pointId}
+        fetchedPointDict = await self._StorageHandler.fetch("point", params)
+        if fetchedPointDict is None:
             raise Exception("Point not found")
-        specialFields = ["id", "projectId", "Idproj"]
-        #compare the point with the updated point and update allowed fields
-        innPointDict = point.__dict__
-        fetchedPointDict = fetchedPoint.__dict__
+        fetchedPointDict = fetchedPointDict[0]
+        #crate a point object
+        updatedPoint: Point = Point.model_construct(None, **fetchedPointDict)
+        #update data point object based on the new point object
+        updatedPoint.lat = point.lat
+        updatedPoint.lng = point.lng
+        updatedPoint.col = point.col
+        updatedPoint.row = point.row
+        updatedPoint.error = point.error
+        updatedPoint.name = point.name
+        updatedPoint.description = point.description
 
-        for key in fetchedPointDict:
-            if key in innPointDict:
-                if key not in specialFields:
-                    if fetchedPointDict[key] != innPointDict[key]:
-                        fetchedPointDict[key] = innPointDict[key]
+        newpoint : Point = updatedPoint
+        systemlog = sys.stdout
+        systemlog.write(f"updatedPoint: {newpoint}\n")
+        dbid = fetchedPointDict["id"]
+        systemlog.write(f"dbid: {dbid}\n")
         #update the point in the storage
-        await self._StorageHandler.update(fetchedPointDict["id"], fetchedPointDict, "point")
+        await self._StorageHandler.update(dbid, newpoint, "point")
+
         return True
 
-    async def getPoint(self, projectId: int, pointId: int) -> Point:
+    async def getPoint(self, projectId: int, pointId: int, byDBID:bool = False) -> Point:
         """
         Get a point of a project by id
         """
         #Convert the data to a point object
-        point = await self._StorageHandler.fetchOne(pointId, "point")
+        #search by Idproj
+        if byDBID == True:
+            point = await self._StorageHandler.fetchOne(pointId, "point")
+            if point is None:
+                raise Exception("Point not found")
+            return Point.model_construct(None, **point)
+        
+        if await self.projectExists(projectId) == False:
+            raise Exception("Project not found")
+        point = None
+        params: dict = {"Idproj": pointId, "projectId": projectId}
+        points = await self._StorageHandler.fetch("point", params)
+        if points is None or points == []:
+            raise Exception("No points found")
+        else:
+            point = points[0]
+            point = Point.model_construct(None, **point)
         if point is None:
-            #search by Idproj
-            points = await self._StorageHandler.fetch("point", {"projectId": projectId})
-            points = [Point(**point) for point in points]
-            for p in points:
-                if p.Idproj == pointId:
-                    point = p
-                    break
-            raise Exception("Point not found")
-        point = Point(**point)
+            ret = str(points)
+            raise Exception(f"Point not found: {ret}")
         return point
-
+     
     def validatepoints(self, points: List[Point]) -> bool:
         """
         Validate the points
         """
         #check if the points are valid
         for point in points:
+            #check if point is a point object
+            if isinstance(point, Point) == False:
+                raise Exception("Invalid point object")
             #check if point has the required attributes
             if hasattr(point, "lat") == False or hasattr(point, "lng") == False or hasattr(point, "col") == False or hasattr(point, "row") == False:
                 raise Exception("Failed to validate points attributes")
@@ -252,7 +300,7 @@ class ProjectHandler:
     
     ### Files
 
-    async def saveImageFile(self, projectId: int, file: bytes, fileType: str) -> None:
+    async def saveImageFile(self, projectId: int, file: UploadFile, fileType: str) -> None:
         """
         Save the image file of a project
         """

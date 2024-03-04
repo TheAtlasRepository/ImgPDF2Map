@@ -1,6 +1,7 @@
 import os
 import tempfile
 from .fileStorage import FileStorage
+from fastapi import UploadFile
 
 _tempPath = "./temp"
 if not os.path.exists(_tempPath):
@@ -13,7 +14,7 @@ class LocalFileStorage(FileStorage):
     tempPath = _tempPath
     tempFolder = tempfile.mkdtemp(dir=_tempPath)
    
-    async def saveFile(self, data: bytes, suffix: str) -> str:
+    async def saveFile(self, data: UploadFile , suffix: str) -> str:
         #create a temporary file
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix, dir=self.tempFolder) as file:
             file.write(data)

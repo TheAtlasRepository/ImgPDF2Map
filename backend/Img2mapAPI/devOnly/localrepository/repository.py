@@ -20,10 +20,9 @@ class Repository:
         Returns a table from the repository
     """
     _instance = None
+    _tables = {}
 
     def __init__(self):
-        self._tables = {}
-        #adding the tables
         self.addTable("project", Table())
         self.addTable("point", Table())
 
@@ -53,7 +52,7 @@ class Repository:
         return self._tables
     
     async def fetchAllRows(self, tableName: str):
-        return self._tables[tableName]._rows
+        return self._tables[tableName].rows
 
     async def removeTable(self, tableName: str):
         del self._tables[tableName]
@@ -71,22 +70,25 @@ class Repository:
         rowdict:dict = table.getRow(id)
         return rowdict
     
-    #query the database
-    async def query(self, tableName: str, query: dict):
-        #get the table
+    #TODO: Fix the query function
+    async def query(self, tableName: str, query: dict) -> list:
         table: Table = self._tables[tableName]
-        #get all the rows
-        rows = table._rows
-        #filter the rows
-        for key in query:
-            rows = {k: v for k, v in rows.items() if k == key}
+        allTablerows: dict = table.rows
+        rows = []
+        if allTablerows == {}: return rows
+        #iterate over the rows row structure is {id: {column: value, column: value}}
+        for key, value in allTablerows.items():
+            #iterate over the query structure is {column: value}
+            #if the row has the same key value pairs as the query add it to the rows
+            if all(value.get(qkey) == qvalue for qkey, qvalue in query.items()):
+                rows.append(value)
         return rows
   
     async def insert(self, tableName: str, pkcolumn: str, data: dict) -> int:
         #get the table
         table: Table = self._tables[tableName]
         #find the next id update the data with it
-        data[pkcolumn] = table._nextId
+        data[pkcolumn] = table.nextId
         #add the row
         table.addRow(data[pkcolumn], data)
         return data[pkcolumn]

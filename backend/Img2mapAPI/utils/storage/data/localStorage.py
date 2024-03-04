@@ -1,6 +1,7 @@
+from typing import List, Union
 from .storageHandler import StorageHandler
 from img2mapAPI.devOnly.localrepository.repository import Repository
-from ...models.coreModel import CoreModel
+from pydantic import BaseModel
 
 # This class is a subclass of StorageHandler and is used to handle local storage, it iteracts with the singleton repository to save, fetch, update and remove data
 #Local storage handler
@@ -15,9 +16,9 @@ class LocalStorage(StorageHandler):
         #not needed in this local storage
         pass
     
-    async def saveInStorage(self, data: CoreModel, type: str, pkName: str = 'id') -> int:
+    async def saveInStorage(self, data: BaseModel, type: str, pkName: str = 'id') -> int:
         #convert the data to a dictionary
-        data = data.__dict__
+        data = dict(data)
         #save the data to the repository
         id = await self.repo.insert(type, pkName, data)
         return id
@@ -27,17 +28,20 @@ class LocalStorage(StorageHandler):
         await self.repo.remove(type, id)
 
     
-    async def update(self, id: int, data: CoreModel, type: str):
-        data = data.__dict__
-        await self.repo.update(type, id, data)
+    async def update(self, id: int, data: BaseModel, type: str):
+        try:
+            out = dict(data)
+        except:
+            out = data.dict()
+        await self.repo.update(type, id, out)
 
    
     async def fetchOne(self, id: int, type: str):
         ret = await self.repo.fetch(type, id)
         return ret
     
-    async def fetch(self, type: str, params: dict = {}):
-        ret = await self.repo.query(type, params)
+    async def fetch(self, type: str, params: dict = {})->Union[None ,List[dict], dict]:
+        ret: List[dict] = await self.repo.query(type, params)
         return ret
     
     async def fetchAll(self, type: str):

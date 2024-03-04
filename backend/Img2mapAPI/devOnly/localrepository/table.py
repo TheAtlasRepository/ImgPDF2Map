@@ -23,11 +23,10 @@ class Table:
     fetchAll() -> list:
         Returns all the rows in the table
     """
-    _instance = None
-    _nextId = 1
+    nextId = 1
     
     def __init__(self):
-        self._rows = {}
+        self.rows = {}
 
     def addRow(self, id: int, row: any) -> None:
         """
@@ -37,8 +36,8 @@ class Table:
             id {int} -- The id of the row
             row {any} -- The row to be added
         """
-        self._rows[id] = row
-        self._nextId += 1
+        self.rows[id] = row
+        self.nextId += 1
 
 
     def getRow(self, id: int) -> any:
@@ -51,7 +50,7 @@ class Table:
         Returns:
             any -- The row
         """
-        return self._rows[id]
+        return self.rows[id]
 
     def removeRow(self, id: int) -> None:
         """
@@ -60,7 +59,7 @@ class Table:
         Arguments:
             id {int} -- The id of the row
         """
-        del self._rows[id]
+        del self.rows[id]
 
     def updateRow(self, id: int, row: any) -> None:
         """
@@ -70,7 +69,7 @@ class Table:
             id {int} -- The id of the row
             row {any} -- The row to be updated
         """
-        self._rows[id] = row
+        self.rows[id] = row
 
     def fetchAll(self) -> list:
         """
@@ -79,9 +78,21 @@ class Table:
         Returns:
             list -- The rows
         """
-        return list(self._rows.values())
+        return list(self.rows.values())
     
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(Table, cls).__new__(cls)
-        return cls._instance
+    def findRow(self, key: str, value: any) -> any:
+        """
+        Returns a row from the table
+
+        Arguments:
+            key {str} -- The key to search for
+            value {any} -- The value to search for
+
+        Returns:
+            any -- The row
+        """
+        for row in self._rows.values():
+            if row[key] == value:
+                return row
+        return None
+        
