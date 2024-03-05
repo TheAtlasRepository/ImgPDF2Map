@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='Img2mapAPI',
+    name='img2mapAPI',
     version='0.6.0-dev',
     packages=find_packages(),
     install_requires=[
