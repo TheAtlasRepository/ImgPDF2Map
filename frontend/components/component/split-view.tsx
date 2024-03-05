@@ -54,9 +54,13 @@ export default function SplitView() {
   const addMapMarker = (geoCoordinates: GeoCoordinates) => {
     if (waitingForImageMarker) return;
 
+    //add the marker to the mapMarkers state, used to render the markers on the map
     setMapMarkers([...mapMarkers, { geoCoordinates }]);
+
+    //update the georefMarkerPairs state which is used to make the API call
     setGeorefMarkerPairs((pairs) => {
       const lastPair = pairs[pairs.length - 1];
+      //if the array is empty or the last pair is complete, add a new pair
       if (
         pairs.length === 0 ||
         (lastPair.latLong[0] !== 0 &&
@@ -75,6 +79,9 @@ export default function SplitView() {
         );
       }
     });
+    // reset drag start for the image, makes for better accuracy of drag distance when placing the next marker
+    setDragStart({ x: 0, y: 0 });
+    // tells the component to wait for the next marker to be placed
     setWaitingForImageMarker(true);
     setWaitingForMapMarker(false);
   };
@@ -94,8 +101,12 @@ export default function SplitView() {
 
     //get the x and y coordinates of the click event
     const rect = (event.target as Element).getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+    let x = event.clientX - rect.left;
+    let y = event.clientY - rect.top;
+
+    //adjust the x and y coordinates based on the transform and zoom level
+    x = x / zoomLevel;
+    y = y / zoomLevel;
 
     //calculate the start position of the drag
     setCalculatedDragDistance(
@@ -118,16 +129,10 @@ export default function SplitView() {
       return;
     }
 
-    // //TODO: FIX THIS, trying to adjust marker placement based on zoomlevel
-    // const centerX = imageSize.width / 2;
-    // const centerY = imageSize.height / 2;
-
-    // //adjust the marker position based on the transform and zoom level
-    // const adjustedX = centerX + (x - centerX) * zoomLevel;
-    // const adjustedY = centerY + (y - centerY) * zoomLevel;
-    //
+    //add the marker to the imageMarkers state
     setImageMarkers([...imageMarkers, { pixelCoordinates: [x, y] }]);
 
+    //update the georefMarkerPairs state which is used to make the API call
     setGeorefMarkerPairs((pairs) => {
       const lastPair = pairs[pairs.length - 1];
       if (
@@ -174,9 +179,8 @@ export default function SplitView() {
     };
   };
 
-  //useEffect to make API call when georefMarkerPairs changes and filter out pairs where latlong or pixelcoords is [0,0]
   useEffect(() => {
-    //filter out pairs where latlong or pixelcoords is [0,0]
+    // Extract only valid pairs
     const validPairs = georefMarkerPairs.filter(
       (pair) =>
         pair.latLong[0] !== 0 &&
@@ -184,24 +188,39 @@ export default function SplitView() {
         pair.pixelCoords[0] !== 0 &&
         pair.pixelCoords[1] !== 0
     );
-    setHelpMessage("First marker placed, now place the second marker.");
-    // iterate through valid pairs and make API call
-    validPairs.forEach((pair) => {
-      const { latLong, pixelCoords } = pair;
-      api
-        .addMarkerPair(projectId, ...latLong, ...pixelCoords)
-        .then((data) => {
-          // handle success
-          console.log("Success:", data);
 
-          setHelpMessage("Marker pair added successfully!");
-        })
-        .catch((error) => {
-          // handle error
-          console.error("Error:", error.message);
-          setErrorMessage(error.message);
-        });
-    });
+    if (validPairs.length > 0) {
+      setHelpMessage("First marker placed, now place the second marker.");
+
+      let processedPairs = 0; // Track the number of processed (valid) pairs
+
+      validPairs.forEach((pair) => {
+        const { latLong, pixelCoords } = pair;
+        api
+          .addMarkerPair(projectId, ...latLong, ...pixelCoords)
+          .then((data) => {
+            console.log("Success:", data);
+            processedPairs++;
+            console.log("processed pairs:", processedPairs);
+            console.log("valid pairs:", validPairs.length);
+
+            // Check if all valid pairs have been processed
+            // TODO: check if this works as expected, might be wonky cause of duplicate bug in api
+            if (processedPairs === validPairs.length) {
+              // All valid pairs processed, reset waiting states
+              setWaitingForMapMarker(false);
+              setWaitingForImageMarker(false);
+              setHelpMessage(
+                "Pair added successfully! Place a marker to the map or image to add another pair."
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error.message);
+            setErrorMessage(error.message);
+          });
+      });
+    }
   }, [georefMarkerPairs]);
 
   //function to add a new project
@@ -220,7 +239,7 @@ export default function SplitView() {
       .catch((error) => {
         // handle error
         console.error("Error:", error.message);
-        setErrorMessage(error.message);
+        setErrorMessage("Error: something went wrong when adding your project");
       });
   };
 
@@ -233,7 +252,7 @@ export default function SplitView() {
         "Welcome to text to map! Click on either the map or the image to add a marker. Then click on the other to pair them. (both markers must be in the same location for best accuracy!)"
       );
       setErrorMessage(
-        "Zooming creates issues with marker placement, please avoid zooming."
+        "Zooming on uploaded image creates issues with marker placement, please avoid zooming."
       );
     }
     return () => {
@@ -244,29 +263,27 @@ export default function SplitView() {
   const renderGeorefPairTable = () => {
     if (!georefMarkerPairs.length) return null;
     return (
-      <div className="">
-        <div className="absolute bottom-0 right-0">
-          <table className="table-auto w-full text-sm text-left">
-            <thead>
-              <tr>
-                <th>Latitude</th>
-                <th>Longitude</th>
-                <th>Map X</th>
-                <th>Map Y</th>
+      <div className="absolute bottom-0 right-0">
+        <table className="table-auto w-full text-sm text-left">
+          <thead>
+            <tr>
+              <th>Latitude</th>
+              <th>Longitude</th>
+              <th>Map X</th>
+              <th>Map Y</th>
+            </tr>
+          </thead>
+          <tbody>
+            {georefMarkerPairs.map((pair, index) => (
+              <tr key={index}>
+                <td>{pair.latLong[0]}</td>
+                <td>{pair.latLong[1]}</td>
+                <td>{pair.pixelCoords[0]}</td>
+                <td>{pair.pixelCoords[1]}</td>
               </tr>
-            </thead>
-            <tbody>
-              {georefMarkerPairs.map((pair, index) => (
-                <tr key={index}>
-                  <td>{pair.latLong[0]}</td>
-                  <td>{pair.latLong[1]}</td>
-                  <td>{pair.pixelCoords[0]}</td>
-                  <td>{pair.pixelCoords[1]}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     );
   };
@@ -286,9 +303,9 @@ export default function SplitView() {
             >
               <AlertDescription>{errorMessage}</AlertDescription>
               <Button
-                className="absolute top-0 right-5 m-0 p-0"
+                className="absolute top-1 right-1 m-0 p-0 w-5 h-5"
                 size={"icon"}
-                variant={"ghost"}
+                variant={"destructive"}
                 onClick={() => setErrorMessage(null)}
               >
                 X
