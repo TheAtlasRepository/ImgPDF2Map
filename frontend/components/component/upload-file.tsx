@@ -96,11 +96,11 @@ const UploadFile: React.FC<UploadFileProps> = ({ onFileUpload, clearStateRequest
         className="cursor-pointer"
       >
         <div
-          className="rounded-lg border-4 border-dashed border-lb p-10 py-20 text-center transition-all hover:bg-gray-100"
+          className="rounded-lg border-4 border-dashed border-lb p-10 py-20 text-center transition-all hover:bg-gray-100 dark:hover:bg-gray-800 dark:border-gray-800"
           onDragOver={handleDragOver}
           onDrop={handleDrop}
         >
-          <FolderUploadIcon className="mx-auto mb-6 text-blue-300" />
+          <FolderUploadIcon className="mx-auto mb-6 text-blue-300 dark:text-blue-600" />
           <div className="text-lg font-medium text-gray-400">
             Open, or drop your <b>image or PDF</b> here
           </div>
@@ -118,7 +118,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ onFileUpload, clearStateRequest
           className="hidden"
         />
         <Button
-          className="mt-6 w-full bg-blue-600 text-white text-xl"
+          className="mt-6 w-full bg-blue-600 text-white text-xl dark:text-gray-200 dark:bg-blue-800 dark:hover:bg-blue-900"
           variant="blue"
         >
           Open a file
@@ -126,7 +126,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ onFileUpload, clearStateRequest
       </div>
 
       {errorMessage && (
-        <Alert variant="destructive" className="mt-5">
+        <Alert variant="destructive" className="mt-5 dark:bg-gray-900">
           <AlertTitle>Error</AlertTitle>
           <AlertDescription>{errorMessage}</AlertDescription>
         </Alert>

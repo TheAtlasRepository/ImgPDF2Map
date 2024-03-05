@@ -24,7 +24,7 @@ export default function SplitView() {
   return (
     <div className="h-screen">
       <Allotment onDragEnd={() => mapRef.current?.resize()}>
-        <Allotment.Pane minSize={200}>
+        <Allotment.Pane minSize={200} className="dark:bg-gray-900">
           <Map
             mapboxAccessToken={mapboxToken}
             mapStyle={mapStyle}

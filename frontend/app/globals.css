@@ -8,10 +8,10 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
-  --background-dark: #0e101a;
+  --background-dark: #0e101b;
   --text-primary: #0e101b;
   --text-secondary: #3e5468;
-  --card-gray: #F4F6F9;
+  --card-gray: #F2F6F9;
 }
 
 @media (prefers-color-scheme: light) {
@@ -48,6 +48,7 @@ body {
   color: rgb(255 255 255 / var(--tw-text-opacity));
   --tw-bg-opacity: 1;
   background-color: rgb(31 41 55 / var(--tw-bg-opacity));
+
 }
 
 .background-dark {

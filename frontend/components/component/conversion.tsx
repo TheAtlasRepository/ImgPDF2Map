@@ -1,6 +1,7 @@
 import { RotateLoader } from 'react-spinners';
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
+
 import axios from "axios";
 
 type ConversionProps = {
@@ -64,7 +65,6 @@ const Conversion: React.FC<ConversionProps> = ({ fileType, fileUrl, pageNumber, 
             }
           });
       }
-
       hasMadeApiCall.current = true; // Set to true so that the API call is only made once
     }
   }, []);
@@ -117,10 +117,10 @@ const Conversion: React.FC<ConversionProps> = ({ fileType, fileUrl, pageNumber, 
   }
 
   return (
-    <div className="flex flex-col bg-white">
+    <div className="flex flex-col bg-white dark:bg-gray-900">
         <div className="mx-auto max-w-xl">
-            <div className="rounded-lg border-4 border-dashed p-10 py-20 text-center">
-                <div className="p-10 text-center text-gray-400">
+            <div className="rounded-lg border-4 border-dashed p-10 py-20 text-center dark:border-gray-800">
+                <div className="p-10 text-center text-gray-300">
                     <h1>Getting your file ready</h1>
                     { isLargeFile && <p>This may take some time for larger files</p>}
                 </div>
