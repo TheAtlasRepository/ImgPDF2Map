@@ -26,6 +26,22 @@ const UploadIcon = (props: any) => {
     )
 }
 
+const UploadIconFolder = (props: any) => {
+    return (
+        <svg 
+        {...props}
+        xmlns="http://www.w3.org/2000/svg"
+        width="100"
+        height="130"
+        fill="currentColor"
+        stroke="none"
+        >
+            <title>file-upload</title>
+            <path d="M64.64,13,86.77,36.21H64.64V13ZM42.58,71.67a3.25,3.25,0,0,1-4.92-4.25l9.42-10.91a3.26,3.26,0,0,1,4.59-.33,5.14,5.14,0,0,1,.4.41l9.3,10.28a3.24,3.24,0,0,1-4.81,4.35L52.8,67.07V82.52a3.26,3.26,0,1,1-6.52,0V67.38l-3.7,4.29ZM24.22,85.42a3.26,3.26,0,1,1,6.52,0v7.46H68.36V85.42a3.26,3.26,0,1,1,6.51,0V96.14a3.26,3.26,0,0,1-3.26,3.26H27.48a3.26,3.26,0,0,1-3.26-3.26V85.42ZM99.08,39.19c.15-.57-1.18-2.07-2.68-3.56L63.8,1.36A3.63,3.63,0,0,0,61,0H6.62A6.62,6.62,0,0,0,0,6.62V116.26a6.62,6.62,0,0,0,6.62,6.62H92.46a6.62,6.62,0,0,0,6.62-6.62V39.19Zm-7.4,4.42v71.87H7.4V7.37H57.25V39.9A3.71,3.71,0,0,0,61,43.61Z"/>
+        </svg>
+    )
+}
+
 const DownloadIcon = (props: any) => {
     return (
         <svg
@@ -52,6 +68,59 @@ const CloseIcon = (props: any) => {
     )
 }
 // Navigation
+const OpenBook = (props: any) => {
+    return (
+        <svg 
+            {...props} {...svgParams}
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            >
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v13m0-13c-2.8-.8-4.7-1-8-1a1 1 0 0 0-1 1v11c0 .6.5 1 1 1 3.2 0 5 .2 8 1m0-13c2.8-.8 4.7-1 8-1 .6 0 1 .5 1 1v11c0 .6-.5 1-1 1-3.2 0-5 .2-8 1"/>
+        </svg>
+    )
+}
+
+const TargetIcon = (props: any) => {
+    return (
+        <svg
+            {...props} {...svgParams}
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            >
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="6" />
+            <circle cx="12" cy="12" r="2" />
+        </svg>
+    )
+}
+
+const SelectionIcon = (props: any) => {
+    return (
+        <svg 
+            {...props}
+            className="w-6 h-6" 
+            aria-hidden="true" 
+            fill="currentColor" 
+            viewBox="0 0 24 24">
+            <path d="M5 3a2 2 0 0 0-2 2v2c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5Zm0 12a2 2 0 0 0-2 2v2c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2H5Zm12 0a2 2 0 0 0-2 2v2c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-2Zm0-12a2 2 0 0 0-2 2v2c0 1.1.9 2 2 2h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2Z"/>
+            <path fill-rule="evenodd" d="M10 6.5c0-.6.4-1 1-1h2a1 1 0 1 1 0 2h-2a1 1 0 0 1-1-1ZM10 18c0-.6.4-1 1-1h2a1 1 0 1 1 0 2h-2a1 1 0 0 1-1-1Zm-4-4a1 1 0 0 1-1-1v-2a1 1 0 1 1 2 0v2c0 .6-.4 1-1 1Zm12 0a1 1 0 0 1-1-1v-2a1 1 0 1 1 2 0v2c0 .6-.4 1-1 1Z" clip-rule="evenodd"/>
+        </svg>
+    )
+}
+
+const WindowsIcon = (props: any) => {
+    return (
+        <svg
+            {...props} 
+            className="w-6 h-6 text-gray-800 dark:text-white" 
+            >
+            <path fill-rule="evenodd" d="M8 5c0-.6.4-1 1-1h11a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-1a1 1 0 1 1 0-2h1V6H9a1 1 0 0 1-1-1Z" clip-rule="evenodd"/>
+            <path fill-rule="evenodd" d="M4 7a2 2 0 0 0-2 2v9c0 1.1.9 2 2 2h11a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H4Zm0 11v-5.5h11V18H4Z" clip-rule="evenodd"/>
+        </svg>
+    )
+}
+
 const ChevronArrowIcon = (props: any) => {
     if (props.left) {
         return (
@@ -101,4 +170,4 @@ const DoubleBubbleIcon = (props: any) => {
     )
 }
 
-export { UploadIcon, DownloadIcon, TextDocumentIcon, DoubleBubbleIcon, ChevronArrowIcon, FatArrowIcon, ArrowLongIcon, TrashHeroIcon, CloseIcon }
+export { UploadIcon, UploadIconFolder, DownloadIcon, TextDocumentIcon, DoubleBubbleIcon, OpenBook, TargetIcon, SelectionIcon, WindowsIcon, ChevronArrowIcon, FatArrowIcon, ArrowLongIcon, TrashHeroIcon, CloseIcon }
