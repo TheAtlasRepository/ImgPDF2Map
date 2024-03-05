@@ -4,5 +4,6 @@ uvicorn[standard]
 rasterio
 python-multipart
 pdf2image
+setuptools
 
 ###### Requirements with Version Specifiers ######
