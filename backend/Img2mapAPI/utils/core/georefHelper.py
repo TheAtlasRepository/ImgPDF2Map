@@ -1,4 +1,5 @@
 import os #importing os for file operations
+import warnings
 import rasterio as rio #importing rasterio for georeferencing
 from rasterio.transform import from_gcps #importing from_gcps to create a transform from GCPs
 from rasterio.control import GroundControlPoint as GCP 
@@ -6,6 +7,7 @@ from rasterio.crs import CRS #importing CRS for the default crs
 from ..models import PointList #importing the pointList model
 from .FileHelper import getUniqeFileName, removeFile #importing the getUniqeFileName and removeFile functions from FileHelper
 
+warnings.filterwarnings("ignore", category=rio.errors.NotGeoreferencedWarning) #ignore the not georeferenced warning
 defaultCrs = 'EPSG:4326'
 
 def createGcps(PointList : PointList):
@@ -109,18 +111,17 @@ def reGeoreferencedImageTiff(innFilePath, points: PointList, crs: str = defaultC
     
     gcps = createGcps(points) #creating the GCPs
     filename = getUniqeFileName('.tiff') #creating a working file
-    tempFilePath = f"temp/{filename}"
 
     #copy the file to the temp folder
-    with open(tempFilePath, "wb") as file:
+    with open(filename, "wb") as file:
         file.write(open(innFilePath, "rb").read())
 
     #open the georeferenced file and geo-reference it
-    dataset = rio.open(tempFilePath, "r+") 
+    dataset = rio.open(filename, "r+") 
     transform = from_gcps(gcps) #create the transform
     dataset.transform = transform #set the transform
     dataset.crs = CRS.from_string(crs) #set the crs
     dataset.close() #close the file
 
-    return tempFilePath
+    return filename
 

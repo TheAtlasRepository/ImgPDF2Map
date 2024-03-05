@@ -48,14 +48,11 @@ class LocalFileStorage(FileStorage):
     
     def __del__(self):
         #remove the temp folder
-        os.rmdir(self.tempFolder)
-        #remove the temp folder if it is empty
-        if len(os.listdir(self.tempPath)) == 0:
-            try:
-                os.rmdir(self.tempPath)
-            except:
-                #use shutil to remove the folder if it is not empty
-                shutil.rmtree(self.tempPath)
+        try:
+            os.rmdir(self.tempFolder)
+        except:
+            #use shutil to remove the folder if it is not empty
+            shutil.rmtree(self.tempFolder)
 
     def __exit__(self, exc_type, exc_value, traceback):
         #remove the temp folder

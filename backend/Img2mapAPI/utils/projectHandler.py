@@ -112,14 +112,15 @@ class ProjectHandler:
         """
         #Convert the data to a project object
         project = await self._StorageHandler.fetchOne(projectId, "project")
-        project = Project(**project)
+        project : Project = Project.model_construct(None, **project)
         if project is None:
             raise Exception("Project not found")
         #check for project points
         points = await self.getProjectPoints(projectId)
         #make pointlist object and add the points to the project
         pointList = PointList()
-        pointList.points = points
+        for point in points:
+            pointList.points.append(point)
         project.points = pointList
 
         return project
@@ -188,7 +189,7 @@ class ProjectHandler:
         pointsInStorage = await self._StorageHandler.fetch("point", {"projectId": projectId})
         #comapre the points in storage with the updated points and update the points
         for point in points:
-            if point.id is None | point.id == 0:
+            if point.id is None or point.id == 0:
               await self.addPoint(projectId, point)
             else:
                 #update the point in the storage
@@ -253,10 +254,7 @@ class ProjectHandler:
         updatedPoint.description = point.description
 
         newpoint : Point = updatedPoint
-        systemlog = sys.stdout
-        systemlog.write(f"updatedPoint: {newpoint}\n")
         dbid = fetchedPointDict["id"]
-        systemlog.write(f"dbid: {dbid}\n")
         #update the point in the storage
         await self._StorageHandler.update(dbid, newpoint, "point")
 
@@ -297,7 +295,12 @@ class ProjectHandler:
         for point in points:
             #check if point is a point object
             if isinstance(point, Point) == False:
-                raise Exception("Invalid point object")
+                try:
+                    point = Point.model_construct(None, **point)
+                    if point is None:
+                        raise Exception("Invalid point object")
+                except:
+                    raise Exception("Invalid point object")
             #check if point has the required attributes
             if hasattr(point, "lat") == False or hasattr(point, "lng") == False or hasattr(point, "col") == False or hasattr(point, "row") == False:
                 raise Exception("Failed to validate points attributes")
@@ -421,10 +424,8 @@ class ProjectHandler:
         project = await self._StorageHandler.fetchOne(projectId, "project")
         return project["imageFilePath"]
     
-
     ### Georeferencing
-
-    #TODO: fix the saving of the georeferenced image    
+ 
     async def georefPNGImage(self, projectId: int, crs: str = None) -> None:
         """
         Georeference the image of a project
@@ -443,11 +444,12 @@ class ProjectHandler:
             raise Exception("Image could not be georeferenced")
         #save the georeferenced image open to bytes
         filePath = await self._FileStorage.saveFileFromPath(georeferencedImage, ".tiff")
+        georef.removeFile(georeferencedImage) #clean up temps from georeferencing
+
         #update the project with the file path
         project.georeferencedFilePath = filePath
         await self.updateProject(project.id, project)
-
-    #TODO: fix the saving of the georeferenced image
+        
     async def georefTiffImage(self, projectId: int, crs: str = None) -> None:
         """
         Georeference the image of a project
@@ -467,6 +469,8 @@ class ProjectHandler:
             raise Exception("Image could not be georeferenced")
         #save the georeferenced image
         filePath = await self._FileStorage.saveFileFromPath(georeferencedImage, ".tiff")
+        georef.removeFile(georeferencedImage) #clean up temps from georeferencing
+        
         #update the project with the file path
         project.georeferencedFilePath = filePath
         await self.updateProject(project.id, project)
