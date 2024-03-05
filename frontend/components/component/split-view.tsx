@@ -105,8 +105,8 @@ export default function SplitView() {
     let y = event.clientY - rect.top;
 
     //adjust the x and y coordinates based on the transform and zoom level
-    x = x / zoomLevel;
-    y = y / zoomLevel;
+    x = Math.round(x / zoomLevel);
+    y = Math.round(y / zoomLevel);
 
     //calculate the start position of the drag
     setCalculatedDragDistance(
@@ -179,6 +179,7 @@ export default function SplitView() {
     };
   };
 
+  // UseEffect to make API call to add marker pairs when a valid pair is added
   useEffect(() => {
     // Extract only valid pairs
     const validPairs = georefMarkerPairs.filter(
