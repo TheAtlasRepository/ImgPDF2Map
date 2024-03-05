@@ -27,7 +27,6 @@ app.add_middleware(
 # Default route
 @router.get("/")
 async def root():
-    #redirect to the documentation
     return {"message": "Welcome to the georeferencing API. Please refer to the documentation for more information. at /docs or /redoc"}
 
 #adding the routers to the app
