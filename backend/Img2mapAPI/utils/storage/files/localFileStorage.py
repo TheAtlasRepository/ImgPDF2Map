@@ -1,4 +1,5 @@
 import os
+import shutil
 import tempfile
 from .fileStorage import FileStorage
 from fastapi import UploadFile
@@ -14,9 +15,10 @@ class LocalFileStorage(FileStorage):
     tempPath = _tempPath
     tempFolder = tempfile.mkdtemp(dir=_tempPath)
    
-    async def saveFile(self, data: bytes , suffix: str) -> str:
-        #create a temporary file
-        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix, dir=self.tempFolder) as file:
+    async def saveFile(self, data: tempfile , suffix: str) -> str:
+        #save the file
+        #create a temp file that will be deleted when the function ends
+        with tempfile.NamedTemporaryFile(dir=self.tempFolder, suffix=suffix, delete=False) as file:
             file.write(data)
             path = file.name
         return path
@@ -32,6 +34,12 @@ class LocalFileStorage(FileStorage):
         #check if the file exists
         return os.path.isfile(path)
     
+    async def saveFileFromPath(self, path: str, suffix: str)->str:
+        #copy the file to the temp folder
+        with open(path, "rb") as file:
+            data = file.read()
+        return await self.saveFile(data, suffix)
+
     @staticmethod
     def getInstance():
         if LocalFileStorage._instance is None:
@@ -43,8 +51,12 @@ class LocalFileStorage(FileStorage):
         os.rmdir(self.tempFolder)
         #remove the temp folder if it is empty
         if len(os.listdir(self.tempPath)) == 0:
-            os.rmdir(self.tempPath)
-        
+            try:
+                os.rmdir(self.tempPath)
+            except:
+                #use shutil to remove the folder if it is not empty
+                shutil.rmtree(self.tempPath)
+
     def __exit__(self, exc_type, exc_value, traceback):
         #remove the temp folder
         os.rmdir(self.tempFolder)

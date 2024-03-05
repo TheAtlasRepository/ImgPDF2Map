@@ -3,6 +3,7 @@
 # The project data is stored in a list in the router file.
 
 # Importing the required modules
+import tempfile
 from typing import List, Union
 from fastapi import UploadFile, File
 from img2mapAPI.utils.models import Project, Point
@@ -71,7 +72,7 @@ class ProjectHandler:
             if key in innProject:
                 if key == "points":
                     if project.points is not None or project.points != []:
-                        await self.updatePoints(projectId, project.points)
+                        await self.updatePoints(projectId, project.points.points)
                 #cheking special fields
                 elif key not in specialFields:
                     if fetchedProjectDict[key] != innProject[key]:
@@ -308,10 +309,13 @@ class ProjectHandler:
     
     ### Files
 
-    async def saveImageFile(self, projectId: int, file: bytes, fileType: str) -> None:
+    #### In use by router:
+    async def saveImageFile(self, projectId: int, file: tempfile, fileType: str) -> None:
         """
         Save the image file of a project
         """
+        if await self.projectExists(projectId) == False:
+            raise Exception("Project not found")
         #only accept png
         if fileType.find("png") == -1:
             raise Exception(status_code=415, description="Invalid file type")
@@ -321,7 +325,28 @@ class ProjectHandler:
         project = await self._StorageHandler.fetchOne(projectId, "project")
         project["imageFilePath"] = filePath
         await self._StorageHandler.update(projectId, project, "project")
-
+  
+    async def getImageFile(self, projectId: int) -> bytes:
+        """
+        Get the image file of a project
+        """
+        #get the image file path
+        project = await self._StorageHandler.fetchOne(projectId, "project")
+        filePath = project["imageFilePath"]
+        #get the image file
+        file = await self._FileStorage.get(filePath)
+        if file is None:
+            raise Exception("File not found")
+        return file
+    
+    async def getGeoreferencedFilePath(self, projectId: int) -> str:
+        """
+        Get the georeferenced file path of a project
+        """
+        project = await self._StorageHandler.fetchOne(projectId, "project")
+        return project["georeferencedFilePath"]
+        
+    #### Not in use by router:
     async def saveGeoreferencedFile(self, projectId: int, file: bytes, fileType: str) -> None:
         """
         Save the georeferenced file of a project
@@ -336,19 +361,6 @@ class ProjectHandler:
         project["georeferencedFilePath"] = filePath
         await self._StorageHandler.update(projectId, project, "project")
 
-    async def getImageFile(self, projectId: int) -> bytes:
-        """
-        Get the image file of a project
-        """
-        #get the image file path
-        project = await self._StorageHandler.fetchOne(projectId, "project")
-        filePath = project["imageFilePath"]
-        #get the image file
-        file = await self._FileStorage.get(filePath)
-        if file is None:
-            raise Exception("File not found")
-        return file
-    
     async def getGeoreferencedFile(self, projectId: int) -> bytes:
         """
         Get the georeferenced file of a project
@@ -409,13 +421,7 @@ class ProjectHandler:
         project = await self._StorageHandler.fetchOne(projectId, "project")
         return project["imageFilePath"]
     
-    async def getGeoreferencedFilePath(self, projectId: int) -> str:
-        """
-        Get the georeferenced file path of a project
-        """
-        project = await self._StorageHandler.fetchOne(projectId, "project")
-        return project["georeferencedFilePath"]
-    
+
     ### Georeferencing
 
     #TODO: fix the saving of the georeferenced image    
@@ -426,17 +432,17 @@ class ProjectHandler:
         #get the image file path
         project = await self.getProject(projectId)
         imageFilePath = project.imageFilePath
-        points = project.points
+        points : PointList = project.points
         #georeference the image
         georeferencedImage = None
         if crs is None:
-            georeferencedImage = georef.InitialGeoreferencePngImage(imageFilePath, points)
+            georeferencedImage = georef.InitialGeoreferencePngImage(imageFilePath, points) #goreference the image, return the path to the georeferenced file
         else:
-            georeferencedImage = georef.InitialGeoreferencePngImage(imageFilePath, points, crs)
+            georeferencedImage = georef.InitialGeoreferencePngImage(imageFilePath, points, crs) #goreference the image, return the path to the georeferenced file
         if georeferencedImage is None:
             raise Exception("Image could not be georeferenced")
         #save the georeferenced image open to bytes
-        filePath = await self._FileStorage.saveFile(georeferencedImage, ".tiff")
+        filePath = await self._FileStorage.saveFileFromPath(georeferencedImage, ".tiff")
         #update the project with the file path
         project.georeferencedFilePath = filePath
         await self.updateProject(project.id, project)
@@ -460,7 +466,7 @@ class ProjectHandler:
         if georeferencedImage is None:
             raise Exception("Image could not be georeferenced")
         #save the georeferenced image
-        filePath = await self._FileStorage.saveFile(georeferencedImage, ".tiff")
+        filePath = await self._FileStorage.saveFileFromPath(georeferencedImage, ".tiff")
         #update the project with the file path
         project.georeferencedFilePath = filePath
         await self.updateProject(project.id, project)
