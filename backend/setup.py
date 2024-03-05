@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='img2mapAPI',
+    name='Img2mapAPI',
     version='0.6.0-dev',
     packages=find_packages(),
     install_requires=[
@@ -18,4 +18,10 @@ setup(
         'Framework :: FastAPI',
     ],
     python_requires='>=3.6',
+    #top-level name should be img2mapAPI
+    entry_points={
+        'console_scripts': [
+            'img2mapAPI = Img2mapAPI:main',
+        ],
+    },
 )
