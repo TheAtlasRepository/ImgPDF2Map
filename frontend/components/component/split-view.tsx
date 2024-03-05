@@ -79,8 +79,8 @@ export default function SplitView() {
         );
       }
     });
-    // reset drag start for the image, makes for better accuracy of drag distance when placing the next marker
-    setDragStart({ x: 0, y: 0 });
+    // // reset drag start for the image, makes for better accuracy of drag distance when placing the next marker
+    // setDragStart({ x: 0, y: 0 });
     // tells the component to wait for the next marker to be placed
     setWaitingForImageMarker(true);
     setWaitingForMapMarker(false);
@@ -251,9 +251,6 @@ export default function SplitView() {
       addProject(projectName);
       setHelpMessage(
         "Welcome to text to map! Click on either the map or the image to add a marker. Then click on the other to pair them. (both markers must be in the same location for best accuracy!)"
-      );
-      setErrorMessage(
-        "Zooming on uploaded image creates issues with marker placement, please avoid zooming."
       );
     }
     return () => {
