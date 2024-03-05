@@ -18,9 +18,4 @@ setup(
         'Framework :: FastAPI',
     ],
     python_requires='>=3.6',
-    entry_points={
-        'console_scripts': [
-            'img2mapAPI = img2mapAPI.main:main',
-        ],
-    },
 )
