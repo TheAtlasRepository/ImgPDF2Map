@@ -24,10 +24,10 @@ export const addProject = async (name: string) => {
 
 export const addMarkerPair = async (
   projectId: number,
-  latitude: number,
-  longitude: number,
-  x: number,
-  y: number
+  lat: number,
+  lng: number,
+  col: number,
+  row: number
 ) => {
   const response = await fetch(`${BASE_URL}/project/${projectId}/point`, {
     method: "POST",
@@ -35,12 +35,10 @@ export const addMarkerPair = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      latitude,
-      longitude,
-      x,
-      y,
-      error: null,
-      id: null,
+      lat,
+      lng,
+      col,
+      row,
       name: "",
     }),
   });

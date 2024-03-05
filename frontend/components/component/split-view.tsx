@@ -218,7 +218,9 @@ export default function SplitView() {
           })
           .catch((error) => {
             console.error("Error:", error.message);
-            setErrorMessage(error.message);
+            setErrorMessage(
+              "Error: something went wrong when adding your pair"
+            );
           });
       });
     }
