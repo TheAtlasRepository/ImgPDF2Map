@@ -9,7 +9,7 @@ from ..utils.storage.files.fileStorage import FileStorage
 from ..utils.storage.files.localFileStorage import LocalFileStorage
 from ..utils.storage.data.storageHandler import StorageHandler
 from ..utils.storage.data.localStorage import LocalStorage
-from ..devOnly.GeorefTestFiles.testproject import createTestProject as cts #test function
+from ..devOnly.georefTestFiles.testproject import createTestProject as cts #test function
 from ..devOnly.localrepository.repository import Repository
 
 router = APIRouter(
