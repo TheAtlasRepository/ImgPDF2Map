@@ -41,6 +41,16 @@ export default function ImageEdit({ editBool, onCrop }: { editBool: boolean, onC
             const scaleFactorX = originalWidth / displayedWidth;
             const scaleFactorY = originalHeight / displayedHeight;
 
+            // If the crop unit is %, convert the crop data to pixels, as the API requires pixel coordinates
+            if (crop.unit === '%') {
+                console.log("Crop data is in percentage, not pixels!");
+                // Convert the crop data to pixels
+                crop.x = crop.x * displayedWidth / 100;
+                crop.y = crop.y * displayedHeight / 100;
+                crop.width = crop.width * displayedWidth / 100;
+                crop.height = crop.height * displayedHeight / 100;
+            }
+
             // Set the coordinates for the top-left corner, and calculate the coordinates of the bottom-right corner.
             // Then scale the coordinates to the original image size.
             // (Values need to be rounded to the nearest whole number to avoid issues with the API.)
