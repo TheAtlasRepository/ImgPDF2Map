@@ -1,9 +1,9 @@
 ###### Requirements without Version Specifiers ######
 fastapi
 uvicorn[standard]
-geopandas
 rasterio
 python-multipart
 pdf2image
+setuptools
 
 ###### Requirements with Version Specifiers ######
