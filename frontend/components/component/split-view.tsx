@@ -13,8 +13,13 @@ import mapboxgl from "mapbox-gl";
 import * as api from "./projectAPI";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import CoordinateList from "./coordinateList";
 
-export default function SplitView() {
+interface SplitViewProps {
+  isCoordList?: boolean;
+}
+
+export default function SplitView({ isCoordList }: SplitViewProps) {
   //project states
   const [projectId, setProjectId] = useState(1);
   const [projectName, setProjectName] = useState("Project 1");
@@ -260,34 +265,6 @@ export default function SplitView() {
     };
   }, []);
 
-  const renderGeorefPairTable = () => {
-    if (!georefMarkerPairs.length) return null;
-    return (
-      <div className="absolute bottom-0 right-0">
-        <table className="table-auto w-full text-sm text-left">
-          <thead>
-            <tr>
-              <th>Latitude</th>
-              <th>Longitude</th>
-              <th>Map X</th>
-              <th>Map Y</th>
-            </tr>
-          </thead>
-          <tbody>
-            {georefMarkerPairs.map((pair, index) => (
-              <tr key={index}>
-                <td>{pair.latLong[0]}</td>
-                <td>{pair.latLong[1]}</td>
-                <td>{pair.pixelCoords[0]}</td>
-                <td>{pair.pixelCoords[1]}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
   return (
     <div className="h-screen">
       <div className=""></div>
@@ -401,7 +378,9 @@ export default function SplitView() {
               </div>
             ))}
           </ImageMap>
-          {renderGeorefPairTable()}
+          {isCoordList && (
+            <CoordinateList georefMarkerPairs={georefMarkerPairs} />
+          )}
         </Allotment.Pane>
       </Allotment>
     </div>
