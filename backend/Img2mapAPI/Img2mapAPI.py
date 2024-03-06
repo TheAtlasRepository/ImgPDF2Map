@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import *
+from img2mapAPI.routers import *
 
 
 app = FastAPI(
