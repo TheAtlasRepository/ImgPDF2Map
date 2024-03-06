@@ -1,49 +1,92 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 
-export default function ImageMap({ src }: { src: string }) {
-  const [transform, setTransform] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [zoomLevel, setZoomLevel] = useState(1);
+interface ImageMapProps {
+  src: string;
+  children?: React.ReactNode;
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
+
+  // variables for dragging and zooming
+  zoomLevel: number;
+  transform: { x: number; y: number };
+  setTransform: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
+  setZoomLevel: React.Dispatch<React.SetStateAction<number>>;
+  imageSize: { width: number; height: number };
+  setImageSize: React.Dispatch<
+    React.SetStateAction<{ width: number; height: number }>
+  >;
+
+  setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
+  setDragStart: React.Dispatch<React.SetStateAction<{ x: number; y: number }>>;
+  dragStart: { x: number; y: number };
+}
+
+export default function ImageMap({
+  src,
+  children,
+  onClick,
+  setIsDragging,
+  setDragStart,
+  dragStart,
+  imageSize,
+  setImageSize,
+
+  setTransform,
+  setZoomLevel,
+  transform,
+  zoomLevel,
+}: ImageMapProps) {
+  //local state for dragging
+  const [localIsDragging, setLocalIsDragging] = useState(false);
+  // const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   //size of imgs container
-  const [imgSize, setImgSize] = useState({ width: 0, height: 0 });
+  // const [imgSize, setImgSize] = useState({ width: 0, height: 0 });
 
   //sets size of img container relative to size of img
   useEffect(() => {
     const img = new Image();
     img.src = src;
     img.onload = () => {
-      setImgSize({ width: img.width, height: img.height });
+      setImageSize({ width: img.width, height: img.height });
     };
   }, [src]);
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    setIsDragging(true);
-    setDragStart({ x: event.clientX, y: event.clientY });
+  const setDragState = (bool: boolean) => {
+    setIsDragging(bool);
+    setLocalIsDragging(bool);
   };
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!isDragging) return;
-    const deltaX = event.clientX - dragStart.x; // speed of drag
-    const deltaY = event.clientY - dragStart.y; // speed of drag
-    setTransform((prevTransform) => ({
-      x: prevTransform.x + deltaX,
-      y: prevTransform.y + deltaY,
-    }));
-    setDragStart({ x: event.clientX, y: event.clientY });
+    if (localIsDragging) {
+      const deltaX = event.clientX - dragStart.x; // speed of drag
+      const deltaY = event.clientY - dragStart.y; // speed of drag
+      setTransform((prevTransform) => ({
+        x: prevTransform.x + deltaX,
+        y: prevTransform.y + deltaY,
+      }));
+      setDragStart({ x: event.clientX, y: event.clientY });
+    }
   };
 
   const handleMouseUp = () => {
-    setIsDragging(false);
+    setDragState(false);
+  };
+
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    setDragState(true);
+    setDragStart({ x: event.clientX, y: event.clientY });
   };
 
   const handleMouseWheel = (event: React.WheelEvent<HTMLDivElement>) => {
     event.preventDefault();
     const zoomDelta = event.deltaY > 0 ? -0.1 : 0.1;
-    setZoomLevel((prevZoomLevel) => prevZoomLevel + zoomDelta);
+    const minZoom = 0.1;
+    setZoomLevel((prevZoomLevel) =>
+      Math.max(prevZoomLevel + zoomDelta, minZoom)
+    );
   };
 
+  //event listener for mouse wheel
   useEffect(() => {
     const container = document.getElementById("image-container");
     if (container) {
@@ -63,16 +106,18 @@ export default function ImageMap({ src }: { src: string }) {
   }, []);
 
   return (
+    // <div style={{ width: imgSize.width / 2, height: imgSize.height / 2 }}>
     <div
       className="flex h-full"
       style={{
         position: "relative",
-        width: imgSize.width / 4,
-        height: imgSize.height / 4,
+        width: imageSize.width,
+        height: imageSize.height,
       }}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
+      onClick={onClick}
       id="image-container"
     >
       <div
@@ -89,6 +134,7 @@ export default function ImageMap({ src }: { src: string }) {
           // style={{ width: "100%", height: "100%", objectFit: "contain" }}
         />
       </div>
+      {children}
     </div>
   );
 }
