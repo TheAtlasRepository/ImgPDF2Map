@@ -1,4 +1,4 @@
-from . import GeorefTestFiles
+from . import georefTestFiles
 from . import localrepository
 
-__all__ = ["GeorefTestFiles", "localrepository"]
+__all__ = ["georefTestFiles", "localrepository"]
