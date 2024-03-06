@@ -23,7 +23,7 @@ async def pdf2png(file: UploadFile, page_number) -> Tuple[str, str]:
         pdf.write(await file.read())
     #convert the .pdf to .png
     img = open(tempImage, 'w+b')
-    images: List[Image] = convert_from_path(tempPdf)
+    images: List[Image.Image] = convert_from_path(tempPdf)
     images[page_number-1].save(img, 'PNG')
     images[page_number-1].close()
     img.close()
