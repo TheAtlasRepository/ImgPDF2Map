@@ -1,7 +1,9 @@
 from fastapi import APIRouter, BackgroundTasks, File, UploadFile, HTTPException, Query
 from fastapi.responses import FileResponse
 #internal imports
-from ..utils.core.ImageHelper import *
+from ..utils.core.ImageHelper import pdf2png, isImageSupported
+from ..utils.core.ImageHelper import image2png as imageToPng
+from ..utils.core.ImageHelper import cropPng as cropApng
 from ..utils.core.FileHelper import removeFile as delFile
 
 #API router for file conversion
@@ -27,7 +29,7 @@ async def pdfPage2png(background_tasks: BackgroundTasks, page_number: int = 1, f
 
     
 @router.post('/image2png')
-async def image2png(background_tasks: BackgroundTasks,file: UploadFile = File(...)):
+async def image2png(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
     """ **Converts an image to a .png file.** """
     if file.content_type == 'image/png':
         raise HTTPException(status_code=400, detail='File is already a .png file')
@@ -35,7 +37,7 @@ async def image2png(background_tasks: BackgroundTasks,file: UploadFile = File(..
         raise HTTPException(status_code=415, detail=f'File is a {file.content_type} file, which is not supported')
     
     try:
-        (NewImageFile, image_name) = await image2png(file)
+        (NewImageFile, image_name) = await imageToPng(file)
         background_tasks.add_task(delFile, NewImageFile) #create a background task to remove the temporary file
         return FileResponse(NewImageFile, media_type='image/png', filename=image_name, background=background_tasks)
     except Exception as e:
@@ -63,7 +65,7 @@ async def cropPng(
         raise HTTPException(status_code=415, detail='File is not a .png file')
     
     try:
-        (NewImageFile, image_name) = await cropPng(file, p1x, p1y, p2x, p2y)
+        (NewImageFile, image_name) = await cropApng(file, p1x, p1y, p2x, p2y)
         background_tasks.add_task(delFile, NewImageFile)
         return FileResponse(NewImageFile, media_type='image/png', filename=image_name, background=background_tasks)
     except Exception as e:

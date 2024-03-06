@@ -2,9 +2,9 @@ from fastapi import UploadFile
 from typing import List
 from pdf2image import convert_from_path
 from PIL import Image
-from PIL.Image import Image
 from .FileHelper import getUniqeFileName, removeFile
 from typing import Tuple
+import tempfile
 
 #function to convert a .pdf page to .png
 async def pdf2png(file: UploadFile, page_number) -> Tuple[str, str]:
@@ -43,10 +43,13 @@ async def image2png(file: UploadFile) -> Tuple[str, str]:
     #save the image
     with open(inputImage, 'w+b') as img:
         img.write(await file.read())
-    with Image.open(inputImage) as image:
-        #convert the image to .png
-        tempImage = getUniqeFileName('png')
-        image.save(tempImage, 'PNG')
+    
+    image = Image.open(inputImage)
+    png_image = image.convert('RGB')
+    tempImage = getUniqeFileName('png')
+    with open(tempImage, 'w+b') as img:
+        png_image.save(img, 'PNG')
+    
     removeFile(inputImage)
     return tempImage, image_name
 
@@ -66,7 +69,7 @@ def isImageSupported(file: UploadFile) -> bool:
     return True
 
 #function to crop a .png image
-def cropPng(file: UploadFile, p1x: int, p1y: int, p2x: int, p2y: int) -> Tuple[str, str]:
+async def cropPng(file: UploadFile, p1x: int, p1y: int, p2x: int, p2y: int) -> Tuple[str, str]:
     """
     Crops a .png image.
     :param image: .png image to crop
@@ -76,14 +79,21 @@ def cropPng(file: UploadFile, p1x: int, p1y: int, p2x: int, p2y: int) -> Tuple[s
     :param p2y: Y coordinate of the second point
     :return: cropped .png image and the name of the cropped .png image
     """
-    # Open the image file
-    image = Image.open(file.file)
-    # Crop image and save it to a new temporary file
-    image.crop((p1x, p1y, p2x, p2y))
+    inputImage = getUniqeFileName('png')
+    #save the image
+    with open(inputImage, 'w+b') as img:
+        img.write(await file.read())
+
     tempImage = getUniqeFileName('png')
+    # Open the image file
+    image = Image.open(inputImage)
+    # Crop image and save it to a new temporary file
+    cropped = image.crop((p1x, p1y, p2x, p2y))
     with open(tempImage, 'w+b') as img:
-        image.save(img, 'PNG')
+        cropped.save(img, 'PNG')
         image.close()
+
     newfileName = file.filename[:-4] + 'cropped.png'
+    removeFile(inputImage)
     return tempImage, newfileName
     
