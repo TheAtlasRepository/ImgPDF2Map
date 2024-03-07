@@ -52,7 +52,6 @@ export default function Editor() {
 
       // Make API call to upload the image
       await api.uploadImage(projectId, formData);
-      console.log("Image uploaded successfully.");
     } catch (error) {
       console.error("Error uploading image:", error);
     }
