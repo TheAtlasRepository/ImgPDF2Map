@@ -1,25 +1,44 @@
+import axios, { AxiosResponse, AxiosError } from "axios";
+
+interface ProjectResponse {
+  id: number;
+  name: string;
+}
+
+interface MarkerPairResponse {
+  id: number;
+  lat: number;
+  lng: number;
+  col: number;
+  row: number;
+  name: string;
+}
+
+interface ErrorResponse {
+  detail: string;
+}
+
 const BASE_URL = "http://localhost:8000";
 
-const handleResponse = async (response: Response) => {
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.detail || "Something went wrong!");
+let hasMadeProjectApiCall = false;
+
+// A helper function to extract error message
+function getErrorMessage(error: AxiosError<ErrorResponse>): string {
+  return error.response?.data.detail || "Something went wrong!";
+}
+
+export const addProject = async (name: string): Promise<ProjectResponse> => {
+  if (hasMadeProjectApiCall) return Promise.reject("API call already made");
+  hasMadeProjectApiCall = true;
+  try {
+    const response: AxiosResponse<ProjectResponse> = await axios.post(
+      `${BASE_URL}/project/`,
+      { name }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error as AxiosError<ErrorResponse>));
   }
-  return response.json();
-};
-
-export const addProject = async (name: string) => {
-  const response = await fetch(`${BASE_URL}/project/`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name,
-    }),
-  });
-
-  return handleResponse(response);
 };
 
 export const addMarkerPair = async (
@@ -28,20 +47,22 @@ export const addMarkerPair = async (
   lng: number,
   col: number,
   row: number
-) => {
-  const response = await fetch(`${BASE_URL}/project/${projectId}/point`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      lat,
-      lng,
-      col,
-      row,
-      name: "",
-    }),
-  });
-
-  return handleResponse(response);
+): Promise<MarkerPairResponse> => {
+  try {
+    const response: AxiosResponse<MarkerPairResponse> = await axios.post(
+      `${BASE_URL}/project/${projectId}/point`,
+      {
+        lat,
+        lng,
+        col,
+        row,
+        name: "",
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(getErrorMessage(error as AxiosError<ErrorResponse>));
+  } finally {
+    console.log("Marker pair added");
+  }
 };
