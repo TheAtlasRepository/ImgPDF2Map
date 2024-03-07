@@ -66,3 +66,21 @@ export const addMarkerPair = async (
     console.log("Marker pair added");
   }
 };
+
+// uploadImage
+export const uploadImage = async (
+  projectId: number,
+  formData: FormData
+): Promise<void> => {
+  try {
+    await axios.post(`${BASE_URL}/project/${projectId}/image`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  } catch (error) {
+    throw new Error(getErrorMessage(error as AxiosError<ErrorResponse>));
+  } finally {
+    console.log("Image uploaded");
+  }
+};

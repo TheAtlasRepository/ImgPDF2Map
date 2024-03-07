@@ -11,7 +11,7 @@ import {
 import * as api from "./projectAPI";
 
 export default function Editor() {
-  const [projectId, setProjectId] = useState(1);
+  const [projectId, setProjectId] = useState(0);
   const [projectName, setProjectName] = useState("Project 1");
   const [isAutoSaved, setIsAutoSaved] = useState(false);
   const [isSideBySide, setIsSideBySide] = useState(false); // Add state for side by side toggle
@@ -29,11 +29,33 @@ export default function Editor() {
         // handle success
         console.log("Success:", data);
         setProjectId(data.id);
+        console.log("Project ID:", data.id);
+        uploadImage(data.id);
       })
       .catch((error) => {
         // handle error
         console.error("Error:", error.message);
       });
+  };
+
+  //upload image function to upload the blob url imgsrc to the server
+  const uploadImage = async (projectId: number) => {
+    try {
+      // Convert blob URL to blob
+      const response = await fetch(imageSrc);
+      const blob = await response.blob();
+
+      // Create a FormData object and append the blob as 'file'
+      const formData = new FormData();
+      // Here assuming you want to send the file with a generic name, you can customize it
+      formData.append("file", blob, "image.png");
+
+      // Make API call to upload the image
+      await api.uploadImage(projectId, formData);
+      console.log("Image uploaded successfully.");
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
   };
 
   //call the addProject function when the component mounts
