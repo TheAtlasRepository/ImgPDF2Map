@@ -70,9 +70,12 @@ class ProjectHandler:
         specialFields = ["id", "created", "lastModified", "points"]
         for key in fetchedProjectDict:
             if key in innProject:
+                #check if key of points exists
                 if key == "points":
-                    if project.points is not None or project.points != []:
-                        await self.updatePoints(projectId, project.points.points)
+                    if project.points is not None or project.points != [] :
+                        #Todo: fiks the error on updatePoints, removed for now, just cant update points atm
+                      #  await self.updatePoints(projectId, project.points.points)
+                        pass
                 #cheking special fields
                 elif key not in specialFields:
                     if fetchedProjectDict[key] != innProject[key]:
@@ -179,7 +182,9 @@ class ProjectHandler:
             await self._StorageHandler.remove(points[0]["id"], "point")
             return True
         raise Exception("Point not found")
-                
+
+    #TODO: causes error on updateProject, removed for now, just cant update points atm
+    #dict etc. error          
     async def updatePoints(self, projectId: int, points: List[Point]) -> None:
         """
         Update the points of a project
