@@ -192,15 +192,18 @@ export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
   useEffect(() => {
     // Determine if the last pair is valid
     const lastPair = georefMarkerPairs[georefMarkerPairs.length - 1];
+    if (lastPair) {
+      setHelpMessage(
+        "Marker placed! Place the corresponding marker on the image."
+      );
+    }
     const isValidPair =
       lastPair &&
       lastPair.latLong[0] !== 0 &&
       lastPair.latLong[1] !== 0 &&
       lastPair.pixelCoords[0] !== 0 &&
       lastPair.pixelCoords[1] !== 0;
-    setHelpMessage(
-      "First marker placed! Place the corresponding marker on the image."
-    );
+
     // Only proceed if the last pair is valid and an API call has not been made for the current set
     if (isValidPair && !apiCallMade.current) {
       apiCallMade.current = true; // Block further API calls for the current set of marker pairs
@@ -260,7 +263,7 @@ export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
           <Map
             mapboxAccessToken={mapboxToken}
             mapStyle={mapStyle}
-            initialViewState={{ latitude: 8, longitude: 60 }}
+            initialViewState={{ latitude: 50, longitude: 10 }}
             maxZoom={20}
             minZoom={3}
             reuseMaps={true}
