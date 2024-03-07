@@ -137,7 +137,7 @@ async def getImage(projectId: int):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-#TODO: fix the updating of the project with the new image
+
 @router.get("/{projectId}/georef/initial")
 async def InitalgeorefImage(projectId: int, crs: str = None):
     """ Georeference the image of a project by id, returns the georeferenced image file if found"""
@@ -148,12 +148,21 @@ async def InitalgeorefImage(projectId: int, crs: str = None):
     #except Exception as e:
     #    raise HTTPException(status_code=404, detail=str(e))
 
-#TODO: fix updating the project with the new georeferenced image
+
 @router.get("/{projectId}/georef/referenced")
 async def adjustGeoref(projectId: int):
     """ re-georeference the image of a project by id, returns the georeferenced image file if found"""
     try:
         await _projectHandler.georefTiffImage(projectId)
+        imagepath = await _projectHandler.getGeoreferencedFilePath(projectId)
+        return FileResponse(imagepath, media_type="image/tiff", filename="georeferenced.tiff")
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+@router.get("/{projectId}/image/geo")
+async def getGeorefImage(projectId: int):
+    """ Get the georeferenced image of a project by id, returns the georeferenced image file if found"""
+    try:
         imagepath = await _projectHandler.getGeoreferencedFilePath(projectId)
         return FileResponse(imagepath, media_type="image/tiff", filename="georeferenced.tiff")
     except Exception as e:
