@@ -232,11 +232,27 @@ export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
     }
   }, [georefMarkerPairs, projectId]); // Depend on georefMarkerPairs to automatically re-trigger when they change
 
+  //function to handle the georeferencing process
+  const handleGeoref = () => {
+    console.log(projectId);
+    api
+      .initalGeorefimage(projectId)
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error.message);
+      });
+  };
+
   return (
     <div className="h-screen">
       <div className=""></div>
       <div className="flex justify-center">
         <div className="fixed w-2/5 z-50 m-4 text-center">
+          <Button className="m-4" variant={"blue"} onClick={handleGeoref}>
+            Start Georeferencing
+          </Button>
           <Alert variant={"help"} className="">
             <AlertDescription>{helpMessage}</AlertDescription>
           </Alert>
@@ -269,8 +285,8 @@ export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
             reuseMaps={true}
             ref={mapRef}
             onClick={(event) => {
-              const { lng, lat } = event.lngLat;
-              addMapMarker([lng, lat]);
+              const { lat, lng } = event.lngLat;
+              addMapMarker([lat, lng]);
             }}
           >
             <div className="absolute top-0 left-0 m-4">
@@ -288,8 +304,8 @@ export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
             {mapMarkers.map((marker, index) => (
               <Marker
                 key={index}
-                longitude={marker.geoCoordinates[0]}
-                latitude={marker.geoCoordinates[1]}
+                longitude={marker.geoCoordinates[1]}
+                latitude={marker.geoCoordinates[0]}
                 offset={new mapboxgl.Point(0, -15)}
               >
                 {/* use this for custom css on marker */}
