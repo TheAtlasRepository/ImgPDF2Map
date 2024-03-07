@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import SplitView from "./split-view";
 import ImageEdit from "./imageEdit";
@@ -8,15 +8,39 @@ import {
   WindowsIcon,
   SelectionIcon,
 } from "@/components/ui/icons";
+import * as api from "./projectAPI";
 
 export default function Editor() {
-  const [projectName, setProjectName] = useState(""); // Set initial value to an empty string
+  const [projectId, setProjectId] = useState(1);
+  const [projectName, setProjectName] = useState("Project 1");
   const [isAutoSaved, setIsAutoSaved] = useState(false);
   const [isSideBySide, setIsSideBySide] = useState(false); // Add state for side by side toggle
   const [wasSideBySide, setWasSideBySide] = useState(false);
   const [isCrop, setIsCrop] = useState(false);
   const [imageSrc, setImageSrc] = useState(localStorage.getItem("pdfData")!); // Keeps track of image URL
   const [isCoordList, setIsCoordList] = useState(true); // Add state for coordinates table
+
+  //function to add a new project
+  const addProject = (name: string) => {
+    //make API call to add project
+    api
+      .addProject(name)
+      .then((data) => {
+        // handle success
+        console.log("Success:", data);
+        setProjectId(data.id);
+      })
+      .catch((error) => {
+        // handle error
+        console.error("Error:", error.message);
+      });
+  };
+
+  //call the addProject function when the component mounts
+  useEffect(() => {
+    addProject(projectName);
+    console.log("Project added");
+  }, []);
 
   const handleSave = () => {
     setIsAutoSaved(true);
@@ -119,6 +143,7 @@ export default function Editor() {
         <SplitView
           // pass isCoordList to the SplitView component
           isCoordList={isCoordList}
+          projectId={projectId}
         />
       ) : (
         <div

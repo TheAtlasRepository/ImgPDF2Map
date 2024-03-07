@@ -17,14 +17,15 @@ import CoordinateList from "./coordinateList";
 
 interface SplitViewProps {
   isCoordList?: boolean;
+  projectId: number;
 }
 
-export default function SplitView({ isCoordList }: SplitViewProps) {
+export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
   //project states
-  const [projectId, setProjectId] = useState(1);
-  const [projectName, setProjectName] = useState("Project 1");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [helpMessage, setHelpMessage] = useState<string | null>(null);
+  const [helpMessage, setHelpMessage] = useState<string | null>(
+    "Welcome to the georeferencing tool! Place your first marker on the map or image to get started. (the marker pair created should reflect the same point on the map and image)"
+  );
 
   //mapbox states
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
@@ -43,7 +44,7 @@ export default function SplitView({ isCoordList }: SplitViewProps) {
     pixelCoordinates: imageCoordinates;
   };
 
-  //array of lonlat and pixel coordinates in pairs
+  // Array containing pairs of georeferenced markers and their corresponding image markers
   const [georefMarkerPairs, setGeorefMarkerPairs] = useState<
     { latLong: GeoCoordinates; pixelCoords: imageCoordinates }[]
   >([]);
@@ -184,86 +185,52 @@ export default function SplitView({ isCoordList }: SplitViewProps) {
     };
   };
 
-  // UseEffect to make API call to add marker pairs when a valid pair is added
+  //ref to block multiple API calls for the same set of marker pairs
+  const apiCallMade = useRef(false);
+
+  //useEffect to make API call when the last pair of marker pairs is complete
   useEffect(() => {
-    // Extract only valid pairs
-    const validPairs = georefMarkerPairs.filter(
-      (pair) =>
-        pair.latLong[0] !== 0 &&
-        pair.latLong[1] !== 0 &&
-        pair.pixelCoords[0] !== 0 &&
-        pair.pixelCoords[1] !== 0
-    );
-
-    if (validPairs.length > 0) {
-      setHelpMessage("First marker placed, now place the second marker.");
-
-      let processedPairs = 0; // Track the number of processed (valid) pairs
-
-      validPairs.forEach((pair) => {
-        const { latLong, pixelCoords } = pair;
-        api
-          .addMarkerPair(projectId, ...latLong, ...pixelCoords)
-          .then((data) => {
-            console.log("Success:", data);
-            processedPairs++;
-            console.log("processed pairs:", processedPairs);
-            console.log("valid pairs:", validPairs.length);
-
-            // Check if all valid pairs have been processed
-            // TODO: check if this works as expected, might be wonky cause of duplicate bug in api
-            if (processedPairs === validPairs.length) {
-              // All valid pairs processed, reset waiting states
-              setWaitingForMapMarker(false);
-              setWaitingForImageMarker(false);
-              setHelpMessage(
-                "Pair added successfully! Place a marker to the map or image to add another pair."
-              );
-            }
-          })
-          .catch((error) => {
-            console.error("Error:", error.message);
-            setErrorMessage(
-              "Error: something went wrong when adding your pair"
-            );
-          });
-      });
-    }
-  }, [georefMarkerPairs]);
-
-  //function to add a new project
-  const addProject = (name: string) => {
-    if (!projectName) return;
-
-    //make API call to add project
-    api
-      .addProject(name)
-      .then((data) => {
-        // handle success
-        console.log("Success:", data);
-        setProjectId(data.id);
-        console.log("project id:", projectId);
-      })
-      .catch((error) => {
-        // handle error
-        console.error("Error:", error.message);
-        setErrorMessage("Error: something went wrong when adding your project");
-      });
-  };
-
-  //call the addProject function when the component mounts
-  useEffect(() => {
-    let mounted = true;
-    if (mounted) {
-      addProject(projectName);
+    // Determine if the last pair is valid
+    const lastPair = georefMarkerPairs[georefMarkerPairs.length - 1];
+    if (lastPair) {
       setHelpMessage(
-        "Welcome to text to map! Click on either the map or the image to add a marker. Then click on the other to pair them. (both markers must be in the same location for best accuracy!)"
+        "Marker placed! Place the corresponding marker on the image."
       );
     }
-    return () => {
-      mounted = false;
-    };
-  }, []);
+    const isValidPair =
+      lastPair &&
+      lastPair.latLong[0] !== 0 &&
+      lastPair.latLong[1] !== 0 &&
+      lastPair.pixelCoords[0] !== 0 &&
+      lastPair.pixelCoords[1] !== 0;
+
+    // Only proceed if the last pair is valid and an API call has not been made for the current set
+    if (isValidPair && !apiCallMade.current) {
+      apiCallMade.current = true; // Block further API calls for the current set of marker pairs
+
+      // Proceed to make API call with the last (and valid) pair
+      const { latLong, pixelCoords } = lastPair;
+      api
+        .addMarkerPair(projectId, ...latLong, ...pixelCoords)
+        .then((data) => {
+          // Handle successful API response
+          console.log("Success:", data);
+          setHelpMessage(
+            "Pair added successfully! Place a marker to the map or image to add another pair."
+          );
+        })
+        .catch((error) => {
+          // Handle API call error
+          console.error("Error:", error.message);
+        })
+        .finally(() => {
+          // This reset allows for a new API call if further valid pairs are added
+          apiCallMade.current = false;
+          setWaitingForImageMarker(false);
+          setWaitingForMapMarker(false);
+        });
+    }
+  }, [georefMarkerPairs, projectId]); // Depend on georefMarkerPairs to automatically re-trigger when they change
 
   return (
     <div className="h-screen">
@@ -296,7 +263,7 @@ export default function SplitView({ isCoordList }: SplitViewProps) {
           <Map
             mapboxAccessToken={mapboxToken}
             mapStyle={mapStyle}
-            initialViewState={{}}
+            initialViewState={{ latitude: 50, longitude: 10 }}
             maxZoom={20}
             minZoom={3}
             reuseMaps={true}
