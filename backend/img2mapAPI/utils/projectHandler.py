@@ -116,7 +116,10 @@ class ProjectHandler:
         if project is None:
             raise Exception("Project not found")
         #check for project points
-        points = await self.getProjectPoints(projectId)
+        try:
+            points = await self.getProjectPoints(projectId)
+        except:
+            points = []
         #make pointlist object and add the points to the project
         pointList = PointList()
         for point in points:
