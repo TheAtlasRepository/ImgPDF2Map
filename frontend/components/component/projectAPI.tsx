@@ -84,3 +84,15 @@ export const uploadImage = async (
     console.log("Image uploaded");
   }
 };
+
+// initalGeorefimage /project/{projectId}/georef/initial
+export const initalGeorefimage = async (projectId: number): Promise<void> => {
+  try {
+    // Add image capture logic here later
+    await axios.get(`${BASE_URL}/project/${projectId}/georef/initial`);
+  } catch (error) {
+    throw new Error(getErrorMessage(error as AxiosError<ErrorResponse>));
+  } finally {
+    console.log("Initial georefimage done");
+  }
+};
