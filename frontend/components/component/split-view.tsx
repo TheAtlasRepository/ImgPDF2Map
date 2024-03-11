@@ -321,20 +321,21 @@ export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
           </Map>
         </Allotment.Pane>
         <Allotment.Pane minSize={200} className="bg-gray-100">
-          <ImageMap
-            src={localStorage.getItem("pdfData")!}
-            onClick={addImageMarker}
-            //transforms passed to imagemap component for image manipulation
-            setTransform={setTransform}
-            setZoomLevel={setZoomLevel}
-            transform={transform}
-            zoomLevel={zoomLevel}
-            setIsDragging={setIsDragging}
-            setDragStart={setDragStart}
-            dragStart={dragStart}
-            setImageSize={setImageSize}
-            imageSize={imageSize}
-          >
+          <div className="w-full overflow-visible">
+            <ImageMap
+              src={localStorage.getItem("pdfData")!}
+              onClick={addImageMarker}
+              //transforms passed to imagemap component for image manipulation
+              setTransform={setTransform}
+              setZoomLevel={setZoomLevel}
+              transform={transform}
+              zoomLevel={zoomLevel}
+              setIsDragging={setIsDragging}
+              setDragStart={setDragStart}
+              dragStart={dragStart}
+              setImageSize={setImageSize}
+              imageSize={imageSize}
+            ></ImageMap>
             {imageMarkers.map((marker, index) => (
               <div
                 key={index}
@@ -360,7 +361,7 @@ export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
                 />
               </div>
             ))}
-          </ImageMap>
+          </div>
           {isCoordList && (
             <CoordinateList georefMarkerPairs={georefMarkerPairs} />
           )}
