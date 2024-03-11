@@ -9,12 +9,14 @@ import {
   SelectionIcon,
 } from "@/components/ui/icons";
 import * as api from "./projectAPI";
+import OverlayView from "./overlayview";
 
 export default function Editor() {
   const [projectId, setProjectId] = useState(0);
   const [projectName, setProjectName] = useState("Project 1");
   const [isAutoSaved, setIsAutoSaved] = useState(false);
   const [isSideBySide, setIsSideBySide] = useState(false); // Add state for side by side toggle
+  const [isOverlay, setIsOverlay] = useState(false); // Add state for crop toggle
   const [wasSideBySide, setWasSideBySide] = useState(false);
   const [isCrop, setIsCrop] = useState(false);
   const [imageSrc, setImageSrc] = useState(localStorage.getItem("pdfData")!); // Keeps track of image URL
@@ -70,6 +72,7 @@ export default function Editor() {
   const handleToggleSideBySide = () => {
     if (!isCrop) {
       setIsSideBySide(!isSideBySide); // Toggle the value of isSideBySide
+      setIsOverlay(false); // Close the overlay view when side by side is activated
       console.log(isSideBySide); // Log the value of isSideBySide
     }
   };
@@ -93,6 +96,15 @@ export default function Editor() {
     setImageSrc(localStorage.getItem("pdfData")!);
     handleToggleCrop();
   };
+
+  const handleToggleOverlay = () => {
+    if (!isOverlay) {
+      setIsOverlay(!isOverlay); // Toggle the value of isOverlay
+      setIsSideBySide(false); // Close the side by side view when overlay is activated
+      setIsCrop(false); // Close the image edit view when overlay is activated
+      console.log(isOverlay);
+    }
+  }
 
   // Add the handleToggleCoordTable function
   const handleToggleCoordTable = () => {
@@ -128,6 +140,7 @@ export default function Editor() {
           <Button
             className="bg-gray-200 dark:bg-gray-700 hover:bg-blue-800 dark:hover:bg-blue-800"
             variant="secondary"
+            onClick={handleToggleOverlay}
           >
             <WindowsIcon className="text-gray-500" />
             Overlay
@@ -160,30 +173,32 @@ export default function Editor() {
           Continue
         </Button>
       </div>
-      {isSideBySide ? (
-        <SplitView
-          // pass isCoordList to the SplitView component
-          isCoordList={isCoordList}
-          projectId={projectId}
-        />
-      ) : (
-        <div
-          className={`flex flex-col items-center justify-center flex-1 ${
-            !isCrop
-              ? "bg-gray-100 dark:bg-gray-900"
-              : "bg-gray-400 dark:bg-gray-800"
-          }`}
-        >
-          <div className="flex items-center justify-center w-full">
-            <div className="w-1/2 flex justify-center items-center">
-              <ImageEdit
-                editBool={isCrop}
-                onCrop={handleCrop} // When the user has cropped the image
-              />
-            </div>
+      {isOverlay ? (
+      // Assuming OverlayView is the component you want to show when isOverlay is true
+      <OverlayView
+      projectId={projectId}
+      />
+    ) : isSideBySide ? (
+      <SplitView
+        isCoordList={isCoordList}
+        projectId={projectId}
+      />
+    ) : (
+      <div
+        className={`flex flex-col items-center justify-center flex-1 ${
+          !isCrop ? "bg-gray-100 dark:bg-gray-900" : "bg-gray-400 dark:bg-gray-800"
+        }`}
+      >
+        <div className="flex items-center justify-center w-full">
+          <div className="w-1/2 flex justify-center items-center">
+            <ImageEdit
+              editBool={isCrop}
+              onCrop={handleCrop}
+            />
           </div>
         </div>
-      )}
+      </div>
+    )}
     </div>
   );
 }
