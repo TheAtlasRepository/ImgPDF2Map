@@ -321,7 +321,7 @@ export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
           </Map>
         </Allotment.Pane>
         <Allotment.Pane minSize={200} className="bg-gray-100">
-          <div className="w-screen overflow-visible">
+          <div className="w-full overflow-visible">
             <ImageMap
               src={localStorage.getItem("pdfData")!}
               onClick={addImageMarker}
