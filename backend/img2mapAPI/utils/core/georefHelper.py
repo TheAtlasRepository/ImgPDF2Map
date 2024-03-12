@@ -125,3 +125,24 @@ def reGeoreferencedImageTiff(innFilePath, points: PointList, crs: str = defaultC
 
     return filename
 
+def getCornerCoordinates(tiff_path):
+    """
+    Get the corner coordinates (longitude, latitude) of a georeferenced TIFF.
+
+    Parameters:
+    - tiff_path: Path to the georeferenced TIFF file.
+
+    Returns:
+    - A list of corner coordinates in the order: [top left, top right, bottom right, bottom left].
+    """
+    with rio.open(tiff_path) as dataset:
+        # Get the bounds of the image
+        bounds = dataset.bounds
+
+        # Calculate corner coordinates based on the bounds
+        top_left = (bounds.left, bounds.top)
+        top_right = (bounds.right, bounds.top)
+        bottom_right = (bounds.right, bounds.bottom)
+        bottom_left = (bounds.left, bounds.bottom)
+
+        return [top_left, top_right, bottom_right, bottom_left]

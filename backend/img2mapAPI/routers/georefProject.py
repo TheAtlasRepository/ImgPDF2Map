@@ -178,5 +178,11 @@ async def createTestProject():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
-
-    
+@router.get("/{projectId}/georef/coordinates")
+async def getCornerCoordinates(projectId: int):
+    """ Get the corner coordinates of the image of a project by id, returns the corner coordinates if found"""
+    try:
+        cornerCoordinates = await _projectHandler.getCornerCoordinates(projectId)
+        return cornerCoordinates
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
