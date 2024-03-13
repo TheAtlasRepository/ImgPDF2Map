@@ -39,6 +39,7 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
       }
     }
 
+    
     fetch(imageSrc)
       .then((response) => response.blob())
       .then((blob) => {
