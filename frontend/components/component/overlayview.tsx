@@ -87,7 +87,6 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
       <Slider value={opacity} onChange={handleOpacity} />
     </div>
   );
-  
 };
 
 export default OverlayView;
