@@ -9,6 +9,7 @@ from ..utils.storage.files.fileStorage import FileStorage
 from ..utils.storage.files.localFileStorage import LocalFileStorage
 from ..utils.storage.data.storageHandler import StorageHandler
 from ..utils.storage.data.localStorage import LocalStorage
+from ..utils.storage.data.sqliteLocalStorage import SQLiteStorage
 from ..devOnly.georefTestFiles.testproject import createTestProject as cts #test function
 from ..devOnly.localrepository.repository import Repository
 
@@ -19,7 +20,7 @@ router = APIRouter(
 
 #TODO: Add a dependency class to handle errors and return the correct status code
 _repository: Repository = Repository()
-_StorageHandler: StorageHandler = LocalStorage(_repository) 
+_StorageHandler: StorageHandler = SQLiteStorage()
 _Filestorage: FileStorage = LocalFileStorage()
 
 _projectHandler = ProjectHandler(_Filestorage, _StorageHandler)
@@ -30,11 +31,11 @@ async def createProject(project: Project):
     Create a new project and return the id of the project
     - only the name is required, the rest of the attributes are optional
     """
-    try:
-        id = await _projectHandler.createProject(project)
-        return {"id": id}
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f'Project could not be created: {str(e.with_traceback(None))}, {e.args}')
+    #try:
+    id = await _projectHandler.createProject(project)
+    return {"id": id}
+    #except Exception as e:
+    #    raise HTTPException(status_code=400, detail=f'Project could not be created: {str(e.with_traceback(None))}, {e.args}')
 
 @router.put("/{projectId}")
 async def updateProject(projectId: int, project: Project):
