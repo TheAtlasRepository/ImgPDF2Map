@@ -8,6 +8,7 @@ import {
   WindowsIcon,
   SelectionIcon,
 } from "@/components/ui/icons";
+import UserDownload from "./userDownload";
 import * as api from "./projectAPI";
 
 export default function Editor() {
@@ -153,6 +154,9 @@ export default function Editor() {
             Crop
           </Button>
         </div>
+        <UserDownload
+          projectId={projectId}>
+        </UserDownload>
         <Button
           className="bg-gray-200 dark:bg-gray-700 dark:hover:bg-blue-800 dark:text-white"
           onClick={handleSave}
