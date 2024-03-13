@@ -90,6 +90,14 @@ export const initalGeorefimage = async (projectId: number): Promise<void> => {
   try {
     // Add image capture logic here later
     await axios.get(`${BASE_URL}/project/${projectId}/georef/initial`);
+    //response type blob
+    const response = await fetch(
+      `${BASE_URL}/project/${projectId}/georef/initial`
+    );
+    const blob = await response.blob();
+    // Directly create object URL from the blob
+    const objectURL = URL.createObjectURL(blob);
+    localStorage.setItem("tiffUrl", objectURL);
   } catch (error) {
     throw new Error(getErrorMessage(error as AxiosError<ErrorResponse>));
   } finally {
