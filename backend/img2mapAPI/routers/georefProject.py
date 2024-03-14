@@ -20,7 +20,7 @@ router = APIRouter(
 
 #TODO: Add a dependency class to handle errors and return the correct status code
 _repository: Repository = Repository()
-_StorageHandler: StorageHandler = SQLiteStorage()
+_StorageHandler: StorageHandler = SQLiteStorage('georefProjects.sqlite3')
 _Filestorage: FileStorage = LocalFileStorage()
 
 _projectHandler = ProjectHandler(_Filestorage, _StorageHandler)
