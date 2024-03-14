@@ -9,6 +9,10 @@ __pycache__/
 # Application created directories and subdirectories & files
 temp/
 temp/*
+temp/**/*
+temp/**/**/*
+database/
+database/*
 
 # Distribution / packaging
 .Python
