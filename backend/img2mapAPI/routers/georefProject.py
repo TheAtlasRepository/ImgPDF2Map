@@ -8,10 +8,8 @@ from ..utils.projectHandler import ProjectHandler
 from ..utils.storage.files.fileStorage import FileStorage
 from ..utils.storage.files.localFileStorage import LocalFileStorage
 from ..utils.storage.data.storageHandler import StorageHandler
-from ..utils.storage.data.localStorage import LocalStorage
 from ..utils.storage.data.sqliteLocalStorage import SQLiteStorage
 from ..devOnly.georefTestFiles.testproject import createTestProject as cts #test function
-from ..devOnly.localrepository.repository import Repository
 
 router = APIRouter(
     prefix="/project",
@@ -19,7 +17,6 @@ router = APIRouter(
 )
 
 #TODO: Add a dependency class to handle errors and return the correct status code
-_repository: Repository = Repository()
 _StorageHandler: StorageHandler = SQLiteStorage('georefProjects.sqlite3')
 _Filestorage: FileStorage = LocalFileStorage()
 
