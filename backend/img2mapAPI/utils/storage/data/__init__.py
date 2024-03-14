@@ -1,5 +1,5 @@
 from . import storageHandler
-from . import localStorage
+from . import sqliteLocalStorage
 
-__all__ = ['storageHandler', 'localStorage']
+__all__ = ['storageHandler', 'sqliteLocalStorage']
 # Path: backend/Img2mapAPI/Helpers/StorageHandler/LocalStorage.py

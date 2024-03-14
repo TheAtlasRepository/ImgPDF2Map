@@ -5,11 +5,11 @@ from pydantic import BaseModel
 #Abstract class for moving data to and from storage/DB and the API server
 class StorageHandler(ABC):
     #abstarct fileds
-    db = None
+    _instance = None
 
     #abstract methods
     @abstractmethod
-    async def connect(self, db: str, user: str, password: str, host: str, port: int)->None:
+    async def connect(self, db: str, user: str, password: str, host: str, port: int)->any:
         """
         Connect to the storage
         
@@ -19,6 +19,8 @@ class StorageHandler(ABC):
             password {str} -- The password
             host {str} -- The host
             port {int} -- The port
+
+        return {any} -- The connection to the storage/DB or None if the connection failed
         """
         pass
 
