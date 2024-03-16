@@ -16,25 +16,14 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
     [0, 0],
     [0, 0],
   ]);
-  const northEastLngLat = [cornerCoordinates[1][0], cornerCoordinates[1][1]];
-  const southWestLngLat = [cornerCoordinates[3][0], cornerCoordinates[3][1]];
+
+  var [bounds, setBounds] = useState([0, 0, 0, 0]);
+
   const [dataUrl, setDataUrl] = useState("");
   const [imageSrc, setImageSrc] = useState(localStorage.getItem("pdfData")!);
 
   const baseURL = "http://localhost:8000";
   useEffect(() => {
-    async function fetchCornerCoordinates() {
-      try {
-        const coordinatesResponse = await axios.get(
-          `${baseURL}/project/${projectId}/georef/coordinates`
-        );
-        const coords = coordinatesResponse.data;
-        setCornerCoordinates(coords);
-      } catch (error) {
-        console.error("Error fetching corner coordinates:", error);
-      }
-    }
-
     fetch(imageSrc)
       .then((response) => response.blob())
       .then((blob) => {
@@ -48,8 +37,7 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
       .catch((error) =>
         console.error("Error converting blob URL to data URL:", error)
       );
-    fetchCornerCoordinates();
-  }, [projectId]);
+  }, [projectId, imageSrc]);
 
   return (
     <div className="w-full h-full">
@@ -57,6 +45,13 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
         style={{ width: "100%", height: "100%" }}
         mapStyle="mapbox://styles/mapbox/streets-v11"
         mapboxAccessToken={mapboxToken}
+        initialViewState={{
+          latitude: 58.145,
+          longitude: 8,
+          zoom: 12,
+        }}
+        minZoom={5}
+        maxZoom={19}
       >
         {dataUrl && (
           <Source
@@ -64,9 +59,6 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
             type="raster"
             tiles={[`${baseURL}/project/${projectId}/tiles/{z}/{x}/{y}.png`]}
             tileSize={256}
-            // sets the bounds of the image to the corner coordinates
-            // stops requests for tiles outside of the bounds
-            bounds={[...southWestLngLat, ...northEastLngLat]}
           >
             <Layer
               id="georeferenced-image-layer"
