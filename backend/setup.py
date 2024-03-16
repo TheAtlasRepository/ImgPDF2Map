@@ -11,6 +11,7 @@ setup(
         'rasterio',
         'python-multipart',
         'pdf2image',
+        'rio_tiler',
     ],
     classifiers=[
         # https://pypi.org/classifiers/
