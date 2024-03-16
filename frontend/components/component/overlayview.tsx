@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Map, { Source, Layer } from "react-map-gl";
 import axios from "axios";
 import CoordinateList from "./coordinateList";
+import Slider from "../ui/slider";
 
 interface MapOverlayProps {
   projectId: number;
@@ -10,17 +11,16 @@ interface MapOverlayProps {
 const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 const OverlayView = ({ projectId }: MapOverlayProps) => {
-  const [cornerCoordinates, setCornerCoordinates] = useState([
-    [0, 0],
-    [0, 0],
-    [0, 0],
-    [0, 0],
-  ]);
-
+  
   var [bounds, setBounds] = useState([0, 0, 0, 0]);
 
   const [dataUrl, setDataUrl] = useState("");
   const [imageSrc, setImageSrc] = useState(localStorage.getItem("pdfData")!);
+  const [opacity, setOpacity] = useState(1);
+
+  const handleOpacity = (value: number) => {
+    setOpacity(value);
+  }
 
   const baseURL = "http://localhost:8000";
   useEffect(() => {
@@ -64,11 +64,12 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
               id="georeferenced-image-layer"
               source="georeferenced-image-source"
               type="raster"
-              raster-opacity={1}
+              paint={{ "raster-opacity": opacity / 100}}
             />
           </Source>
         )}
       </Map>
+      <Slider value={opacity} onChange={handleOpacity} />
     </div>
   );
 };
