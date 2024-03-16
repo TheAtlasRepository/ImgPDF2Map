@@ -54,11 +54,6 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
   return (
     <div className="w-full h-full">
       <Map
-        initialViewState={{
-          latitude: 58,
-          longitude: 8,
-          zoom: 10,
-        }}
         style={{ width: "100%", height: "100%" }}
         mapStyle="mapbox://styles/mapbox/streets-v11"
         mapboxAccessToken={mapboxToken}
