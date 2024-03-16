@@ -16,8 +16,6 @@ from PIL import Image
 import io
 from rio_tiler.io import Reader
 from rio_tiler.errors import TileOutsideBounds
-from rio_tiler.models import ImageData
-from rio_tiler.utils import render
 import numpy as np
 
 
