@@ -16,6 +16,8 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
     [0, 0],
     [0, 0],
   ]);
+  const northEastLngLat = [cornerCoordinates[1][0], cornerCoordinates[1][1]];
+  const southWestLngLat = [cornerCoordinates[3][0], cornerCoordinates[3][1]];
   const [dataUrl, setDataUrl] = useState("");
   const [imageSrc, setImageSrc] = useState(localStorage.getItem("pdfData")!);
 
@@ -53,9 +55,9 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
     <div className="w-full h-full">
       <Map
         initialViewState={{
-          longitude: cornerCoordinates[0][0],
-          latitude: cornerCoordinates[0][1],
-          zoom: 3,
+          latitude: 58,
+          longitude: 8,
+          zoom: 10,
         }}
         style={{ width: "100%", height: "100%" }}
         mapStyle="mapbox://styles/mapbox/streets-v11"
@@ -64,16 +66,18 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
         {dataUrl && (
           <Source
             id="georeferenced-image-source"
-            type="image"
-            url={dataUrl}
-            coordinates={cornerCoordinates}
+            type="raster"
+            tiles={[`${baseURL}/project/${projectId}/tiles/{z}/{x}/{y}.png`]}
+            tileSize={256}
+            // sets the bounds of the image to the corner coordinates
+            // stops requests for tiles outside of the bounds
+            bounds={[...southWestLngLat, ...northEastLngLat]}
           >
             <Layer
               id="georeferenced-image-layer"
               source="georeferenced-image-source"
               type="raster"
               raster-opacity={1}
-              raster-resampling="linear"
             />
           </Source>
         )}

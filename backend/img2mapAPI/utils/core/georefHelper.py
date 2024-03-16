@@ -4,6 +4,7 @@ import rasterio as rio #importing rasterio for georeferencing
 from rasterio.transform import from_gcps #importing from_gcps to create a transform from GCPs
 from rasterio.control import GroundControlPoint as GCP 
 from rasterio.crs import CRS #importing CRS for the default crs
+from rasterio.enums import Resampling #importing Resampling for the overview levels
 from ..models import PointList #importing the pointList model
 from .FileHelper import getUniqeFileName, removeFile #importing the getUniqeFileName and removeFile functions from FileHelper
 
@@ -87,6 +88,15 @@ def InitialGeoreferencePngImage(tempFilePath, points: PointList, crs: str = defa
     transform = from_gcps(gcps) #create the transform
     dataset.transform = transform #set the transform
     dataset.crs = CRS.from_string(crs) #set the crs
+
+    #define overview levels
+    #is needed for generating the map tiles
+    overview_levels = [2, 4, 8, 16]
+    dataset.build_overviews(overview_levels, Resampling.nearest) #build the overviews
+    #update tags
+    dataset.update_tags(ns='rio_overview', resampling='nearest') #update the tags
+
+    #close the file
     dataset.close()
 
     removeFile(filename) #removing the temporary file
@@ -121,6 +131,13 @@ def reGeoreferencedImageTiff(innFilePath, points: PointList, crs: str = defaultC
     transform = from_gcps(gcps) #create the transform
     dataset.transform = transform #set the transform
     dataset.crs = CRS.from_string(crs) #set the crs
+
+    #define overview levels
+    #is needed for generating the map tiles
+    overview_levels = [2, 4, 8, 16]
+    dataset.build_overviews(overview_levels, Resampling.nearest) #build the overviews
+    #update tags
+    dataset.update_tags(ns='rio_overview', resampling='nearest') #update the tags
     dataset.close() #close the file
 
     return filename
