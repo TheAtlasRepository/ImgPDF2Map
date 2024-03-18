@@ -11,7 +11,6 @@ interface MapOverlayProps {
 const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 const OverlayView = ({ projectId }: MapOverlayProps) => {
-  
   var [bounds, setBounds] = useState([0, 0, 0, 0]);
 
   const [dataUrl, setDataUrl] = useState("");
@@ -20,7 +19,7 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
 
   const handleOpacity = (value: number) => {
     setOpacity(value);
-  }
+  };
 
   const baseURL = "http://localhost:8000";
   useEffect(() => {
@@ -64,7 +63,7 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
               id="georeferenced-image-layer"
               source="georeferenced-image-source"
               type="raster"
-              paint={{ "raster-opacity": opacity / 100}}
+              paint={{ "raster-opacity": opacity / 100 }}
             />
           </Source>
         )}

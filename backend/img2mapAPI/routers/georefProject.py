@@ -12,11 +12,7 @@ from ..utils.storage.data.localStorage import LocalStorage
 from ..devOnly.georefTestFiles.testproject import createTestProject as cts #test function
 from ..devOnly.localrepository.repository import Repository
 
-from PIL import Image
-import io
-from rio_tiler.io import Reader
-from rio_tiler.errors import TileOutsideBounds
-import numpy as np
+from ..utils.core.georefHelper import generateTile
 
 
 router = APIRouter(
@@ -194,38 +190,13 @@ async def getCornerCoordinates(projectId: int):
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
 
-blanke_tile = Image.new('RGBA', (256, 256), (255, 255, 255, 0))
-bytes_io = io.BytesIO()
-blanke_tile.save(bytes_io, format='PNG')
-blank_tile_bytes = bytes_io.getvalue()
 
 @router.get("/{projectId}/tiles/{z}/{x}/{y}.png", response_class=Response)
-async def get_tile(projectId: int, z: int, x: int, y: int):
+async def getTile(projectId: int, z: int, x: int, y: int):
     try:
         tiff_path = await _projectHandler.getGeoreferencedFilePath(projectId)
-        
-        with Reader(tiff_path) as src:
-            tile, mask = src.tile(x, y, z)
-            
-            # Correct the shapes
-            tile = np.moveaxis(tile, 0, -1)  # Move bands to the last axis to get shape (height, width, 3)
-            mask = np.expand_dims(mask, axis=-1)  # Add an axis to mask to get shape (height, width, 1)
-
-            # Stack tile and mask arrays along the last axis
-            data = np.concatenate((tile, mask), axis=-1)
-            
-            # Convert numpy array to PIL Image
-            img = Image.fromarray(data, 'RGBA')
-
-            # Convert PIL Image to bytes
-            img_byte_arr = io.BytesIO()
-            img.save(img_byte_arr, format='PNG')
-            img_byte_arr.seek(0)
-
-            return Response(content=img_byte_arr.getvalue(), media_type="image/png")
-    except TileOutsideBounds:
-        # Return the blank tile for out-of-bounds requests
-        return Response(content=blank_tile_bytes, media_type="image/png")
+        tile = await generateTile(tiff_path, x, y, z)
+        return tile
     except Exception as e:
         # Handle unexpected errors
         return Response(status_code=500, content=f"An unexpected error occurred: {str(e)}")
