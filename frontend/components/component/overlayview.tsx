@@ -11,35 +11,18 @@ interface MapOverlayProps {
 const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 const OverlayView = ({ projectId }: MapOverlayProps) => {
-  const [cornerCoordinates, setCornerCoordinates] = useState([
-    [0, 0],
-    [0, 0],
-    [0, 0],
-    [0, 0],
-  ]);
+  var [bounds, setBounds] = useState([0, 0, 0, 0]);
+
   const [dataUrl, setDataUrl] = useState("");
   const [imageSrc, setImageSrc] = useState(localStorage.getItem("pdfData")!);
   const [opacity, setOpacity] = useState(1);
 
   const handleOpacity = (value: number) => {
     setOpacity(value);
-  }
+  };
 
   const baseURL = "http://localhost:8000";
   useEffect(() => {
-    async function fetchCornerCoordinates() {
-      try {
-        const coordinatesResponse = await axios.get(
-          `${baseURL}/project/${projectId}/georef/coordinates`
-        );
-        const coords = coordinatesResponse.data;
-        setCornerCoordinates(coords);
-      } catch (error) {
-        console.error("Error fetching corner coordinates:", error);
-      }
-    }
-
-    
     fetch(imageSrc)
       .then((response) => response.blob())
       .then((blob) => {
@@ -53,34 +36,34 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
       .catch((error) =>
         console.error("Error converting blob URL to data URL:", error)
       );
-    fetchCornerCoordinates();
-  }, [projectId]);
+  }, [projectId, imageSrc]);
 
   return (
     <div className="w-full h-full">
       <Map
-        initialViewState={{
-          longitude: cornerCoordinates[0][0],
-          latitude: cornerCoordinates[0][1],
-          zoom: 3,
-        }}
-        style={{ width: "100%", height: "90%" }}
+        style={{ width: "100%", height: "100%" }}
         mapStyle="mapbox://styles/mapbox/streets-v11"
         mapboxAccessToken={mapboxToken}
+        initialViewState={{
+          latitude: 58.145,
+          longitude: 8,
+          zoom: 12,
+        }}
+        minZoom={5}
+        maxZoom={19}
       >
         {dataUrl && (
           <Source
             id="georeferenced-image-source"
-            type="image"
-            url={dataUrl}
-            coordinates={cornerCoordinates}
+            type="raster"
+            tiles={[`${baseURL}/project/${projectId}/tiles/{z}/{x}/{y}.png`]}
+            tileSize={256}
           >
             <Layer
               id="georeferenced-image-layer"
               source="georeferenced-image-source"
               type="raster"
-              paint={{ "raster-opacity": opacity / 100}}
-              raster-resampling="linear"
+              paint={{ "raster-opacity": opacity / 100 }}
             />
           </Source>
         )}
