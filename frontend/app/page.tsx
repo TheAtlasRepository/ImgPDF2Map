@@ -1,6 +1,7 @@
 'use client';
 import UploadPipeline from '@/components/component/uploadPipeline';
 import Navbar from '../components/ui/navbar';
+import { Suspense } from 'react';
 
 export default function Home() {
   return (
@@ -10,7 +11,9 @@ export default function Home() {
       />
       
       <div className="items-center py-10 justify-between">
-        <UploadPipeline />
+        <Suspense fallback={<div>Loading...</div>}>
+          <UploadPipeline />
+        </Suspense>
       </div>
 
       <div className="flex justify-center p-2 py-10">
