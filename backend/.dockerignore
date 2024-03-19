@@ -35,5 +35,6 @@ __pycache__/*
 
 .dockerignore
 Dockerfile
+*.Dockerfile
 
 
