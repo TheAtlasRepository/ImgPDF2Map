@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Map, { Source, Layer } from "react-map-gl";
-import axios from "axios";
-import CoordinateList from "./coordinateList";
-import Slider from "../ui/slider";
+import { Slider } from "@/components/ui/slider"
 
 interface MapOverlayProps {
   projectId: number;
@@ -11,14 +9,14 @@ interface MapOverlayProps {
 const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
 
 const OverlayView = ({ projectId }: MapOverlayProps) => {
-  var [bounds, setBounds] = useState([0, 0, 0, 0]);
 
   const [dataUrl, setDataUrl] = useState("");
   const [imageSrc, setImageSrc] = useState(localStorage.getItem("pdfData")!);
-  const [opacity, setOpacity] = useState(1);
+  const [opacity, setOpacity] = useState(100);
 
-  const handleOpacity = (value: number) => {
-    setOpacity(value);
+  const handleOpacity = (values: number[]) => {
+    const opacityValue = values[0]
+    setOpacity(opacityValue);
   };
 
   const baseURL = "http://localhost:8000";
@@ -52,6 +50,15 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
         minZoom={5}
         maxZoom={19}
       >
+        <div className="flex justify-center mt-5">
+          <div className="fixed z-50 w-1/5">
+            <Slider
+              defaultValue={[50]}
+              max={100}
+              step={1}
+              onValueChange={handleOpacity}/>
+          </div>
+        </div>
         {dataUrl && (
           <Source
             id="georeferenced-image-source"
@@ -68,7 +75,6 @@ const OverlayView = ({ projectId }: MapOverlayProps) => {
           </Source>
         )}
       </Map>
-      <Slider value={opacity} onChange={handleOpacity} />
     </div>
   );
 };
