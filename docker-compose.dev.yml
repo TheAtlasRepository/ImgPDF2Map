@@ -1,4 +1,4 @@
-version: 'version 1.0.0'
+version: 'version 1.0.0-dev'
 
 networks:
   img2map-network:
@@ -9,13 +9,10 @@ services:
     container_name: Img2Map-Website
     build:
       context: ./frontend
-      dockerfile: dev.Dockerfile
+      dockerfile: /docker/dev.Dockerfile
     ports:
       - "80:3000"
       - "433:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     environment:
       - NODE_ENV=development
     env_file:
@@ -30,7 +27,7 @@ services:
     container_name: Img2Map-API
     build:
       context: ./backend
-      dockerfile: dev.Dockerfile
+      dockerfile: /docker/dev.Dockerfile
     ports:
       - "8000:8000"
     networks:
