@@ -14,6 +14,20 @@
 
 ### Automatic setup dev server and enviroment (windows)
 ---
+#### Docker build
+First you will have to create a `.env.local` file in the directory ./frontend, it should look like `.env.example`
+
+To run you you will have to [Download Docker compose](https://docs.docker.com/compose/install/), recomend docker desktop.
+
+Now open a terminal, make sure you are in the project root folder ({localpath}/{projectName}/). Run This cmd for dev ` docker-compose -f docker-compose.dev.yml up --build` to run the development version of the application.
+
+> **IF you want to run prod version:**
+> 
+>Change the .env.local to .env
+> 
+> Run this cmd ```docker-compose -f docker-compose.prod.yml up --build```, Note this will take a notably longer build time.
+
+#### Dev Startup Script
 First you will need to locate the `startup.bat` in the `\` (root) directory of the project. When you have located it you have three options depending on youre case.
 
 **Options**:
