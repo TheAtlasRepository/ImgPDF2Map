@@ -24,15 +24,13 @@ services:
       dockerfile: /docker/prod.Dockerfile
     ports:
       - "80:3000"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     environment:
       - NODE_ENV=production
     env_file:
-      - ./frontend/.env.local
+      - ./frontend/.env
     networks:
       - img2map-network
     depends_on:
-      - img2map-api
+      - serviceName: img2map-api
+        condition: service_healthy
   
