@@ -1,4 +1,4 @@
-from fastapi import APIRouter, File, UploadFile, HTTPException, BackgroundTasks 
+from fastapi import APIRouter, File, UploadFile, HTTPException, BackgroundTasks, Path
 from fastapi.responses import FileResponse, Response
 from typing import List
 #internal imports:
@@ -10,6 +10,9 @@ from ..utils.storage.files.localFileStorage import LocalFileStorage
 from ..utils.storage.data.storageHandler import StorageHandler
 from ..utils.storage.data.sqliteLocalStorage import SQLiteStorage
 from ..devOnly.georefTestFiles.testproject import createTestProject as cts #test function
+
+from ..utils.core.georefHelper import generateTile
+
 
 router = APIRouter(
     prefix="/project",
@@ -176,5 +179,22 @@ async def createTestProject():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+@router.get("/{projectId}/georef/coordinates")
+async def getCornerCoordinates(projectId: int):
+    """ Get the corner coordinates of the image of a project by id, returns the corner coordinates if found"""
+    try:
+        cornerCoordinates = await _projectHandler.getCornerCoordinates(projectId)
+        return cornerCoordinates
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
-    
+
+@router.get("/{projectId}/tiles/{z}/{x}/{y}.png", response_class=Response)
+async def getTile(projectId: int, z: int, x: int, y: int):
+    try:
+        tiff_path = await _projectHandler.getGeoreferencedFilePath(projectId)
+        tile = await generateTile(tiff_path, x, y, z)
+        return tile
+    except Exception as e:
+        # Handle unexpected errors
+        return Response(status_code=500, content=f"An unexpected error occurred: {str(e)}")
