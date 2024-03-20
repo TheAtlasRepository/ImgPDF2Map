@@ -23,9 +23,11 @@ Now open a terminal, make sure you are in the project root folder ({localpath}/{
 
 > **IF you want to run prod version:**
 > 
->Change the .env.local to .env
+> Change the .env.local to .env
 > 
 > Run this cmd ```docker-compose -f docker-compose.prod.yml up --build```, Note this will take a notably longer build time.
+> 
+> The terminal link is not correct in this instance and the website is located at [http://localhost](http://localhost). and the API is unreachable for all exept the website.
 
 #### Dev Startup Script
 First you will need to locate the `startup.bat` in the `\` (root) directory of the project. When you have located it you have three options depending on youre case.

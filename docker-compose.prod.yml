@@ -31,6 +31,5 @@ services:
     networks:
       - img2map-network
     depends_on:
-      - serviceName: img2map-api
-        condition: service_healthy
+      - img2map-api #This will make sure that the API is up before the website is started
   
