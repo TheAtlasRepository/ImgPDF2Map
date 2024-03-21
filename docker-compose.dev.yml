@@ -1,0 +1,34 @@
+version: 'version 1.0.0-dev'
+
+networks:
+  img2map-network:
+    driver: bridge
+
+services:
+  next-app:
+    container_name: Img2Map-Website
+    build:
+      context: ./frontend
+      dockerfile: /docker/dev.Dockerfile
+    ports:
+      - "80:3000"
+      - "433:3000"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./frontend/.env.local
+    restart: always
+    networks:
+      - img2map-network
+    depends_on:
+      - img2map-api
+  img2map-api:
+    #Uvicorn server running python FastAPI
+    container_name: Img2Map-API
+    build:
+      context: ./backend
+      dockerfile: /docker/dev.Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - img2map-network
