@@ -1,0 +1,40 @@
+#ignore .temp and subdirs
+temp
+temp/*
+temp/*/*
+
+#ignore .database
+database
+database/*
+
+*.db
+*.sqlite
+*.sqlite3
+
+#precompiled headers
+*.gch
+*.pch
+
+#egg info
+*.egg-info
+*.egg-info/*
+
+#dist
+dist
+dist/*
+
+#precompiled python
+__pycache__
+__pycache__/*
+*.pyc
+*.pyo
+*.pyd
+
+#.gitignore
+.gitignore
+
+.dockerignore
+Dockerfile
+*.Dockerfile
+
+

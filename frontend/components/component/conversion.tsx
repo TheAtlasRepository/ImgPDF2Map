@@ -1,5 +1,5 @@
 import { RotateLoader } from 'react-spinners';
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useRef, useState, useEffect } from "react";
 
 import axios from "axios";
