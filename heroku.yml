@@ -1,7 +1,7 @@
 build:
   docker:
-    web: ./frontend
-    worker: ./backend
+    web: ./frontend/docker/prod.Dockerfile
+    worker: ./backend/docker/prod.Dockerfile
 run:
   web: docker run --name Img2Map-Website --env-file ./frontend/.env -p 80:3000 ./frontend
   worker: docker run --name Img2Map-API -p 8000:8000 ./backend
