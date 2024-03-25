@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 
 # Copy the project files to the working directory
-COPY .. .
+COPY . .
 
 # Install the project and its dependencies
 RUN pip install .
