@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { UploadIconFolder } from "@/components/ui/icons";
 import { InfoCircledIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons'
 
@@ -13,6 +13,8 @@ type UploadFileProps = {
 const UploadFile: React.FC<UploadFileProps> = ({ onFileUpload, clearStateRequest }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [fileName, setFileName] = useState("");
+
+  //wrap the useSearchParams in suspense
   const params = useSearchParams();
 
 
@@ -20,8 +22,8 @@ const UploadFile: React.FC<UploadFileProps> = ({ onFileUpload, clearStateRequest
     // If there is an error message in the URL, set the error message state to the value in the URL
     if (params.get("e")) {
       handleErrorMsg(params.get("e") as string);
-    }
-  });
+    }   
+  }, [params]);
 
   // Handle file input change when user has used "Open a file"-button
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {

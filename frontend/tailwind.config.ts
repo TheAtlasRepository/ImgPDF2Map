@@ -8,6 +8,14 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        "blue-default": "#0E58FF",
+        "blue-hover": "#0b45cc",
+        "gray-default": "#0e1018",
+        "gray-hover": "#242C38",
+
+      },
+
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
