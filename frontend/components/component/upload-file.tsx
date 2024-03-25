@@ -3,6 +3,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { UploadIconFolder } from "@/components/ui/icons";
+import { InfoCircledIcon, ExclamationTriangleIcon } from '@radix-ui/react-icons'
 
 type UploadFileProps = {
   clearStateRequest: () => void;
@@ -91,7 +92,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ onFileUpload, clearStateRequest
   }
 
   return (
-    <div className="mx-auto w-1/4">
+    <div className="mx-auto w-5/6 sm:w-3/4 md:w-1/2 lg:w-1/3 xl:w-1/4">
       <div
         onClick={() => document.querySelector("input")?.click()}
         className="cursor-pointer"
@@ -102,7 +103,7 @@ const UploadFile: React.FC<UploadFileProps> = ({ onFileUpload, clearStateRequest
           onDrop={handleDrop}
         >
           <UploadIconFolder className="mx-auto mb-6 text-blue-300 dark:text-blue-600" />
-          <div className="text-lg font-medium text-gray-400">
+          <div className="text-lg font-medium text-gray-400 text-pretty">
             Open, or drop your <b>image or PDF</b> here
           </div>
           {fileName && (
@@ -128,10 +129,29 @@ const UploadFile: React.FC<UploadFileProps> = ({ onFileUpload, clearStateRequest
 
       {errorMessage && (
         <Alert variant="destructive" className="mt-5 dark:bg-gray-900">
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{errorMessage}</AlertDescription>
-        </Alert>
+          <div className="flex items-start">
+            <div>
+              <ExclamationTriangleIcon className="h-4 w-4"/>
+            </div>
+            <div className="ml-2 flex flex-col justify-center">
+              <AlertTitle>Error!</AlertTitle>
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </div>
+          </div>
+        </Alert>        
       )}
+            
+      <Alert variant="help" className="mt-5 xl:hidden dark:bg-gray-900">
+        <div className="flex items-start">
+          <div>
+            <InfoCircledIcon className="h-4 w-4"/>
+          </div>
+          <div className="ml-2 flex flex-col justify-center">
+            <AlertTitle>Just a heads up!</AlertTitle>
+            <AlertDescription>This application is designed for desktop devices, and may not work as intended on mobile devices or smaller screens.</AlertDescription>
+          </div>
+        </div>
+      </Alert>
     </div>
   );
 }
