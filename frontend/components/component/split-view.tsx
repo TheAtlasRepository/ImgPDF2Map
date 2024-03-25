@@ -66,15 +66,6 @@ export default function SplitView({
 
   //georeferencing types
   type GeoCoordinates = [number, number];
-  type imageCoordinates = [number, number];
-  type ImageMarker = {
-    pixelCoordinates: imageCoordinates;
-  };
-
-  //map states
-  // const [mapMarkers, setMapMarkers] = useState<
-  //   { geoCoordinates: GeoCoordinates }[]
-  // >([]);
 
   const [waitingForImageMarker, setWaitingForImageMarker] = useState(false);
   const [waitingForMapMarker, setWaitingForMapMarker] = useState(false);
