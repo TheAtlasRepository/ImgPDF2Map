@@ -22,6 +22,17 @@ export default function Editor() {
   const [isCrop, setIsCrop] = useState(false);
   const [imageSrc, setImageSrc] = useState(localStorage.getItem("pdfData")!); // Keeps track of image URL
   const [isCoordList, setIsCoordList] = useState(true); // Add state for coordinates table
+  // Array containing pairs of georeferenced markers and their corresponding image markers
+  const [georefMarkerPairs, setGeorefMarkerPairs] = useState<
+    { latLong: [number, number]; pixelCoords: [number, number] }[]
+  >([]);
+  const [mapMarkers, setMapMarkers] = useState<
+    { geoCoordinates: [number, number] }[]
+  >([]);
+
+  const [imageMarkers, setImageMarkers] = useState<
+    { pixelCoordinates: [number, number] }[]
+  >([]);
 
   //function to add a new project
   const addProject = (name: string) => {
@@ -105,7 +116,7 @@ export default function Editor() {
       setIsCrop(false); // Close the image edit view when overlay is activated
       console.log(isOverlay);
     }
-  }
+  };
 
   // Add the handleToggleCoordTable function
   const handleToggleCoordTable = () => {
@@ -167,9 +178,7 @@ export default function Editor() {
             Crop
           </Button>
         </div>
-        <UserDownload
-          projectId={projectId}>
-        </UserDownload>
+        <UserDownload projectId={projectId}></UserDownload>
         <Button
           className="bg-gray-200 dark:bg-gray-700 dark:hover:bg-blue-800 dark:text-white"
           onClick={handleSave}
@@ -178,31 +187,34 @@ export default function Editor() {
         </Button>
       </div>
       {isOverlay ? (
-      // Assuming OverlayView is the component you want to show when isOverlay is true
-      <OverlayView
-      projectId={projectId}
-      />
-    ) : isSideBySide ? (
-      <SplitView
-        isCoordList={isCoordList}
-        projectId={projectId}
-      />
-    ) : (
-      <div
-        className={`flex flex-col items-center justify-center flex-1 ${
-          !isCrop ? "bg-gray-100 dark:bg-gray-900" : "bg-gray-400 dark:bg-gray-800"
-        }`}
-      >
-        <div className="flex items-center justify-center w-full">
-          <div className="w-1/2 flex justify-center items-center">
-            <ImageEdit
-              editBool={isCrop}
-              onCrop={handleCrop}
-            />
+        // Assuming OverlayView is the component you want to show when isOverlay is true
+        <OverlayView projectId={projectId} />
+      ) : isSideBySide ? (
+        <SplitView
+          isCoordList={isCoordList}
+          projectId={projectId}
+          setGeorefMarkerPairs={setGeorefMarkerPairs}
+          georefMarkerPairs={georefMarkerPairs}
+          mapMarkers={mapMarkers}
+          setMapMarkers={setMapMarkers}
+          imageMarkers={imageMarkers}
+          setImageMarkers={setImageMarkers}
+        />
+      ) : (
+        <div
+          className={`flex flex-col items-center justify-center flex-1 ${
+            !isCrop
+              ? "bg-gray-100 dark:bg-gray-900"
+              : "bg-gray-400 dark:bg-gray-800"
+          }`}
+        >
+          <div className="flex items-center justify-center w-full">
+            <div className="w-1/2 flex justify-center items-center">
+              <ImageEdit editBool={isCrop} onCrop={handleCrop} />
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
     </div>
   );
 }

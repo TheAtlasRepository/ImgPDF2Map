@@ -18,9 +18,36 @@ import CoordinateList from "./coordinateList";
 interface SplitViewProps {
   isCoordList?: boolean;
   projectId: number;
+  georefMarkerPairs: {
+    latLong: [number, number];
+    pixelCoords: [number, number];
+  }[];
+  setGeorefMarkerPairs: React.Dispatch<
+    React.SetStateAction<
+      { latLong: [number, number]; pixelCoords: [number, number] }[]
+    >
+  >;
+  mapMarkers: { geoCoordinates: [number, number] }[];
+  setMapMarkers: React.Dispatch<
+    React.SetStateAction<{ geoCoordinates: [number, number] }[]>
+  >;
+
+  imageMarkers: { pixelCoordinates: [number, number] }[];
+  setImageMarkers: React.Dispatch<
+    React.SetStateAction<{ pixelCoordinates: [number, number] }[]>
+  >;
 }
 
-export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
+export default function SplitView({
+  isCoordList,
+  projectId,
+  georefMarkerPairs,
+  setGeorefMarkerPairs,
+  mapMarkers,
+  setMapMarkers,
+  imageMarkers,
+  setImageMarkers,
+}: SplitViewProps) {
   //project states
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [helpMessage, setHelpMessage] = useState<string | null>(
@@ -44,15 +71,10 @@ export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
     pixelCoordinates: imageCoordinates;
   };
 
-  // Array containing pairs of georeferenced markers and their corresponding image markers
-  const [georefMarkerPairs, setGeorefMarkerPairs] = useState<
-    { latLong: GeoCoordinates; pixelCoords: imageCoordinates }[]
-  >([]);
-
   //map states
-  const [mapMarkers, setMapMarkers] = useState<
-    { geoCoordinates: GeoCoordinates }[]
-  >([]);
+  // const [mapMarkers, setMapMarkers] = useState<
+  //   { geoCoordinates: GeoCoordinates }[]
+  // >([]);
 
   const [waitingForImageMarker, setWaitingForImageMarker] = useState(false);
   const [waitingForMapMarker, setWaitingForMapMarker] = useState(false);
@@ -98,7 +120,7 @@ export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [imageMarkers, setImageMarkers] = useState<ImageMarker[]>([]);
+  // const [imageMarkers, setImageMarkers] = useState<ImageMarker[]>([]);
   const [calculatedDragDistance, setCalculatedDragDistance] = useState(0);
 
   const addImageMarker = (event: React.MouseEvent<HTMLDivElement>) => {
