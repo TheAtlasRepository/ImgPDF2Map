@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRef } from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from 'next/link';
 import Logo from './logo';
 import { HamburgerMenuIcon } from '@radix-ui/react-icons'
@@ -13,17 +13,24 @@ const Navbar: React.FC<NavbarProps> = ({ activePage }) => {
   const [isOpen, setOpen] = useState(false);
   const mobileRef = useRef(null);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('overflow-hidden');
+    } else {
+      document.body.classList.remove('overflow-hidden');
+    }
+  }, [isOpen]);
+
   return (
     <div>
-
-      <div className="flex justify-between items-center py-3 px-4 background-dark lg:mb-10">
+      <div className="flex justify-between items-center py-3 px-4 background-dark lg:mb-10 z-20 relative">
+        {/* Service name / Logo */}
         <div className="flex items-center px-5">
           <Logo />
         </div>
 
-        
-
-        <div className="hidden lg:flex lg:items-center">
+        {/* Desktop menu */}
+        <div className="hidden md:flex lg:items-center">
           <div className="flex items-center text-xs">
             <button className={`btn-nav ${activePage === 'Home' ? 'btn-nav-active' : ''}`}>
               <Link href="/">Home</Link>  
@@ -43,7 +50,8 @@ const Navbar: React.FC<NavbarProps> = ({ activePage }) => {
           </div>
         </div>
 
-        <div ref={mobileRef} className="lg:hidden flex flex-col">
+        {/* Mobile menu button and icon */}
+        <div ref={mobileRef} className="md:hidden flex flex-col">
           <button
             onClick={() => setOpen(!isOpen)}
             className="block border-0 bg-transparent px-2 text-gray-500 hover:no-underline hover:shadow-none focus:no-underline focus:shadow-none focus:outline-none focus:ring-0 dark:text-neutral-200 lg:hidden"
@@ -58,27 +66,26 @@ const Navbar: React.FC<NavbarProps> = ({ activePage }) => {
         </div>
       </div>
       
-      {isOpen && (
-        <div className="background-dark shadow-sm">
-          <div className="flex flex-col items-end text-xl">
-            <button className={`my-2 btn-nav ${activePage === 'Home' ? 'btn-nav-active' : ''}`}>
-              <Link href="/">Home</Link>  
-            </button>
+      {/* Mobile menu */}
+      <div className={`background-dark h-screen w-screen shadow-sm absolute z-10 ${isOpen ? 'top-16 transition-all duration-500 ease-out' : '-top-[2000px] transition-all duration-500 ease-in'}`}>
+        <div className="flex flex-col items-center justify-center text-2xl h-5/6">
+          <button className={`my-2 btn-nav btn-nav-mob ${activePage === 'Home' ? 'btn-nav-active' : ''}`}>
+            <Link href="/">Home</Link>  
+          </button>
 
-            <button className={`my-2 btn-nav ${activePage === 'About' ? 'btn-nav-active' : ''}`}>
-              <Link href="/About">About</Link>  
-            </button>
+          <button className={`my-2 btn-nav btn-nav-mob ${activePage === 'About' ? 'btn-nav-active' : ''}`}>
+            <Link href="/About">About</Link>  
+          </button>
 
-            <button className={`my-2 btn-nav ${activePage === 'Your Data' ? 'btn-nav-active' : ''}`}>
-              <Link href="/Privacy">Your Data</Link>  
-            </button>
+          <button className={`my-2 btn-nav btn-nav-mob ${activePage === 'Your Data' ? 'btn-nav-active' : ''}`}>
+            <Link href="/Privacy">Your Data</Link>  
+          </button>
 
-            <button className={`my-2 mb-6 btn-nav ${activePage === 'Text & CSV To Map' ? 'btn-nav-active' : ''}`}>
-              <Link href="/Text2Map">Text & CSV To Map</Link>  
-            </button>
-          </div>
+          <button className={`my-2 mb-6 btn-nav btn-nav-mob ${activePage === 'Text & CSV To Map' ? 'btn-nav-active' : ''}`}>
+            <Link href="/Text2Map">Text & CSV To Map</Link>  
+          </button>
         </div>
-      )}
+      </div>
     </div>
 
   );
