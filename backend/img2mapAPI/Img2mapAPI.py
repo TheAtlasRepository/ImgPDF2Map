@@ -11,9 +11,10 @@ app = FastAPI(
 router = APIRouter()
 
 origins = [
-    "http://localhost",
-    "http://localhost:8080",
-    "http://localhost:3000"
+    "http://localhost", #for local testing
+    "http://localhost:8080", # for vue dev server
+    "http://localhost:3000", # for react dev server
+    "https://img2map-f5cee540ffb0.herokuapp.com/" # for the deployed frontend
 ]
 
 app.add_middleware(
