@@ -2,6 +2,7 @@
 import UploadPipeline from '@/components/component/uploadPipeline';
 import Navbar from '../components/ui/navbar';
 import { Suspense } from 'react';
+import ServiceName from '@/components/ui/return-service-name';
 
 export default function Home() {
   return (
@@ -25,13 +26,13 @@ export default function Home() {
           </div>
           <div className="2xl:w-3/4 p-6 card dark:bg-gray-800">
             <p className="text-lg text-secondary dark:text-gray-300">
-              Discover PDF/IMG2Map, the simplest solution for seamlessly georeferencing digital images and PDF files! 
+              Discover <ServiceName />, the simplest solution for seamlessly georeferencing digital images and PDF files! 
               Effortlessly upload your documents and pinpoint specific locations by selecting reference points on the image. 
               By embedding geospatial metadata, you can transform your files into geographically accurate representations, 
               perfect for urban planning, environmental analysis, or historical research. 
               <br /><br />
               Whether you're a GIS expert or new to spatial data, our intuitive platform makes georeferencing accessible to all. 
-              Start exploring the possibilities with PDF/IMG2Map today!
+              Start exploring the possibilities with <ServiceName /> today!
             </p>
           </div>
         </div>

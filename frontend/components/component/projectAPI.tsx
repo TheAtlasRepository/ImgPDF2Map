@@ -19,7 +19,7 @@ interface ErrorResponse {
 }
 
 // Base URL for the backend API from .env
-const BASE_URL = process.env.BACKEND_URL;
+const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 let hasMadeProjectApiCall = false;
 
