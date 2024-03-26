@@ -15,21 +15,34 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-
-      - name: create .env file
-        run: echo "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}}" > fron.env
-      - name: Build Docker images
-        run: docker-compose -f ./docker-compose.prod.yml build
+      #backend steps
+      - name: create backend .env file
+        #Backend .env
+        #HOST_PORT
+        #CORS_ORIGINS
+        run: echo "HOST_PORT='8000'\nCORS_ORIGINS='http://localhost,${{secrets.CORS_ORIGINS}}'/n" > backend/.env 
       
+      #todo: add tests step
+      #build backend docker image
+      - name: BackendAPI - Build, Push and Release a Docker container to Heroku.
+        uses: gonuit/heroku-docker-deploy@v1.3.3
+        with:
+          #Heroku configuration
+          email: ${{ secrets.HEROKU_EMAIL }} # The email address associated with your Heroku account.
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_API_APP_NAME }}
+          process_type: web # For more information look at https://devcenter.heroku.com/articles/process-model
+          #Docker configuration
+          dockerfile_directory: ./backend # Dockerfile directory.
+          dockerfile_name: /docker/prod.Dockerfile # Dockerfile name.
+          docker_options: "--no-cache -p 8000:8000" # Additional options of docker build command.
 
-      - name: Login to Heroku Container Registry
-        run: echo "${{secrets.HEROKU_API_KEY}}" | docker login -u _ -p $(heroku auth:token) registry.heroku.com
-
-      - name: Push Docker images to Heroku
-        run: docker-compose -f ./docker-compose.yml push
-
-      - name: Release Docker images to Heroku
-        run: heroku container:release web --app img2map
+        #frontend steps
+      - name: create frontend .env file
+        #Frontend .env
+        #
+        run: echo "REACT_APP_API_URL='https://${{secrets.HEROKU_API_APP_NAME}}.herokuapp.com'\n" > frontend/.env
+          
+          
+  
 

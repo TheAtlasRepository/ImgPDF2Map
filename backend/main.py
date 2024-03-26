@@ -10,7 +10,6 @@ def main():
         print("Environment variables loaded")
         #get the port from the environment variables
         port = dotenv.get_key('./.env',key_to_get='HOST_PORT')
-        host = dotenv.get_key('./.env',key_to_get='HOST_NAME')
         try:
             port = int(port)
         except:

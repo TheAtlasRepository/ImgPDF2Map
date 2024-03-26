@@ -20,7 +20,7 @@ RUN pip install pip-tools
 WORKDIR /app
 
 # Copy the pyproject.toml file
-COPY pyproject.toml /app/
+COPY ../pyproject.toml /app/
 
 # Generate requirements.txt
 RUN pip-compile --output-file=requirements.txt pyproject.toml
@@ -53,7 +53,7 @@ RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
 # Copy the project files
-COPY . /app/
+COPY .. /app/
 
 # Check and build in /app directory
 RUN python -m build . -o dist/
