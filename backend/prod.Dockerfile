@@ -80,7 +80,7 @@ WORKDIR /app
 # Copy the application code from the build stage
 COPY --from=build /app /app
 
-COPY .env /app/
+RUN if [ -f .env ]; then cp .env /app/; fi
 RUN pip install dist/*.whl
 
 # Expose port
