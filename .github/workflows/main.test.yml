@@ -31,7 +31,7 @@ jobs:
           #Docker configuration
           dockerfile_directory: ./backend # Dockerfile directory.
           dockerfile_name: /docker/prod.Dockerfile # Dockerfile name.
-          docker_options: "--no-cache -p 8000:8000" # Additional options of docker build command.
+          docker_options: "--no-cache" # Additional options of docker build command.
 
         #frontend steps
       - name: create frontend .env file
@@ -50,4 +50,4 @@ jobs:
           #Docker configuration
           dockerfile_directory: ./frontend # Dockerfile directory.
           dockerfile_name: /docker/prod.Dockerfile # Dockerfile name.
-          docker_options: "--no-cache -p 80:3000" # Additional options of docker build command.
+          docker_options: "--no-cache" # Additional options of docker build command.
