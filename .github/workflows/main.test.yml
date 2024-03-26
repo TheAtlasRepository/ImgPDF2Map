@@ -5,8 +5,8 @@ name: Deploy to Heroku
 on:
   push:
     branches:
-      - f_tasm_action+*
-
+    #  - f_tasm_action+*
+      - main
 jobs:
   build:
     runs-on: ubuntu-latest
