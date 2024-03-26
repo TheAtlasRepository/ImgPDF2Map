@@ -9,7 +9,7 @@ export default function About() {
       />
 
       <div className="flex justify-center p-2 py-5 pt-10">
-        <div className="flex flex-col w-1/2 justify-between">
+        <div className="flex flex-col md:w-5/6 lg:w-3/4 xl:w-1/2 justify-between">
             <h1 className="text-5xl font-bold text-primary mb-5 px-6 dark:text-gray-300">
                 About<br />
             </h1>
@@ -22,7 +22,7 @@ export default function About() {
       </div>
 
       <div className="flex justify-center p-2 py-5">
-        <div className="flex flex-col w-1/2 justify-between">
+        <div className="flex flex-col md:w-5/6 lg:w-3/4 xl:w-1/2 justify-between">
             <h2 className="text-3xl font-bold text-primary mb-5 px-6 dark:text-gray-300">
                 A subheading<br />
             </h2>
@@ -35,7 +35,7 @@ export default function About() {
       </div>
 
       <div className="flex justify-center p-2 py-5">
-        <div className="flex flex-col w-1/2 justify-between">
+        <div className="flex flex-col md:w-5/6 lg:w-3/4 xl:w-1/2 justify-between">
             <h2 className="text-3xl font-bold text-primary mb-5 px-6 dark:text-gray-300">
                 A subheading<br />
             </h2>
