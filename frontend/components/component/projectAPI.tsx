@@ -18,7 +18,8 @@ interface ErrorResponse {
   detail: string;
 }
 
-const BASE_URL = "http://localhost:8000";
+// Base URL for the backend API from .env
+const BASE_URL = process.env.BACKEND_URL;
 
 let hasMadeProjectApiCall = false;
 

@@ -67,10 +67,13 @@ export default function ImageEdit({ editBool, onCrop }: { editBool: boolean, onC
             const formData = new FormData();
             formData.append('file', blob, 'filename');
 
+            // Base URL for the backend API from .env
+            const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
             //Try to send a request to the API
             try {
                 // Send a POST request to the API with the coordinates and file
-                const response = await axios.post(`http://localhost:8000/converter/cropPng?p1x=${p1x}&p1y=${p1y}&p2x=${p2x}&p2y=${p2y}`, formData, {
+                const response = await axios.post(`${BASE_URL}/converter/cropPng?p1x=${p1x}&p1y=${p1y}&p2x=${p2x}&p2y=${p2y}`, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     },

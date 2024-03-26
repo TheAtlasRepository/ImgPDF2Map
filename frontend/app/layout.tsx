@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'PDF 2 Map',
-  description: 'Generated geographic data from PDFs',
+  title: 'Image 2 Map',
+  description: 'Georeference geographic data from Images and PDFs',
 }
 
 export default function RootLayout({
