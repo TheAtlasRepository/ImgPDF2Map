@@ -12,6 +12,7 @@ def main():
     args = parser.parse_args()
     if args.port:
         port = args.port
+        print(f"Running server on port {port}")
     else:
         if dotenv.load_dotenv():
             print("Environment variables loaded")
