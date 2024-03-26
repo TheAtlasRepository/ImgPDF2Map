@@ -11,9 +11,9 @@ jobs:
         steps:
         - uses: actions/checkout@v2
         - name: Backend Build and test with docker
-          run: docker build ./backend -f /docker/dev.Dockerfile -t backend && docker run backend
+          run: docker build /backend -f /docker/dev.Dockerfile -t backend && docker run backend
         - name: Frontend Build and test with docker
-          run: docker build ./frontend -f /docker/dev.Dockerfile -t frontend && docker run frontend
+          run: docker build /frontend -f /docker/dev.Dockerfile -t frontend && docker run frontend
         - name: build with docker-compose
           run: docker-compose -f docker-compose.dev.yml up --build
                 
