@@ -1,4 +1,3 @@
-from img2mapAPI.Img2mapAPI import app
 import uvicorn
 import dotenv
 # Purpose: Entry point for the backend server
@@ -10,11 +9,17 @@ def main():
     if dotenv.load_dotenv():
         print("Environment variables loaded")
         #get the port from the environment variables
-        port = int(dotenv.get('HOST_PORT'))
-        host = dotenv.get('HOST_NAME')
-
+        port = dotenv.get_key('./.env',key_to_get='HOST_PORT')
+        host = dotenv.get_key('./.env',key_to_get='HOST_NAME')
+        try:
+            port = int(port)
+        except:
+            port = 8000
+    import img2mapAPI.Img2mapAPI as Img2mapAPI
     #run the uvicorn server
-    uvicorn.run(app, host=host, port=port)
+    config = uvicorn.Config(Img2mapAPI.app, host=host, port=port, log_level="info", env_file="./.env")
+    server = uvicorn.Server(config)
+    server.run()
     
 
 if __name__ == '__main__':

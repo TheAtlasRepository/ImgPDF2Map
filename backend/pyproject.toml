@@ -25,6 +25,6 @@ classifiers = [
 img2mapAPI = "Img2mapAPI:main"
 
 [tool.setuptools.packages.find]
-exclude = ["tests*",]
+exclude = ["tests*"]
 
 
