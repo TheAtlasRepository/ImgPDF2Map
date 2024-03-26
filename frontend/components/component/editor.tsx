@@ -122,6 +122,8 @@ export default function Editor() {
   const handleToggleCoordTable = () => {
     setIsCoordList((prevIsCoordList) => !prevIsCoordList); // Toggle the value of isCoordTable
   };
+  // Condtition to check if there are atleast 3 markers to display the coordinates table and the values are not 0
+  const isGeorefValid = georefMarkerPairs.length >= 3 && georefMarkerPairs.every((pair) => pair.latLong.every((val) => val !== 0)) && georefMarkerPairs.every((pair) => pair.pixelCoords.every((val) => val !== 0));
 
   return (
     <div className="flex flex-col h-screen bg-white">
@@ -153,6 +155,7 @@ export default function Editor() {
             className="bg-gray-200 dark:bg-gray-700 hover:bg-blue-800 dark:hover:bg-blue-800"
             variant="secondary"
             onClick={handleToggleOverlay}
+            disabled={!isGeorefValid}
           >
             <WindowsIcon className="text-gray-500" />
             Overlay
@@ -178,7 +181,11 @@ export default function Editor() {
             Crop
           </Button>
         </div>
-        <UserDownload projectId={projectId}></UserDownload>
+        <UserDownload
+          projectId={projectId}
+          isDisabled={!isGeorefValid}
+          >
+        </UserDownload>
         <Button
           className="bg-gray-200 dark:bg-gray-700 dark:hover:bg-blue-800 dark:text-white"
           onClick={handleSave}

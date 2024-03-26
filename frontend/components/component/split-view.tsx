@@ -217,6 +217,11 @@ export default function SplitView({
       lastPair.pixelCoords[0] !== 0 &&
       lastPair.pixelCoords[1] !== 0;
 
+    
+const hasEnoughEntries =
+      georefMarkerPairs.length >= 3 &&
+      georefMarkerPairs.every(pair => pair.latLong.every(val => val !== 0) &&
+      pair.pixelCoords.every(val => val !== 0));
     // Only proceed if the last pair is valid and an API call has not been made for the current set
     if (isValidPair && !apiCallMade.current) {
       apiCallMade.current = true; // Block further API calls for the current set of marker pairs
@@ -241,7 +246,14 @@ export default function SplitView({
           apiCallMade.current = false;
           setWaitingForImageMarker(false);
           setWaitingForMapMarker(false);
-        });
+
+        if (hasEnoughEntries) {
+          setHelpMessage(
+            "All pairs added! The map has been georeferenced"
+          );
+          handleGeoref();
+        }
+      });
     }
   }, [georefMarkerPairs, projectId]); // Depend on georefMarkerPairs to automatically re-trigger when they change
 
@@ -263,9 +275,6 @@ export default function SplitView({
       <div className=""></div>
       <div className="flex justify-center">
         <div className="fixed w-2/5 z-50 m-4 text-center">
-          <Button className="m-4" variant={"blue"} onClick={handleGeoref}>
-            Start Georeferencing
-          </Button>
           <Alert variant={"help"} className="">
             <AlertDescription>{helpMessage}</AlertDescription>
           </Alert>
