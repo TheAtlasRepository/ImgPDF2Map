@@ -5,7 +5,7 @@ on:
     branches:
       - dev
     tags:
-      - 'v.[0-9]+.[0-9]+.[0-9]+(?!-dev)'
+      - 'v.[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
   build:
@@ -18,9 +18,7 @@ jobs:
       #backend steps
       - name: create backend .env file
         #Backend .env
-        #HOST_PORT
-        #CORS_ORIGINS
-        run: echo "HOST_PORT='8000'\nCORS_ORIGINS='http://localhost,${{secrets.CORS_ORIGINS}}'/n" > backend/.env 
+        run: echo "HOST_PORT='8000'\nCORS_ORIGINS='http://localhost,${{ vars.CORS_ORIGINS }}'/n" > backend/.env 
       
       #todo: add tests step
       #build backend docker image
@@ -40,8 +38,21 @@ jobs:
         #frontend steps
       - name: create frontend .env file
         #Frontend .env
-        #
-        run: echo "REACT_APP_API_URL='https://${{secrets.HEROKU_API_APP_NAME}}.herokuapp.com'\n" > frontend/.env
+        run: echo "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN='${{secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}}'/nBACKEND_API_URL='${{secrets.BACKEND_API_URL}}'\n" > frontend/.env
+        
+        #todo: add tests step
+      - name: Frontend - Build, Push and Release a Docker container to Heroku.
+        uses: gonuit/heroku-docker-deploy@v1.3.3
+        with:
+          #Heroku configuration
+          email: ${{ secrets.HEROKU_EMAIL }} # The email address associated with your Heroku account.
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_WEB_APP_NAME }}
+          process_type: web # For more information look at https://devcenter.heroku.com/articles/process-model
+          #Docker configuration
+          dockerfile_directory: ./frontend # Dockerfile directory.
+          dockerfile_name: /docker/prod.Dockerfile # Dockerfile name.
+          docker_options: "--no-cache -p 80:3000" # Additional options of docker build command.
           
           
   
