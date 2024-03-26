@@ -21,7 +21,7 @@ def main():
             try:
                 port = int(port)
             except:
-                port = 8000
+                pass
     import img2mapAPI.Img2mapAPI as Img2mapAPI
     #run the uvicorn server
     config = uvicorn.Config(Img2mapAPI.app, host=host, port=port, log_level="info")

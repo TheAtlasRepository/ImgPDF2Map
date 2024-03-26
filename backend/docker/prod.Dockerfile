@@ -87,4 +87,4 @@ RUN pip install dist/*.whl
 EXPOSE $PORT
 
 # Command to run the application
-CMD ["sh", "-c", "python main.py", "--port", "$PORT"]
+CMD ["sh", "-c", "python main.py --port $PORT"]
