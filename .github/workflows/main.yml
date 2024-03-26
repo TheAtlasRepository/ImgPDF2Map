@@ -32,7 +32,7 @@ jobs:
           process_type: web # For more information look at https://devcenter.heroku.com/articles/process-model
           #Docker configuration
           dockerfile_directory: ./backend # Dockerfile directory.
-          dockerfile_name: /docker/prod.Dockerfile # Dockerfile name.
+          dockerfile_name: ./docker/prod.Dockerfile # Dockerfile name.
           docker_options: "--no-cache" # Additional options of docker build command.
 
         #frontend steps
@@ -51,6 +51,6 @@ jobs:
           process_type: web # For more information look at https://devcenter.heroku.com/articles/process-model
           #Docker configuration
           dockerfile_directory: ./frontend # Dockerfile directory.
-          dockerfile_name: /docker/prod.Dockerfile # Dockerfile name.
+          dockerfile_name: ./docker/prod.Dockerfile # Dockerfile name.
           docker_options: "--no-cache" # Additional options of docker build command.
           
