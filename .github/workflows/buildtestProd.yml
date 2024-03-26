@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Building docker-compose for production
         run: docker-compose -f docker-compose.prod.yml up --build
         #Todo: Add tests
