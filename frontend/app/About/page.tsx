@@ -15,7 +15,7 @@ export default function About() {
             </h1>
           <div className="w-100 p-6 card dark:bg-gray-800">
             <p className="text-lg text-secondary dark:text-gray-300">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque in dapibus neque. Vestibulum vitae nibh vel nibh faucibus elementum gravida eget augue. Cras fringilla iaculis interdum. Vivamus eu pellentesque felis, a blandit nibh. Suspendisse hendrerit varius maximus. Cras ullamcorper commodo tortor. Curabitur feugiat dignissim urna, et ultrices dui vulputate et. Aliquam in ligula urna. Maecenas vel vulputate justo, eget cursus nunc. Integer pellentesque, lorem et vehicula faucibus, sapien enim gravida ex, et sagittis ligula ipsum eu urna. Phasellus cursus justo eget lacus pretium, id fringilla ligula pretium. Donec suscipit, libero non ornare vehicula, est erat porta sapien, eget congue sem nisi vel orci. Nunc sollicitudin fermentum ante, ac porttitor lacus commodo id. Vestibulum congue dui est, sed laoreet velit ultricies quis.
+                Herllooo
             </p>
           </div>
         </div>
