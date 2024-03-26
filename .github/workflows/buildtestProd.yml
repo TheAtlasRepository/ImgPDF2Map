@@ -1,0 +1,13 @@
+name: DockerCompose Build and test prod
+on:
+  pull_request:
+    branches:
+      - dev
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Building docker-compose for production
+        run: docker-compose -f docker-compose.prod.yml up --build
+        #Todo: Add tests

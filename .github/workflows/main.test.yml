@@ -1,3 +1,5 @@
+#disable VScode warning for context access might be invalid
+#pragma: allowlist secret
 name: Deploy to Heroku
 
 on:
@@ -16,7 +18,7 @@ jobs:
       #backend steps
       - name: create backend .env file
         #Backend .env
-        run: echo "HOST_PORT='8000'\nCORS_ORIGINS='http://localhost,${{ vars.CORS_ORIGINS }}'/n" > backend/.env 
+        run: echo "HOST_PORT='8000'\nCORS_ORIGINS='http://localhost,${{ vars.CORS_ORIGINS }}'/nvars
       
       #todo: add tests step
       #build backend docker image
