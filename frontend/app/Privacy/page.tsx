@@ -28,7 +28,7 @@ export default function About() {
             </h2>
           <div className="w-100 p-6 card dark:bg-gray-800">
             <p className="text-lg text-secondary dark:text-gray-300">
-              We value your privacy and strive to keep your information secure. When you use our service, we only collect your IP address, which is utilized solely for improving our service and ensuring its security. We do not retain any other identifying information on our servers or logsWe value your privacy and strive to keep your information secure. When you use our service, we may collect information such as your IP address, hardware information, software  information and file names. This data is utilized solely for improving our service and for service security. We do not retain any other identifying information on our servers or logs, and the logs are deleted after a short period. If you are detected as misusing our service, you may be blocked from accessing it. We do not share your information with any third parties.
+              We value your privacy and strive to keep your information secure. When you use our service, we may collect information such as your IP address, hardware information, software  information and file names. This data is utilized solely for improving our service and for service security. We do not retain any other identifying information on our servers or logs, and the logs are deleted after a short period. If you are detected as misusing our service, you may be blocked from accessing it. We do not share your information with any third parties.
             </p>
           </div>
         </div>
