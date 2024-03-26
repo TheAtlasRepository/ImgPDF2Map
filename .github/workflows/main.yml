@@ -38,7 +38,7 @@ jobs:
         #frontend steps
       - name: create frontend .env file
         #Frontend .env
-        run: echo "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN='${{secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}}'/nBACKEND_API_URL='${{secrets.BACKEND_API_URL}}'\n" > frontend/.env
+        run: echo "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN='${{secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}}'/nNEXT_PUBLIC_BACKEND_URL='${{secrets.BACKEND_API_URL}}'\n" > frontend/.env
         
         #todo: add tests step
       - name: Frontend - Build, Push and Release a Docker container to Heroku.
