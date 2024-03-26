@@ -84,7 +84,7 @@ RUN if [ ! -f /app/.env ] && [ -f .env ]; then cp .env /app/; fi
 RUN pip install dist/*.whl
 
 # Expose port
-EXPOSE 8000
+EXPOSE $PORT
 
 # Command to run the application
-CMD ["sh", "-c", "python main.py"]
+CMD ["sh", "-c", "python main.py", "--port", "$PORT"]
