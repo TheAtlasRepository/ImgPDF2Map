@@ -6,6 +6,8 @@ on:
       - 'v.[0-9]+.[0-9]+.[0-9]'
       - '!v.*'
     branches-ignore:
+      - f_* #ignore feature branches
+      - b_* #ignore bugfix branches
       - '!dev'
 jobs:
   Build-and-deploy-backend-API-heroku:
