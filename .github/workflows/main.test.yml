@@ -22,7 +22,7 @@ jobs:
           echo "HOST_PORT=8000" > backend/.env
           echo "CORS_ORIGINS=http://localhost,${{ vars.CORS_ORIGINS }}" >> backend/.env
       
-      #todo: add tests step
+      #TODO: add tests step
       #build backend docker image
       - name: BackendAPI - Build, Push and Release a Docker container to Heroku.
         uses: gonuit/heroku-docker-deploy@v1.3.3
@@ -45,7 +45,7 @@ jobs:
           echo "NEXT_PUBLIC_BACKEND_URL=${{secrets.BACKEND_API_URL}}" >> frontend/.env
           echo "NEXT_PUBLIC_PDF_URLS=${{vars.NEXT_PUBLIC_PDF_URLS}}" >> frontend/.env
         
-        #todo: add tests step
+        #TODO: add tests step
       - name: Frontend - Build, Push and Release a Docker container to Heroku.
         uses: gonuit/heroku-docker-deploy@v1.3.3
         with:
