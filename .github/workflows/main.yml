@@ -5,7 +5,7 @@ on:
     branches:
       - dev
     tags:
-      - 'v.[0-9]+.[0-9]+.[0-9]+*'
+      - 'v.[0-9]+.[0-9]+.[0-9]+(!?-dev)?'
 
 jobs:
   build:
@@ -18,7 +18,7 @@ jobs:
       #backend steps
       - name: create backend .env file
         #Backend .env
-        run: echo "HOST_PORT='8000'\nCORS_ORIGINS='http://localhost,${{ vars.CORS_ORIGINS }}'/n" > backend/.env 
+        run: echo "HOST_PORT='8000'\nCORS_ORIGINS='http://localhost,${{ vars.CORS_ORIGINS }}'/n" > backend/.env
       
       #todo: add tests step
       #build backend docker image
@@ -38,8 +38,8 @@ jobs:
         #frontend steps
       - name: create frontend .env file
         #Frontend .env
-        run: echo "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN='${{secrets.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}}'/nNEXT_PUBLIC_BACKEND_URL='${{secrets.BACKEND_API_URL}}'\n" > frontend/.env
-        
+        run: echo "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN='${{secrets.MAPBOX_ACCESS_TOKEN}}'/nNEXT_PUBLIC_BACKEND_URL='${{secrets.BACKEND_API_URL}}'\nNEXT_PUBLIC_PDF_URLS='${{vars.NEXT_PUBLIC_PDF_URLS}}'\n" > frontend/.env
+
         #todo: add tests step
       - name: Frontend - Build, Push and Release a Docker container to Heroku.
         uses: gonuit/heroku-docker-deploy@v1.3.3
@@ -53,4 +53,3 @@ jobs:
           dockerfile_directory: ./frontend # Dockerfile directory.
           dockerfile_name: ./docker/prod.Dockerfile # Dockerfile name.
           docker_options: "--no-cache" # Additional options of docker build command.
-          
