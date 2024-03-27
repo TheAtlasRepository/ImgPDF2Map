@@ -18,7 +18,9 @@ jobs:
       #backend steps
       - name: create backend .env file
         #Backend .env
-        run: echo "HOST_PORT='8000'\nCORS_ORIGINS='http://localhost,${{ vars.CORS_ORIGINS }}'/n" > backend/.env
+        run: |
+          echo "HOST_PORT=8000" > backend/.env
+          echo "CORS_ORIGINS=http://localhost,${{ vars.CORS_ORIGINS }}" >> backend/.env
       
       #todo: add tests step
       #build backend docker image
@@ -38,8 +40,11 @@ jobs:
         #frontend steps
       - name: create frontend .env file
         #Frontend .env
-        run: echo "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{secrets.MAPBOX_ACCESS_TOKEN}}/nNEXT_PUBLIC_BACKEND_URL=${{secrets.BACKEND_API_URL}}\nNEXT_PUBLIC_PDF_URLS=${{vars.NEXT_PUBLIC_PDF_URLS}}\n" > frontend/.env
-
+        run: |
+          echo "NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN=${{secrets.MAPBOX_ACCESS_TOKEN}}" > frontend/.env
+          echo "NEXT_PUBLIC_BACKEND_URL=${{secrets.BACKEND_API_URL}}" >> frontend/.env
+          echo "NEXT_PUBLIC_PDF_URLS=${{vars.NEXT_PUBLIC_PDF_URLS}}" >> frontend/.env
+        
         #todo: add tests step
       - name: Frontend - Build, Push and Release a Docker container to Heroku.
         uses: gonuit/heroku-docker-deploy@v1.3.3
