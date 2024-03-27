@@ -60,7 +60,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/next.config.js ./
 #copy nessessary files for yarn start
 
 #see if .env is in working dir if not (copy .env if not exist then .env.local if not exist exit)
-RUN RUN if [ ! -f /app/.env ] && [ -f .env ]; then cp .env /app/; fi
+RUN if [ ! -f /app/.env ] && [ -f .env ]; then cp .env /app/; fi
 USER nextjs
 
 EXPOSE 3000
