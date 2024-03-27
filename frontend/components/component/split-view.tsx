@@ -321,6 +321,9 @@ export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
           </Map>
         </Allotment.Pane>
         <Allotment.Pane minSize={200} className="bg-gray-100">
+        {isCoordList && (
+            <CoordinateList georefMarkerPairs={georefMarkerPairs} />
+          )}
           <div className="w-full overflow-visible">
             <ImageMap
               src={localStorage.getItem("pdfData")!}
@@ -362,9 +365,6 @@ export default function SplitView({ isCoordList, projectId }: SplitViewProps) {
               </div>
             ))}
           </div>
-          {isCoordList && (
-            <CoordinateList georefMarkerPairs={georefMarkerPairs} />
-          )}
         </Allotment.Pane>
       </Allotment>
     </div>
