@@ -2,13 +2,11 @@ name: Deploy to Heroku
 
 on:
   push:
-    branches:
-      - dev
     tags:
-      - 'v.*.*.*'
-      - '!v.*.*.*-dev'
-      - '!v.*.*.*-alpha'
-
+      - 'v.[0-9]+.[0-9]+.[0-9]'
+      - '!v.*'
+    branches-ignore:
+      - '!dev'
 jobs:
   Build-and-deploy-backend-API-heroku:
     runs-on: ubuntu-latest
