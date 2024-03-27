@@ -20,7 +20,7 @@ jobs:
         #Backend .env
         run: |
           echo "HOST_PORT=8000" > backend/.env
-          echo "CORS_ORIGINS=http://localhost,${{ vars.CORS_ORIGINS }}" >> backend/.env
+          echo "CORS_ORIGINS='http://localhost,${{ vars.CORS_ORIGINS }}'" >> backend/.env
       
       #TODO: add tests step
       #build backend docker image
