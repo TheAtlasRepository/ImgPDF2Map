@@ -24,6 +24,7 @@ if load_dotenv('./.env'):
     try:
         origins = get_key('./.env',key_to_get='CORS_ORIGINS')
         origins = origins.split(',')
+        print(f"Origins: {origins}")
     except:
         print("Error getting CORS_ORIGINS from environment variables")
         pass
